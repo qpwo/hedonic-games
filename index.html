@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
+
     <style type="text/css">
-#container {
-  max-width: 400px;
+#outergraphbox {
+  width: 400px;
   height: 400px;
   margin: auto;
+  border: 1px solid black;
+}
+#innergraphbox {
+  width: 400px;
+  height: 400px;
 }
     </style>
+
+    <script src="sigma.min.js"></script>
+    <script src="sigma.parsers.json.min.js"></script>
   </head>
   <body>
     <p> Hello World! </p>
     <p> And hello to you too! </p>
-    <div id="container"></div>
-    <script src="sigma.min.js"></script>
-    <script src="sigma.parsers.json.min.js"></script>
+    <div id="outergraphbox"><div id="innergraphbox"></div></div>
     <script>
 sigma.parsers.json('data.json', {
-  container: 'container',
+  container: 'innergraphbox',
   settings: {
     defaultNodeColor: '#ec5148'
   }
