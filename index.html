@@ -28,20 +28,6 @@
     <script src="main.js"></script>
 
     <script>
-var s = new sigma('innergraphbox');
-var count = 1;
-function addRandomNode() {
-  count = count + 1;
-  s.graph.addNode({
-    id: 'n' + count.toString(),
-    label: 'node number ' + count.toString(),
-    x: Math.random(),
-    y: Math.random(),
-    size: 1,
-    color: '#F00'
-  });
-  s.refresh();
-}
     </script>
 
     <button type="button" onclick="addRandomNode()">Add random node</button><br>
