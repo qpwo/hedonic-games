@@ -25,6 +25,7 @@
     <div id="outergraphbox"><div id="innergraphbox"></div></div>
 
     <script src="sigma.min.js"></script>
+    <script src="main.js"></script>
 
     <script>
 var s = new sigma('innergraphbox');
@@ -43,6 +44,9 @@ function addRandomNode() {
 }
     </script>
 
-    <button type="button" onclick="addRandomNode()">Add random node</button>
+    <button type="button" onclick="addRandomNode()">Add random node</button><br>
+    Node Name: <input type="text" name="nodeName" id="nodeName"><br>
+    Node X: <input type="text" name="nodeX" id="nodeX"> Node Y: <input type="text" name="nodeY" id="nodeY"> <br>
+    <button type="button" onclick="addNode()">Add node with information</button><br>
   </body>
 </html>
