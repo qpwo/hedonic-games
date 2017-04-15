@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
 
+  <head>
     <style type="text/css">
 #outergraphbox {
   width: 400px;
@@ -14,21 +14,35 @@
   height: 400px;
 }
     </style>
+  </head>
+
+  <body>
+
+    <p> Hello World! </p>
+
+    <p> And hello to you too! </p>
+
+    <div id="outergraphbox"><div id="innergraphbox"></div></div>
 
     <script src="sigma.min.js"></script>
-    <script src="sigma.parsers.json.min.js"></script>
-  </head>
-  <body>
-    <p> Hello World! </p>
-    <p> And hello to you too! </p>
-    <div id="outergraphbox"><div id="innergraphbox"></div></div>
+
     <script>
-sigma.parsers.json('data.json', {
-  container: 'innergraphbox',
-  settings: {
-    defaultNodeColor: '#ec5148'
-  }
-});
+var s = new sigma('innergraphbox');
+var count = 1;
+function addRandomNode() {
+  count = count + 1;
+  s.graph.addNode({
+    id: 'n' + count.toString(),
+    label: 'node number ' + count.toString(),
+    x: Math.random(),
+    y: Math.random(),
+    size: 1,
+    color: '#F00'
+  });
+  s.refresh();
+}
     </script>
+
+    <button type="button" onclick="addRandomNode()">Add random node</button>
   </body>
 </html>
