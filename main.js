@@ -7,6 +7,7 @@ function randomSelect(array) {
 
 var s = new sigma('innergraphbox');
 var creatingCoalition = false;
+var coalitions = { "testCoalition": [ ] };
 
 function addRandomNode(name="none") {
   // add a random node to the graph
@@ -135,16 +136,42 @@ function displayNetwork() {
 
 // Functions for the coalition creation interface
 
-function modifyCreateCoalitionState()
+function updateCoalitionInterface()
 {
     if (creatingCoalition)
     {
-        creatingCoalition = false;
+        // Modify the HTML
+        document.getElementById("createNewCoalition").innerHTML = "Add nodes to coaltion";
+        document.getElementById("coalitionNodeListHeader").innerHTML = "Current nodes in coalition";
+
+        // Create the list of coalition nodes
+        var nodeHTML = "";
+        for (i = 0; i < coalitions["testCoalition"].length; i++)
+        {
+            nodeHTML += "<li>"+coalitions["testCoalition"][i]+"</li>";
+        }
+        document.getElementById("coalitionNodeList").innerHTML = nodeHTML;
     }
     else
     {
+        // Modify the HTML
+        document.getElementById("createNewCoalition").innerHTML = "Create new coalition";
+        document.getElementById("coalitionNodeListHeader").innerHTML = "";
+        document.getElementById("coalitionNodeList").innerHTML = "";
+    }
+}
+
+function modifyCreateCoalitionState()
+{
+    if (!creatingCoalition)
+    {
         creatingCoalition = true;
     }
+    else
+    {
+        creatingCoalition = false;
+    }
+    updateCoalitionInterface();
 }
 // Handlers for events when the user interacts with the graph
 
@@ -153,7 +180,16 @@ function clickNodeHandler(event)
 {
     if (creatingCoalition)
     {
-        alert("You clicked on " + event.data.node.label + "!");
+        var nodeId = event.data.node.id;
+        if (coalitions["testCoalition"].indexOf(nodeId) != -1)
+        {
+            alert("The node " + nodeId + " is already in the coalition!");
+        }
+        else
+        {
+            coalitions["testCoalition"].push(nodeId);
+            updateCoalitionInterface();
+        }
     }
 }
 

@@ -28,15 +28,17 @@
         <div class="span8"> 
             <div id="outergraphbox"><div id="innergraphbox"></div></div>
         </div>
-        <div class="span8">
+        <div class="span4">
             <h3>Coalition Management</h3>
-            <button type="button" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</input>
+            <button type="button" class="btn" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</input>
+        </div>
+        <div class="span4">
+            <h4 id="coalitionNodeListHeader"></h4>
+            <ul id="coalitionNodeList">
+            </ul>
         </div>
     </div>
     
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="sigma.min.js"></script>
-    <script src="sigma.parsers.json.min.js"></script>
     <script src="main.js"></script>
 
     <h3> add nodes: </h3>
