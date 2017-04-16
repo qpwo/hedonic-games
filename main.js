@@ -10,6 +10,17 @@ var creatingCoalition = false;
 var coalitions = { };
 var coalitionName = "";
 
+function displayRanking() {
+  var node = document.getElementById("nodeSelect").value;
+  var network = makeGraphObject();
+  var rankedCoalitions = rankCoalitions(network, node, coalitions);
+  var result = "";
+  for (var i = 0; i < rankedCoalitions.length; i++) {
+    result += i.toString() + " : " + rankedCoalitions[i].toString() + "<br/>";
+  }
+  document.getElementById("coalitionRanking").innerHTML = result;
+}
+
 function addRandomNode(name="none") {
   // add a random node to the graph
   if (name == "none")
