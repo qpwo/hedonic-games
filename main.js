@@ -3,6 +3,24 @@ var s = new sigma('innergraphbox');
 var totalNumNodes = 0;
 var totalNumEdges = 0;
 
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if (rawFile.readyState === 4)
+        {
+            if (rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                return allText;
+            }
+        }
+    }
+    rawFile.send(null);
+}
+
 function addRandomNode() {
   s.graph.addNode({
     id: 'n' + totalNumNodes.toString(),
@@ -73,4 +91,15 @@ function addList() {
     }
   }
   s.refresh();
+}
+
+function readJSON()
+{
+    sigma.parsers.json(
+        'sample.json',
+        s,
+        function() {
+            s.refresh();
+        }
+    );
 }
