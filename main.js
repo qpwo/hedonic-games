@@ -1,39 +1,24 @@
-function readTextFile(file) {
-  // does ...
-  var rawFile = new XMLHttpRequest();
-  rawFile.open("GET", file, false);
-  rawFile.onreadystatechange = function ()
-  {
-    if (rawFile.readyState === 4)
-    {
-      if (rawFile.status === 200 || rawFile.status == 0)
-      {
-        var allText = rawFile.responseText;
-        return allText;
-      }
-    }
-  }
-  rawFile.send(null);
+// ** general functions **
+function randomSelect(array) {
+  return array[Math.floor(Math.random() * array.length)];
 }
+
+// ** specific for graph stuff **
 
 var s = new sigma('innergraphbox');
 
-var totalNumNodes = 0;
-var totalNumEdges = 0;
-
-
 function addRandomNode() {
   // add a random node to the graph
+  var nodename = 'n' + s.graph.nodes().length.toString();
   s.graph.addNode({
-    id: 'n' + totalNumNodes.toString(),
-    label: 'n' + totalNumNodes.toString(),
+    id: nodename,
+    label: nodename,
     x: Math.random(),
     y: Math.random(),
     size: 1,
     color: '#F00'
   });
   s.refresh();
-  totalNumNodes++;
 }
 
 function addNode() {
@@ -50,18 +35,24 @@ function addNode() {
     color: '#F00'
   });
   s.refresh();
-  totalNumNodes++;
 }
+
 
 function addRandomEdge() {
   // add a random edge to the graph
+  // note: this does not guarantee that the edge is new
+  var nodes = s.graph.nodes().map(function(nodeObject) {return nodeObject.id});
+  var source = randomSelect(nodes);
+  var target = randomSelect(nodes);
+  while (source == target) {
+    target = randomSelect(nodes);
+  }
   s.graph.addEdge({
-    id: 'e' + totalNumEdges.toString(),
-    source: 'n' + Math.floor(Math.random() * totalNumNodes).toString(),
-    target: 'n' + Math.floor(Math.random() * totalNumNodes).toString(),
+    id: 'edge' + source + '-' + target,
+    source: source,
+    target: target
   });
   s.refresh();
-  totalNumEdges++;
 }
 
 function addEdge() {
@@ -69,12 +60,11 @@ function addEdge() {
   var source = document.getElementById('edgeSource').value;
   var target = document.getElementById('edgeTarget').value;
   s.graph.addEdge({
-    id: 'e' + totalNumEdges.toString(),
+    id: 'edge' + source + '-' + target,
     source: source,
     target: target,
   });
   s.refresh();
-  totalNumEdges++;
 }
 
 function addList() {
@@ -86,29 +76,28 @@ function addList() {
     var split1 = line.split(':');
     var source = split1[0];
     var targets = split1[1].split(',');
-    for (var j = 1; j < targets.length; j++) {
-      console.log("Adding edge from", source, "to", targets[j], ".");
+    for (var j = 0; j < targets.length; j++) {
+      var target = targets[j];
       s.graph.addEdge({
-        id: 'e' + totalNumEdges.toString(),
+        id: 'edge' + source + '-' + target,
         source: source,
-        target: targets[j]
+        target: target
       });
-      totalNumEdges++;
     }
   }
   s.refresh();
 }
 
-function readJSON()
-{
-    fileName = document.getElementById("getFile").files[0].name;
-    sigma.parsers.json(
-        fileName,
-        s,
-        function() {
-            s.refresh();
-        }
-    );
+function readJSON() {
+  // replaces whatever is on the graph with the contents of a JSON file
+  fileName = document.getElementById("getFile").files[0].name;
+  sigma.parsers.json(
+    fileName,
+    s,
+    function() {
+      s.refresh();
+    }
+  );
 }
 
 function makeGraphObject() {
