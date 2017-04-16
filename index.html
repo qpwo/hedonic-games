@@ -30,14 +30,16 @@
         </div>
         <div class="span4">
             <h3>Coalition Management</h3>
-            <input type="text" name="coalitionName" id="coalitionName" placeholder="Coalition Name"></input>
-            <button type="button" class="btn" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</button>
-            <select id="coalitionList" name="coalitionList" onchange="updateCoalitionInterface()">
-                <!-- Values here will be created by main.js -->
-            </select>
-            <button type="button" class="btn" id="saveCoalitionConfiguration" onclick="saveCoalitionConfiguration()">Save Coalition Configuration</button>
-            <button type="button" class="btn" id="loadCoalitionConfiguration" onclick="document.getElementById('getCoalitionFile').click()">Load Coalition Configuration</button>
-            <input type="file" id="getCoalitionFile" style="display:none" onchange="loadCoalitionConfiguration()"></input>
+            <ul>
+              <li> <input type="text" name="coalitionName" id="coalitionName" placeholder="Coalition Name"></input> </li>
+              <li> <button type="button" class="btn" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</button> </li>
+              <li> <select id="coalitionList" name="coalitionList" onchange="updateCoalitionInterface()"> </select> </li>
+              <li> <button type="button" class="btn" id="saveCoalitionConfiguration" onclick="saveCoalitionConfiguration()">Save Coalition Configuration</button> </li>
+              <li> <button type="button" class="btn" id="loadCoalitionConfiguration" onclick="document.getElementById('getCoalitionFile').click()">Load Coalition Configuration</button> </li>
+              <li> <input type="file" id="getCoalitionFile" style="display:none" onchange="loadCoalitionConfiguration()"></input> </li>
+              <li> <input type="text" id="coalitionColor" placeholder="color for coalition"></input> </li>
+              <li> <button type="button" class="btn" onclick="colorCurrentCoalition()">Color coalition</button> </li>
+            </ul>
         </div>
         <div class="span4">
             <h4 id="coalitionNodeListHeader"></h4>

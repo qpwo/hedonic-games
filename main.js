@@ -97,6 +97,20 @@ function addList() {
   s.refresh();
 }
 
+
+// color a subgraph induced by a set of nodes (node IDs)
+function colorSubgraph(nodes, color) {
+  for (let nodeObject of s.graph.nodes(nodes)) {
+    nodeObject.color = color;
+  }
+  for (let edge of s.graph.edges()) {
+    if (nodes.includes(edge.source) && nodes.includes(edge.target)) {
+      edge.color = color;
+    }
+  }
+  s.refresh();
+}
+
 function readJSON() {
   // replaces whatever is on the graph with the contents of a JSON file
   fileName = document.getElementById("getFile").files[0].name;
@@ -137,12 +151,23 @@ function displayNetwork() {
 
 // Functions for the coalition creation interface
 
+function currentCoalition() {
+  var coalitionName = document.getElementById("coalitionList").value;
+  return coalitions[coalitionName];
+}
+
+function colorCurrentCoalition() {
+  var color = document.getElementById("coalitionColor").value;
+  colorSubgraph(currentCoalition(), color);
+}
+
+
 function updateCoalitionInterface()
 {
     if (creatingCoalition)
     {
         // Modify the HTML
-        document.getElementById("createNewCoalition").innerHTML = "Add nodes to coaltion";
+        document.getElementById("createNewCoalition").innerHTML = "Add nodes to coalition";
         document.getElementById("coalitionNodeListHeader").innerHTML = "Current nodes in coalition";
 
         // Create the list of coalition nodes
