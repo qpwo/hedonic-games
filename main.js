@@ -95,8 +95,9 @@ function addList() {
 
 function readJSON()
 {
+    fileName = document.getElementById("getFile").value;
     sigma.parsers.json(
-        'sample.json',
+        fileName,
         s,
         function() {
             s.refresh();

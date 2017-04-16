@@ -45,8 +45,8 @@
     <button type="button" onclick="addList()"> Add list</button></p>
 
     <h3> JSON input: </h3>
-    <button type="button" onclick="readJSON()"> Read local JSON</button></p>
-
+    <input type="file" id="getFile" style="display:none" onchange="readJSON()"></input>
+    <button type="button" onclick="document.getElementById('getFile').click()"> Read JSON</button></p>
 
     <h3> Plaintext output: </h3>
     <p>  <button type="button" onclick="displayNetwork()">Convert Network to String</button> </p>
