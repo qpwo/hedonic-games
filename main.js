@@ -8,12 +8,13 @@ function randomSelect(array) {
 var s = new sigma('innergraphbox');
 var creatingCoalition = false;
 
-function addRandomNode() {
+function addRandomNode(name="none") {
   // add a random node to the graph
-  var nodename = 'n' + s.graph.nodes().length.toString();
+  if (name == "none")
+    name = 'n' + s.graph.nodes().length.toString();
   s.graph.addNode({
-    id: nodename,
-    label: nodename,
+    id: name,
+    label: name,
     x: Math.random(),
     y: Math.random(),
     size: 1,
@@ -69,16 +70,21 @@ function addEdge() {
 }
 
 function addList() {
-  // add all the edges to the graph that are described in the big text field
+  // replace the current graph with the one described in the big text box on the webpage
+  s.graph.clear();
   var bigString = document.getElementById('bigString').value;
   var lines = bigString.split('\n');
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i].replace(/ /g, '');
     var split1 = line.split(':');
     var source = split1[0];
+    if (!s.graph.nodes(source))
+      addRandomNode(source);
     var targets = split1[1].split(',');
     for (var j = 0; j < targets.length; j++) {
       var target = targets[j];
+      if (!s.graph.nodes(target))
+        addRandomNode(target);
       s.graph.addEdge({
         id: 'edge' + source + '-' + target,
         source: source,
