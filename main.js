@@ -17,9 +17,9 @@ function addRandomNode() {
 }
 
 function addNode() {
-  name = document.getElementById('nodeName').value;
-  xPosition = parseFloat(document.getElementById('nodeX').value);
-  yPosition = parseFloat(document.getElementById('nodeY').value);
+  var name = document.getElementById('nodeName').value;
+  var xPosition = parseFloat(document.getElementById('nodeX').value);
+  var yPosition = parseFloat(document.getElementById('nodeY').value);
   s.graph.addNode({
     id: name,
     label: name,
@@ -43,8 +43,8 @@ function addRandomEdge() {
 }
 
 function addEdge() {
-  source = document.getElementById('edgeSource').value;
-  target = document.getElementById('edgeTarget').value;
+  var source = document.getElementById('edgeSource').value;
+  var target = document.getElementById('edgeTarget').value;
   s.graph.addEdge({
     id: 'e' + totalNumEdges.toString(),
     source: source,
@@ -52,4 +52,25 @@ function addEdge() {
   });
   s.refresh();
   totalNumEdges++;
+}
+
+function addList() {
+  var bigString = document.getElementById('bigString').value;
+  var lines = bigString.split('\n');
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].replace(/ /g, '');
+    var split1 = line.split(':');
+    var source = split1[0];
+    var targets = split1[1].split(',');
+    for (var j = 1; j < targets.length; j++) {
+      console.log("Adding edge from", source, "to", targets[j], ".");
+      s.graph.addEdge({
+        id: 'e' + totalNumEdges.toString(),
+        source: source,
+        target: targets[j]
+      });
+      totalNumEdges++;
+    }
+  }
+  s.refresh();
 }
