@@ -103,3 +103,27 @@ function readJSON()
         }
     );
 }
+
+
+function displayNetwork() {
+  document.getElementById("outputString").innerHTML = "Computing...";
+  var nodes = s.graph.nodes();
+  var edges = s.graph.edges();
+  var graph = {};
+  for (var i = 0; i < nodes.length; i++) {
+    graph[nodes[i].id] = [];
+  }
+  for (p in graph) {
+    console.log(p);
+  }
+  for (var i = 0; i < edges.length; i++) {
+    var edge = edges[i];
+    graph[edge.source].push(edge.target);
+  }
+  result = "";
+  for (var i = 0; i < nodes.length; i++) {
+    node = nodes[i].id;
+    result += node + ":" + graph[node].toString() + "<br/>";
+  }
+  document.getElementById("outputString").innerHTML = result;
+}
