@@ -16,12 +16,8 @@ ul, li{
   padding: 5px 0px;
 }
 
-button, select{
-    margin-top: 12px;
-}
-
 #removeNodeFromCoalition {
-    margin-left: 12px;
+  margin-left: 12px;
 }
 
 #outergraphbox {
