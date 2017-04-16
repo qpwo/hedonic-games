@@ -30,11 +30,17 @@
         </div>
         <div class="span4">
             <h3>Coalition Management</h3>
-            <button type="button" class="btn" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</input>
+            <input type="text" name="coalitionName" id="coalitionName" placeholder="Coalition Name"></input>
+            <button type="button" class="btn" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</button>
+            <select id="coalitionList">
+                <!-- Values here will be created by main.js -->
+            </select>
+            <button type="button" class="btn" id="modifyExistingCoalition" onclick="modifyExistingCoalition()">Modify Existing Coalition</button>
         </div>
         <div class="span4">
             <h4 id="coalitionNodeListHeader"></h4>
             <ul id="coalitionNodeList">
+                <!-- Values here will be created by main.js -->
             </ul>
         </div>
     </div>
