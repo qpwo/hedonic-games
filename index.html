@@ -6,85 +6,80 @@
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="http://fonts.googleapis.com/css?family=Corben:bold" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Nobile" rel="stylesheet" type="text/css">
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="sigma.min.js"></script>
+    <script src="sigma.parsers.json.min.js"></script>
+
     <style type="text/css">
-    #outergraphbox {
-      width: 400px;
-      height: 400px;
-      margin: auto;
-      border: 1px solid black;
-    }
-    #innergraphbox {
-      width: 400px;
-      height: 400px;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Corben';
-    }
-    p, div {
-        font-family: 'Nobile';
-    }
+#outergraphbox {
+  width: 400px;
+  height: 400px;
+  margin: auto;
+  border: 1px solid black;
+}
+#innergraphbox {
+  width: 400px;
+  height: 400px;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Corben';
+}
+p, div {
+  font-family: 'Nobile';
+}
+ul li{
+  list-style-type: none;
+  padding: 5px 0px;
+}
     </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
 
   <body>
     <h1 class="text-center">Hedonic Game Visualizer</h1>
     <h4 class="text-center"> Welcome to the hedonic game visualizer!  This software was made by
-    Joshua Baunach and Luke Miles on 2017 April 15. </h4>
+      Joshua Baunach and Luke Miles on 2017 April 15. </h4>
 
     <div id="outergraphbox"><div id="innergraphbox"></div></div>
-    
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="sigma.min.js"></script>
-    <script src="sigma.parsers.json.min.js"></script>
+
     <script src="main.js"></script>
 
     <h3> Nodes: </h3>
-    <div class="row">
-        <div class="span4">
-            <p> <button type="button" onclick="addRandomNode()">Add random node</button> </p>
-        </div>
-        <div class="span4">
-            <p> Node Name: <input type="text" name="nodeName" id="nodeName">
-            Node X: <input type="text" name="nodeX" id="nodeX">
-            Node Y: <input type="text" name="nodeY" id="nodeY"> </p>
-            <p> <button type="button" onclick="addNode()">Add node with information</button><br> </p>
-        </div>
-    </div>
+    <ul>
+      <li> <button type="button" class="btn" onclick="addRandomNode()">Add random node</button> </li>
+      <li> Node Name: <input type="text" name="nodeName" id="nodeName"> </li>
+      <li> Node X: <input type="text" name="nodeX" id="nodeX"> </li>
+      <li> Node Y: <input type="text" name="nodeY" id="nodeY"> </li>
+      <li> <button type="button" class="btn" onclick="addNode()">Add node with information</button> </li>
+    </ul>
+
     <h3> Edges: </h3>
-    <div class="row">
-        <div class="span4">
-            <p> <button type="button" onclick="addRandomEdge()">Add random edge</button> </p>
-        </div>
-        <div class="span4">
-            Edge Source ID: <input type="text" name="edgeSource" id="edgeSource">
-            Edge Destination ID: <input type="text" name="edgeTarget" id="edgeTarget"> </p>
-            <p> <button type="button" onclick="addEdge()">Add edge with information</button><br> </p>
-        </div>
-    </div>
+    <ul>
+      <li> <button type="button" class="btn" onclick="addRandomEdge()">Add random edge</button> </li>
+      <li> Edge Source ID: <input type="text" name="edgeSource" id="edgeSource"> </li>
+      <li> Edge Destination ID: <input type="text" name="edgeTarget" id="edgeTarget"> </li>
+      <li> <button type="button" class="btn" onclick="addEdge()">Add edge with information</button> </li>
+    </ul>
 
     <h3> Mixup: </h3>
-    <div class="row">
-        <div class="span4">
-            <p> List of nodes and edges: <textarea name="bigString" id="bigString" cols="40" rows="5"></textarea>
-            <button type="button" onclick="addList()"> Add list</button></p>
-        </div>
-    </div>
+    <ul>
+      <li> List of nodes and edges: </li>
+      <li> <textarea name="bigString" id="bigString" cols="40" rows="5"></textarea> </li>
+      <li> <button type="button" class="btn" onclick="addList()"> Add list</button> </li>
+    </ul>
 
     <h3> JSON input: </h3>
-    <div class="row">
-        <div class="span4">
-            <input type="file" id="getFile" style="display:none" onchange="readJSON()"></input>
-            <button type="button" onclick="document.getElementById('getFile').click()"> Read JSON</button></p>
-        </div>
-    </div>
+    <ul>
+      <li> <input type="file" id="getFile" style="display:none" onchange="readJSON()"></input>
+        <button type="button" class="btn" onclick="document.getElementById('getFile').click()"> Read JSON</button> </li>
+    </ul>
 
     <h3> Plaintext output: </h3>
-    <div class="row">
-        <div class="span4">
-            <p>  <button type="button" onclick="displayNetwork()">Convert Network to String</button> </p>
-            <p id="outputString"></p>
-        </div>
-    </div>
+    <ul>
+      <li> <button type="button" class="btn" onclick="displayNetwork()">Convert Network to String</button> </li>
+      <li> <p id="outputString"></p> </li>
+    </ul>
+
   </body>
+
 </html>
