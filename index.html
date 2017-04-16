@@ -28,11 +28,20 @@
   </head>
 
   <body>
+  
     <h1 class="text-center">Hedonic Game Visualizer</h1>
     <h4 class="text-center"> Welcome to the hedonic game visualizer!  This software was made by
     Joshua Baunach and Luke Miles on 2017 April 15. </h4>
 
-    <div id="outergraphbox"><div id="innergraphbox"></div></div>
+    <div class="row">
+        <div class="span8"> 
+            <div id="outergraphbox"><div id="innergraphbox"></div></div>
+        </div>
+        <div class="span8">
+            <h3>Coalition Management</h3>
+            <button type="button" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</input>
+        </div>
+    </div>
     
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="sigma.min.js"></script>

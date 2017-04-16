@@ -6,6 +6,7 @@ function randomSelect(array) {
 // ** specific for graph stuff **
 
 var s = new sigma('innergraphbox');
+var creatingCoalition = false;
 
 function addRandomNode() {
   // add a random node to the graph
@@ -125,3 +126,30 @@ function displayNetwork() {
   }
   document.getElementById("outputString").innerHTML = result;
 }
+
+// Functions for the coalition creation interface
+
+function modifyCreateCoalitionState()
+{
+    if (creatingCoalition)
+    {
+        creatingCoalition = false;
+    }
+    else
+    {
+        creatingCoalition = true;
+    }
+}
+// Handlers for events when the user interacts with the graph
+
+// Handler for clicking a node
+function clickNodeHandler(event)
+{
+    if (creatingCoalition)
+    {
+        alert("You clicked on " + event.data.node.label + "!");
+    }
+}
+
+// Code to initialize the page
+s.bind("clickNode", clickNodeHandler);
