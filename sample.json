@@ -1,0 +1,45 @@
+{
+    "nodes": [
+        {
+            "id": "ANeatNode",
+            "label": "ANeatNode",
+            "x": 0,
+            "y": 0,
+            "size": 3,
+            "color": "#F00"
+        },
+        {
+            "id": "ANeaterNode",
+            "label": "ANeaterNode",
+            "x": 3,
+            "y": 1,
+            "size": 2,
+            "color": "#F00"
+        },
+        {
+            "id": "TheNeatestNode",
+            "label": "TheNeatestNode",
+            "x": 1,
+            "y": 3,
+            "size": 1,
+            "color": "#F00"
+        }
+    ],
+    "edges": [
+        {
+            "id": "edgy0",
+            "source": "ANeatNode",
+            "target": "ANeaterNode"
+        },
+        {
+            "id": "edgy1",
+            "source": "ANeaterNode",
+            "target": "TheNeatestNode"
+        },
+        {
+            "id": "edgy2",
+            "source": "TheNeatestNode",
+            "target": "ANeatNode"
+        }
+    ]
+}
