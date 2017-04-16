@@ -14,6 +14,8 @@
     <script src="sigma.min.js"></script>
     <script src="sigma.parsers.json.min.js"></script>
 
+    <!-- hedonic game algorithms -->
+
     <!-- our stylesheet -->
     <link rel="stylesheet" type="text/css" href="mystyle.css" />
   </head>
@@ -50,7 +52,18 @@
         </div>
     </div>
     
+    <script src="hedonism.js"></script>
     <script src="main.js"></script>
+
+    <h3> evaluate coalitions: </h3>
+    <ul>
+      <li> Select level of altruims: (TODO)</li>
+      <li> From who's perspective?
+        <input type=text id=nodeSelect placeholder="enter node id"> </input>
+      </li>
+      <li> <button class="btn" onclick="displayRanking()">Rank!</button> </li>
+      <li> Ranking: <p id=coalitionRanking></p><li>
+    </ul>
 
     <h3> add nodes: </h3>
     <ul>
