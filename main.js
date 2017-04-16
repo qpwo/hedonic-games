@@ -101,7 +101,7 @@ function addList() {
 
 function readJSON()
 {
-    fileName = document.getElementById("getFile").value;
+    fileName = document.getElementById("getFile").files[0].name;
     sigma.parsers.json(
         fileName,
         s,
