@@ -4,47 +4,32 @@
   <head>
     <!-- Bootstrap -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="http://fonts.googleapis.com/css?family=Corben:bold" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Nobile" rel="stylesheet" type="text/css">
     <script src="bootstrap/js/bootstrap.min.js"></script>
 
+    <!-- nice google fonts -->
+    <link href="http://fonts.googleapis.com/css?family=Corben:bold" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Nobile" rel="stylesheet" type="text/css">
+
+    <!-- graph library -->
     <script src="sigma.min.js"></script>
     <script src="sigma.parsers.json.min.js"></script>
 
-    <style type="text/css">
-#outergraphbox {
-  width: 400px;
-  height: 400px;
-  margin: auto;
-  border: 1px solid black;
-}
-#innergraphbox {
-  width: 400px;
-  height: 400px;
-}
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Corben';
-}
-p, div {
-  font-family: 'Nobile';
-}
-ul li{
-  list-style-type: none;
-  padding: 5px 0px;
-}
-    </style>
+    <!-- our stylesheet -->
+    <link rel="stylesheet" type="text/css" href="mystyle.css" />
   </head>
 
   <body>
+
     <h1 class="text-center">Hedonic Game Visualizer</h1>
+
     <h4 class="text-center"> Welcome to the hedonic game visualizer!  This software was made by
       Joshua Baunach and Luke Miles on 2017 April 15. </h4>
 
+    <!-- load in the interactive graph -->
     <div id="outergraphbox"><div id="innergraphbox"></div></div>
-
     <script src="main.js"></script>
 
-    <h3> Nodes: </h3>
+    <h3> add nodes: </h3>
     <ul>
       <li> <button type="button" class="btn" onclick="addRandomNode()">Add random node</button> </li>
       <li> Node Name: <input type="text" name="nodeName" id="nodeName"> </li>
@@ -53,7 +38,7 @@ ul li{
       <li> <button type="button" class="btn" onclick="addNode()">Add node with information</button> </li>
     </ul>
 
-    <h3> Edges: </h3>
+    <h3> add edges: </h3>
     <ul>
       <li> <button type="button" class="btn" onclick="addRandomEdge()">Add random edge</button> </li>
       <li> Edge Source ID: <input type="text" name="edgeSource" id="edgeSource"> </li>
@@ -61,20 +46,20 @@ ul li{
       <li> <button type="button" class="btn" onclick="addEdge()">Add edge with information</button> </li>
     </ul>
 
-    <h3> Mixup: </h3>
+    <h3> add edge-map: </h3>
     <ul>
       <li> List of nodes and edges: </li>
       <li> <textarea name="bigString" id="bigString" cols="40" rows="5"></textarea> </li>
       <li> <button type="button" class="btn" onclick="addList()"> Add list</button> </li>
     </ul>
 
-    <h3> JSON input: </h3>
+    <h3> load from JSON file: </h3>
     <ul>
       <li> <input type="file" id="getFile" style="display:none" onchange="readJSON()"></input>
         <button type="button" class="btn" onclick="document.getElementById('getFile').click()"> Read JSON</button> </li>
     </ul>
 
-    <h3> Plaintext output: </h3>
+    <h3> convert graph to plaintext edge-map: </h3>
     <ul>
       <li> <button type="button" class="btn" onclick="displayNetwork()">Convert Network to String</button> </li>
       <li> <p id="outputString"></p> </li>
