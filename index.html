@@ -32,17 +32,16 @@
             <h3>Coalition Management</h3>
             <input type="text" name="coalitionName" id="coalitionName" placeholder="Coalition Name"></input>
             <button type="button" class="btn" id="createNewCoalition" onclick="modifyCreateCoalitionState()">Create new Coalition</button>
-            <select id="coalitionList">
+            <select id="coalitionList" name="coalitionList" onchange="updateCoalitionInterface()">
                 <!-- Values here will be created by main.js -->
             </select>
-            <button type="button" class="btn" id="modifyExistingCoalition" onclick="modifyExistingCoalition()">Modify Existing Coalition</button>
             <button type="button" class="btn" id="saveCoalitionConfiguration" onclick="saveCoalitionConfiguration()">Save Coalition Configuration</button>
             <button type="button" class="btn" id="loadCoalitionConfiguration" onclick="document.getElementById('getCoalitionFile').click()">Load Coalition Configuration</button>
             <input type="file" id="getCoalitionFile" style="display:none" onchange="loadCoalitionConfiguration()"></input>
         </div>
         <div class="span4">
             <h4 id="coalitionNodeListHeader"></h4>
-            <ul id="coalitionNodeList">
+                <ul id="coalitionNodeList" name="coalitionNodeList">
                 <!-- Values here will be created by main.js -->
             </ul>
         </div>

@@ -7,7 +7,6 @@ function randomSelect(array) {
 
 var s = new sigma('innergraphbox');
 var creatingCoalition = false;
-var modifyingCoalition = false;
 var coalitions = { };
 var coalitionName = "";
 
@@ -140,19 +139,10 @@ function displayNetwork() {
 
 function updateCoalitionInterface()
 {
-    if (creatingCoalition || modifyingCoalition)
+    if (creatingCoalition)
     {
         // Modify the HTML
-        if (creatingCoalition)
-        {
-            document.getElementById("createNewCoalition").innerHTML = "Add nodes to coaltion";
-            document.getElementById("modifyExistingCoalition").disabled = true;
-        }
-        else
-        {
-            document.getElementById("modifyExistingCoalition").innerHTML = "Add nodes to coaltion";
-            document.getElementById("createNewCoalition").disabled = true;
-        }
+        document.getElementById("createNewCoalition").innerHTML = "Add nodes to coaltion";
         document.getElementById("coalitionNodeListHeader").innerHTML = "Current nodes in coalition";
 
         // Create the list of coalition nodes
@@ -167,9 +157,6 @@ function updateCoalitionInterface()
     {
         // Modify the HTML
         document.getElementById("createNewCoalition").innerHTML = "Create new coalition";
-        document.getElementById("modifyExistingCoalition").innerHTML = "Modify Existing Coalition";
-        document.getElementById("coalitionNodeListHeader").innerHTML = "";
-        document.getElementById("coalitionNodeList").innerHTML = "";
 
         // If the working coalition has no nodes, go ahead and delete it
         if (coalitionName != "")
@@ -180,6 +167,8 @@ function updateCoalitionInterface()
             }
         }
 
+        var oldSelected = document.getElementById("coalitionList").value;
+
         // Update the list of coalitions
         var coalitionHTML = "";
         for (i = 0; i < Object.keys(coalitions).length; i++)
@@ -188,54 +177,44 @@ function updateCoalitionInterface()
             coalitionHTML += "<option value=\"" + coalName + "\">"+coalName+"</option>";
         }
         document.getElementById("coalitionList").innerHTML = coalitionHTML;
-        document.getElementById("createNewCoalition").disabled = false;
-        document.getElementById("modifyExistingCoalition").disabled = false;
+        document.getElementById("coalitionList").value = oldSelected;
+        coalitionName = document.getElementById("coalitionList").value;
+    }
+
+    if (coalitionName != "")
+    {
+        document.getElementById("coalitionNodeListHeader").innerHTML = "Current nodes in coalition";
+
+        // Create the list of coalition nodes
+        var nodeHTML = "";
+        for (i = 0; i < coalitions[coalitionName].length; i++)
+        {
+            nodeHTML += "<li>"+coalitions[coalitionName][i]+"<button class=\"btn\" id=\"removeNodeFromCoalition\" onClick=\"removeCoalitionNode('" + coalitions[coalitionName][i] + "')\">X</button></li>";
+        }
+        document.getElementById("coalitionNodeList").innerHTML = nodeHTML;
     }
 }
 
 function modifyCreateCoalitionState()
 {
-    if (!modifyingCoalition)
-    {
-        if (!creatingCoalition)
-        {
-            coalitionName = document.getElementById("coalitionName").value;
-            if (Object.keys(coalitions).indexOf(coalitionName) != -1)
-            {
-                alert("Coalition "+coalitionName+" already exists!");
-            }
-            else
-            {
-                coalitions[coalitionName] = [ ];
-                creatingCoalition = true;
-            }
-        }
-        else
-        {
-            creatingCoalition = false;
-            document.getElementById("modifyExistingCoalition").disabled = false;
-        }
-        updateCoalitionInterface();
-    }
-}
-
-function modifyExistingCoalition()
-{
     if (!creatingCoalition)
     {
-        if (!modifyingCoalition)
+        coalitionName = document.getElementById("coalitionName").value;
+        if (Object.keys(coalitions).indexOf(coalitionName) != -1)
         {
-            coalitionName = document.getElementById("coalitionList").value;
-            modifyingCoalition = true;
-            document.getElementById("createNewCoalition").disabled = true;
+            alert("Coalition "+coalitionName+" already exists!");
         }
         else
         {
-            modifyingCoalition = false;
-            document.getElementById("createNewCoalition").disabled = false;
+            coalitions[coalitionName] = [ ];
+            creatingCoalition = true;
         }
-        updateCoalitionInterface();
     }
+    else
+    {
+        creatingCoalition = false;
+    }
+    updateCoalitionInterface();
 }
 
 // Functions for handling loading and saving coalition configurations
@@ -273,6 +252,9 @@ function loadCoalitionConfiguration(callback)
         // Parse JSON string into object
         coalitions = JSON.parse(response);
         updateCoalitionInterface();
+        var coalList = document.getElementById("coalitionList");
+        coalList.value = coalList.options[0].text;
+        updateCoalitionInterface();
     });
 }
 
@@ -281,8 +263,8 @@ function loadCoalitionConfiguration(callback)
 // Handler for clicking a node
 function clickNodeHandler(event)
 {
-    if (creatingCoalition || modifyingCoalition)
-    {
+    if (coalitionName != "")
+        {
         var nodeId = event.data.node.id;
         if (coalitions[coalitionName].indexOf(nodeId) != -1)
         {
