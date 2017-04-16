@@ -51,30 +51,45 @@
     </div>
     
     <script src="main.js"></script>
+    <div class="row">
+        <div class="span8">
+            <h3> add nodes: </h3>
+            <ul>
+              <li> <button type="button" class="btn" onclick="addRandomNode()">Add random node</button> </li>
+              <li> Node Name: <input type="text" name="nodeName" id="nodeName"> </li>
+              <li> Node X: <input type="text" name="nodeX" id="nodeX"> </li>
+              <li> Node Y: <input type="text" name="nodeY" id="nodeY"> </li>
+              <li> <button type="button" class="btn" onclick="addNode()">Add node with information</button> </li>
+            </ul>
+        </div>
+        <div class="span8">
+            <h3> add edges: </h3>
+            <ul>
+              <li> <button type="button" class="btn" onclick="addRandomEdge()">Add random edge</button> </li>
+              <li> Edge Source ID: <input type="text" name="edgeSource" id="edgeSource"> </li>
+              <li> Edge Destination ID: <input type="text" name="edgeTarget" id="edgeTarget"> </li>
+              <li> <button type="button" class="btn" onclick="addEdge()">Add edge with information</button> </li>
+            </ul>
+        </div>
+    </div>
 
-    <h3> add nodes: </h3>
-    <ul>
-      <li> <button type="button" class="btn" onclick="addRandomNode()">Add random node</button> </li>
-      <li> Node Name: <input type="text" name="nodeName" id="nodeName"> </li>
-      <li> Node X: <input type="text" name="nodeX" id="nodeX"> </li>
-      <li> Node Y: <input type="text" name="nodeY" id="nodeY"> </li>
-      <li> <button type="button" class="btn" onclick="addNode()">Add node with information</button> </li>
-    </ul>
-
-    <h3> add edges: </h3>
-    <ul>
-      <li> <button type="button" class="btn" onclick="addRandomEdge()">Add random edge</button> </li>
-      <li> Edge Source ID: <input type="text" name="edgeSource" id="edgeSource"> </li>
-      <li> Edge Destination ID: <input type="text" name="edgeTarget" id="edgeTarget"> </li>
-      <li> <button type="button" class="btn" onclick="addEdge()">Add edge with information</button> </li>
-    </ul>
-
-    <h3> load graph from edge-map: </h3>
-    <ul>
-      <li> List of nodes and edges: </li>
-      <li> <textarea name="bigString" id="bigString" cols="40" rows="5"></textarea> </li>
-      <li> <button type="button" class="btn" onclick="addList()"> Add list</button> </li>
-    </ul>
+    <div class="row">
+        <div class="span8">
+            <h3> load graph from edge-map: </h3>
+            <ul>
+              <li> List of nodes and edges: </li>
+              <li> <textarea name="bigString" id="bigString" cols="40" rows="5"></textarea> </li>
+              <li> <button type="button" class="btn" onclick="addList()"> Add list</button> </li>
+            </ul>
+        </div>
+        <div class="span8">
+            <h3> convert graph to plaintext edge-map: </h3>
+            <ul>
+              <li> <button type="button" class="btn" onclick="displayNetwork()">Convert Network to String</button> </li>
+              <li> <p id="outputString"></p> </li>
+            </ul>
+        </div>
+    </div>
 
     <h3> load from JSON file: </h3>
     <ul>
@@ -82,11 +97,6 @@
         <button type="button" class="btn" onclick="document.getElementById('getFile').click()"> Read JSON</button> </li>
     </ul>
 
-    <h3> convert graph to plaintext edge-map: </h3>
-    <ul>
-      <li> <button type="button" class="btn" onclick="displayNetwork()">Convert Network to String</button> </li>
-      <li> <p id="outputString"></p> </li>
-    </ul>
     </div>
   </body>
 
