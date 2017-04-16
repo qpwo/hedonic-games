@@ -33,11 +33,11 @@ ul, li{
 }
 
 #pageContainer {
-    background: url(/cream_dust_transparent.png) repeat 0 0;
+    background: url(cream_dust_transparent.png) repeat 0 0;
 }
 
 body {
-    background: url(/background.png);
+    background: url(background.png);
     background-position: 50%;
     padding: 2.5%;
 }
