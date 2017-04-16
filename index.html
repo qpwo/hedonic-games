@@ -63,7 +63,8 @@
               <li> Node X: <input type="text" name="nodeX" id="nodeX"> </li>
               <li> Node Y: <input type="text" name="nodeY" id="nodeY"> </li>
               <li> <button type="button" class="btn" onclick="addNode()">Add node with information</button> </li>
-            </ul> </div>
+            </ul>
+        </div>
         <div class="span8">
             <h3> add edges: </h3>
             <ul>
@@ -94,7 +95,14 @@
     </div>
     <h3> evaluate coalitions: </h3>
     <ul>
-      <li> Select level of altruims: (TODO)</li>
+      <li> Select level of altruims:
+        <select id="altruismPicker">
+          <option value="simple">simple friend-oriented</option>
+          <option value="AL">truly altruistic</option>
+          <option value="SF">selfish first</option>
+          <option value="EQ">equal treatment</option>
+        </select>
+      </li>
       <li> From who's perspective?
         <input type=text id=nodeSelect placeholder="enter node id"> </input>
       </li>
@@ -108,7 +116,7 @@
         <button type="button" class="btn" onclick="document.getElementById('getFile').click()"> Read JSON</button> </li>
     </ul>
 
-    </div>
+  </div>
   </body>
 
 </html>

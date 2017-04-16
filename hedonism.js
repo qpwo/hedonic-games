@@ -4,10 +4,10 @@ function myAdd(a, b) {
   return a+b;
 }
 
-function rankCoalitions(network, player, coalitions) {
+function rankCoalitions(network, player, coalitions, scoreFunc) {
   coalitionArray = Object.keys(coalitions);
   for (let coalition of coalitionArray) {
-    coalition.score = FOScore(network, player, coalition)
+    coalition.score = scoreFunc(network, player, coalition)
   }
   return coalitionArray.sort(function(coalition1, coalition2) {
     return coalition1.score > coalition2.score;})
@@ -21,6 +21,7 @@ function FOScore(network, player, coalition) {
   for (const otherPlayer of coalition) {
     score += friends.includes(otherPlayer) ? n : -1;
   }
+  console.log("Friend-oriented score of player", player, "in coalition", coalition, "is", score);
   return score;
 }
 
@@ -54,7 +55,7 @@ function FOScoreSF(network, player, coalition) {
   var n = Object.keys(network).length;
   var myScore = FOScore(network, player, coalition);
   var friendsScore = friendAverage(network, player, coalition);
-  return Math.pow(n, 5) * myScore + friendScore;
+  return Math.pow(n, 5) * myScore + friendsScore;
 }
 
 function FOScoreEQ(network, player, coalition) {
@@ -62,9 +63,9 @@ function FOScoreEQ(network, player, coalition) {
   var myScore = FOScore(network, player, coalition);
   var friendsScore = friendAverage(network, player, coalition);
   var friends = network[player];
-  var numFriends = coalition.filter(function(otherPlayer) {
-    return friends.includes(otherPlayer)}).length;
-  return myScore + numFriends * friendScore;
+  console.log("The coalition is", coalition);
+  var numFriends = coalition.filter(function(otherPlayer){return friends.includes(otherPlayer)}).length;
+  return myScore + numFriends * friendsScore;
 }
 
 function FOScoreAL(network, player, coalition) {
@@ -72,5 +73,5 @@ function FOScoreAL(network, player, coalition) {
   var n = Object.keys(network).length;
   var myScore = FOScore(network, player, coalition);
   var friendsScore = friendAverage(network, player, coalition);
-  return myScore + Math.pow(n, 5) * friendScore;
+  return myScore + Math.pow(n, 5) * friendsScore;
 }

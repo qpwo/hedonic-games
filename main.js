@@ -13,7 +13,9 @@ var coalitionName = "";
 function displayRanking() {
   var node = document.getElementById("nodeSelect").value;
   var network = makeGraphObject();
-  var rankedCoalitions = rankCoalitions(network, node, coalitions);
+  var nameToFunc = {"EQ": FOScoreEQ, "AL":FOScoreAL, "SF":FOScoreSF, "simple":FOScore};
+  var scoreFunc = nameToFunc[document.getElementById("altruismPicker").value];
+  var rankedCoalitions = rankCoalitions(network, node, coalitions, scoreFunc);
   var result = "";
   for (var i = 0; i < rankedCoalitions.length; i++) {
     result += i.toString() + " : " + rankedCoalitions[i].toString() + "<br/>";
