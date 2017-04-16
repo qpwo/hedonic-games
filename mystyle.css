@@ -7,11 +7,18 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Corben';
 }
 
-ul li{
+ul, li{
   list-style-type: none;
   padding: 5px 0px;
 }
 
+button, select{
+    margin-top: 12px;
+}
+
+#removeNodeFromCoalition {
+    margin-left: 12px;
+}
 
 #outergraphbox {
   width: 400px;

@@ -159,7 +159,7 @@ function updateCoalitionInterface()
         var nodeHTML = "";
         for (i = 0; i < coalitions[coalitionName].length; i++)
         {
-            nodeHTML += "<li>"+coalitions[coalitionName][i]+"<button class=\"btn\" onClick=\"removeCoalitionNode('" + coalitions[coalitionName][i] + "')\">X</button></li>";
+            nodeHTML += "<li>"+coalitions[coalitionName][i]+"<button class=\"btn\" id=\"removeNodeFromCoalition\" onClick=\"removeCoalitionNode('" + coalitions[coalitionName][i] + "')\">X</button></li>";
         }
         document.getElementById("coalitionNodeList").innerHTML = nodeHTML;
     }
@@ -238,6 +238,44 @@ function modifyExistingCoalition()
     }
 }
 
+// Functions for handling loading and saving coalition configurations
+function saveCoalitionConfiguration()
+{
+    var coalitionText = JSON.stringify(coalitions);
+    var coalitionBlob = new Blob([coalitionText], {type: "application/json"});
+    var coalitionURL = URL.createObjectURL(coalitionBlob);
+
+    var a = document.createElement('a');
+    a.download = "coalition.json";
+    a.href = coalitionURL;
+    a.click();
+}
+
+function loadCoalitionJSON(callback)
+{
+  var xobj = new XMLHttpRequest();
+  xobj.overrideMimeType("application/json");
+  xobj.open('GET', fileName, true);
+  xobj.onreadystatechange = function() {
+      if (xobj.readyState == 4 && xobj.status == "200")
+      {
+          callback(xobj.responseText);
+      }
+  };
+  xobj.send(null);
+}
+
+function loadCoalitionConfiguration(callback)
+{
+    // replaces whatever is on the graph with the contents of a JSON file
+    fileName = document.getElementById("getCoalitionFile").files[0].name;
+    loadCoalitionJSON(function(response) {
+        // Parse JSON string into object
+        coalitions = JSON.parse(response);
+        updateCoalitionInterface();
+    });
+}
+
 // Handlers for events when the user interacts with the graph
 
 // Handler for clicking a node
@@ -286,3 +324,10 @@ function removeCoalitionNode(nodeId)
 // Code to initialize the page
 s.bind("clickNode", clickNodeHandler);
 updateCoalitionInterface();
+
+// Click functionality because firefox does not like click() for some reason
+HTMLElement.prototype.click = function() {
+    var evt = this.ownerDocument.createEvent('MouseEvents');
+    evt.initMouseEvent('click', true, true, this.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null); // Not enough parameters :kappa:
+    this.dispatchEvent(evt);
+}

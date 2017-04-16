@@ -36,6 +36,9 @@
                 <!-- Values here will be created by main.js -->
             </select>
             <button type="button" class="btn" id="modifyExistingCoalition" onclick="modifyExistingCoalition()">Modify Existing Coalition</button>
+            <button type="button" class="btn" id="saveCoalitionConfiguration" onclick="saveCoalitionConfiguration()">Save Coalition Configuration</button>
+            <button type="button" class="btn" id="loadCoalitionConfiguration" onclick="document.getElementById('getCoalitionFile').click()">Load Coalition Configuration</button>
+            <input type="file" id="getCoalitionFile" style="display:none" onchange="loadCoalitionConfiguration()"></input>
         </div>
         <div class="span4">
             <h4 id="coalitionNodeListHeader"></h4>
