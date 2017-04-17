@@ -32,10 +32,20 @@ function FOSFScore(graph, node, coalition) {
   return Math.pow(n, 5) * myScore + friendsScore;
 }
 
-function FOEQScore(graph, node, coalition) {
-  // equal treatment score
-}
-
 function FOALScore(graph, node, coalition) {
   // altruistic treatment score
+  var n = Object.keys(graph).length;
+  var myScore = FOScore(graph, node, coalition);
+  var friendsScore = friendAverage(graph, node, coalition);
+  return myScore + Math.pow(n, 5) * friendsScore;
+}
+
+function FOEQScore(graph, node, coalition) {
+  // equal treatment score
+  var n = Object.keys(graph).length;
+  var myScore = FOScore(graph, node, coalition);
+  var friendsScore = friendAverage(graph, node, coalition);
+  var numFriends = graph[node].filter(function(node2){
+    return coalition.includes(node2);}).length;
+  return myScore + numFriends * friendsScore;
 }

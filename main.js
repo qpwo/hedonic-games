@@ -1,21 +1,20 @@
 var s = new sigma("innergraphbox");
 var partition = [];
-var scoreFunc = {"func":FOScore};
+var scoreFunc = FOScore;
 
 function addNode(name, x, y) {
   // add a random node to the graph
   name = (name ? name : 'n' + s.graph.nodes().length.toString());
-  if (!s.graph.nodes(name)) {
-    s.graph.addNode({
-      id: name,
-      label: name,
-      x: (x ? x : Math.random()),
-      y: (y ? y : Math.random()),
-      size: 1,
-      color: '#000'
-    });
-    s.refresh();
-  }
+  if (s.graph.nodes(name)) return;
+  s.graph.addNode({
+    id: name,
+    label: name,
+    x: (x ? x : Math.random()),
+    y: (y ? y : Math.random()),
+    size: 1,
+    color: '#000'
+  });
+  s.refresh();
 }
 
 addNode();
@@ -23,14 +22,14 @@ addNode();
 addNode();
 
 function addEdge(source, target) {
+  if (source == target) return;
   name = source + '-' + target;
-  if (!s.graph.edges(name)) {
-    s.graph.addEdge({
-      id: name,
-      source: source,
-      target: target
-    });
-  }
+  if (s.graph.edges(name)) return;
+  s.graph.addEdge({
+    id: name,
+    source: source,
+    target: target
+  });
 }
 
 function drawGraphFromText() {
@@ -98,7 +97,7 @@ function displayScores() {
   for (const node of Object.keys(graph)) {
     result += "<tr> <th>" + node + "</th>"; // start a new row
     for (const coalition of partition) {
-      var score = scoreFunc.func(graph, node, coalition); 
+      var score = scoreFunc(graph, node, coalition); 
       result += "<td>" + score.toString() + "</td>"; // add a score
     }
     result += "</tr>";
@@ -110,5 +109,5 @@ function displayScores() {
 function setPlayerType() {
   var nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
   var selection = document.getElementById("playerTypePicker").value;
-  scoreFunc.func = nameToFunc[selection];
+  scoreFunc = nameToFunc[selection];
 }
