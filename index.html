@@ -23,9 +23,19 @@
         <textarea id="partitionTextField" cols="40" rows="5"></textarea>
         <button type="button" onclick="makePartitionFromText()">Color!</button>
       </li>
+      <li> Select player type:
+        <select id="playerTypePicker">
+          <option value="simple">simple friend-oriented</option>
+          <option value="AL">truly altruistic</option>
+          <option value="SF">selfish first</option>
+          <option value="EQ">equal treatment</option>
+        </select>
+        <button type="button" onclick="setPlayerType()"> Change mindset! </button>
+      </li>
       <li> Compute scores:
         <button type="button" onclick="displayScores()">Compute!</button>
         <p id="scoreParagraph"> </p>
+      </li>
     </ul>
 
   </body>

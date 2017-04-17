@@ -1,5 +1,6 @@
 var s = new sigma("innergraphbox");
 var partition = [];
+var scoreFunc = {"func":FOScore};
 
 function addNode(name, x, y) {
   // add a random node to the graph
@@ -97,7 +98,7 @@ function displayScores() {
   for (const node of Object.keys(graph)) {
     result += "<tr> <th>" + node + "</th>"; // start a new row
     for (const coalition of partition) {
-      var score = FOValue(graph, node, coalition); 
+      var score = scoreFunc.func(graph, node, coalition); 
       result += "<td>" + score.toString() + "</td>"; // add a score
     }
     result += "</tr>";
@@ -106,3 +107,8 @@ function displayScores() {
   document.getElementById("scoreParagraph").innerHTML = result;
 }
 
+function setPlayerType() {
+  var nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
+  var selection = document.getElementById("playerTypePicker").value;
+  scoreFunc.func = nameToFunc[selection];
+}
