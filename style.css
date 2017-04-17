@@ -1,0 +1,11 @@
+#outergraphbox {
+  width: 400px;
+  height: 400px;
+  margin: auto;
+  outline: 1px solid black;
+}
+#innergraphbox {
+  width: 400px;
+  height: 400px;
+}
+
