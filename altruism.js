@@ -45,7 +45,26 @@ function FOEQScore(graph, node, coalition) {
   var n = Object.keys(graph).length;
   var myScore = FOScore(graph, node, coalition);
   var friendsScore = friendAverage(graph, node, coalition);
-  var numFriends = graph[node].filter(function(node2){
-    return coalition.includes(node2);}).length;
+  var numFriends = arrayIntersect(coalition, graph[node]).length;
   return myScore + numFriends * friendsScore;
+}
+
+function isAcceptable(graph, node, coalition) {
+  return (coalition == [node] || arrayIntersect(graph[node], coalition).length > 0); // KNOWN BUG: array equality don't work this way
+}
+
+function isIndividuallyRational(graph, partition) {
+  var nodes = Object.keys(graph);
+  for (const coalition of partition) {
+    for (const node of coalition) {
+      if (!isAcceptable(graph, node, coalition)) {
+        return [false, node];
+      }
+    }
+  }
+  return [true, undefined];
+}
+
+function arrayIntersect(bigArray, smallArray) {
+  return bigArray.filter(element => smallArray.includes(element));
 }
