@@ -11,17 +11,21 @@
 
     <div id="outergraphbox"><div id="innergraphbox"></div></div>
     <script src="sigma.min.js"></script>
+    <script src="altruism.js"></script>
     <script src="main.js"></script>
 
     <ul>
       <li> Enter adjacency list:
         <textarea id="graphTextField" cols="40" rows="5"></textarea>
-        <button type=button onclick="drawGraphFromText()">Draw!</button>
+        <button type="button" onclick="drawGraphFromText()">Draw!</button>
       </li>
       <li> Enter partition:
         <textarea id="partitionTextField" cols="40" rows="5"></textarea>
-        <button type=button onclick="makePartitionFromText()">Color!</button>
+        <button type="button" onclick="makePartitionFromText()">Color!</button>
       </li>
+      <li> Compute scores:
+        <button type="button" onclick="displayScores()">Compute!</button>
+        <p id="scoreParagraph"> </p>
     </ul>
 
   </body>

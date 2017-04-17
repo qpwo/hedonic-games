@@ -86,13 +86,23 @@ function collectGraph() {
   return graph;
 }
 
-function FOValue(graph, node, coalition) {
-  var n = Object.keys(graph).length;
-  var friends = graph[node];
-  var value = 0;
-  for (const node2 of coalition) {
-    if (node != node2)
-      value += (friends.includes(node2) ? n : -1);
+function displayScores() {
+  var graph = collectGraph();
+  result = "<table>";
+  result += "<tr><th></th>";
+  for (const coalition of partition) {
+    result += "<th>" + coalition.toString() + "</th>";
   }
-  return value;
+  result += "</tr>";
+  for (const node of Object.keys(graph)) {
+    result += "<tr> <th>" + node + "</th>"; // start a new row
+    for (const coalition of partition) {
+      var score = FOValue(graph, node, coalition); 
+      result += "<td>" + score.toString() + "</td>"; // add a score
+    }
+    result += "</tr>";
+  }
+  result += "</table>";
+  document.getElementById("scoreParagraph").innerHTML = result;
 }
+

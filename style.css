@@ -1,9 +1,14 @@
+table, th, td {
+   border: 1px solid black;
+}
+
 #outergraphbox {
   width: 400px;
   height: 400px;
   margin: auto;
-  outline: 1px solid black;
+  border: 1px solid black;
 }
+
 #innergraphbox {
   width: 400px;
   height: 400px;
