@@ -3,45 +3,49 @@ var partition = [];
 
 function addNode(name, x, y) {
   // add a random node to the graph
-  if (!name) {
-    name = 'n' + s.graph.nodes().length.toString();
+  name = (name ? name : 'n' + s.graph.nodes().length.toString());
+  if (!s.graph.nodes(name)) {
+    s.graph.addNode({
+      id: name,
+      label: name,
+      x: (x ? x : Math.random()),
+      y: (y ? y : Math.random()),
+      size: 1,
+      color: '#000'
+    });
+    s.refresh();
   }
-  s.graph.addNode({
-    id: name,
-    label: name,
-    x: (x ? x : Math.random()),
-    y: (y ? y : Math.random()),
-    size: 1,
-    color: '#000'
-  });
-  s.refresh();
 }
 
 addNode();
 addNode();
 addNode();
 
+function addEdge(source, target) {
+  name = source + '-' + target;
+  if (!s.graph.edges(name)) {
+    s.graph.addEdge({
+      id: name,
+      source: source,
+      target: target
+    });
+  }
+}
+
 function drawGraphFromText() {
   // replace the current graph with the one described in the big text box on the webpage
   s.graph.clear();
   var bigString = document.getElementById('graphTextField').value;
   var lines = bigString.split('\n');
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].replace(/ /g, '');
-    var split1 = line.split(':');
-    var source = split1[0];
-    if (!s.graph.nodes(source))
-      addNode(source);
-    var targets = split1[1].split(',');
-    for (var j = 0; j < targets.length; j++) {
-      var target = targets[j];
-      if (!s.graph.nodes(target))
-        addNode(target);
-      s.graph.addEdge({
-        id: 'edge' + source + '-' + target,
-        source: source,
-        target: target
-      });
+  for (const line of lines) {
+    var colonSplit = line.replace(/ /g, '').split(':');
+    var source = colonSplit[0];
+    var targets = colonSplit[1].split(',');
+    addNode(source);
+    for (let target of targets) {
+      addNode(target);
+      addEdge(source, target);
+      addEdge(target, source);
     }
   }
   s.refresh();
@@ -69,4 +73,26 @@ function colorSubgraph(nodes, color) {
 function randomColor() {
   // generates a random hex color code
   return '#'+Math.random().toString(16).substr(-6);
+}
+
+function collectGraph() {
+  var graph = {};
+  for (const node of s.graph.nodes()) {
+    graph[node.id] = [];
+  }
+  for (const edge of s.graph.edges()) {
+    graph[edge.source].push(edge.target);
+  }
+  return graph;
+}
+
+function FOValue(graph, node, coalition) {
+  var n = Object.keys(graph).length;
+  var friends = graph[node];
+  var value = 0;
+  for (const node2 of coalition) {
+    if (node != node2)
+      value += (friends.includes(node2) ? n : -1);
+  }
+  return value;
 }
