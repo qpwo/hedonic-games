@@ -1,0 +1,16 @@
+table, th, td {
+   border: 1px solid black;
+}
+
+#outergraphbox {
+  width: 400px;
+  height: 400px;
+  margin: auto;
+  border: 1px solid black;
+}
+
+#innergraphbox {
+  width: 400px;
+  height: 400px;
+}
+

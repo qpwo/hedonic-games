@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>altruistic hedonic game simulator</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+
+  <body>
+    <h3> Altruistic Hedonic Game Simulator </h3>
+    <p> Welcome to the altruistic hedonic game simulator! This software is
+    based off the 2016 AAMAS paper <i>Altruistic Hedonic Games</i> by Nguyen,
+    Rey, Rey, Rothe, and Schend.</p>
+    <p> This software was written by Joshua Baunach and Luke Miles in April 2017.</p>
+
+    <!-- Display the graph -->
+    <div id="outergraphbox"><div id="innergraphbox"></div></div>
+    <script src="sigma.min.js"></script>
+    <script src="altruism.js"></script>
+    <script src="main.js"></script>
+
+    <!-- All the buttons and interface -->
+    <ul>
+
+      <li> Enter adjacency list:
+        <textarea id="graphTextField" cols="40" rows="5">a: b, c, d
+c: d, e</textarea>
+        <button type="button" onclick="drawGraphFromText()">Draw!</button>
+      </li>
+
+      <li> Enter partition:
+        <textarea id="partitionTextField" cols="40" rows="5">a,b
+c,d
+e</textarea>
+        <button type="button" onclick="makePartitionFromText()">Color!</button>
+      </li>
+
+      <li> Select player type:
+        <select id="playerTypePicker">
+          <option value="simple">simple friend-oriented</option>
+          <option value="AL">truly altruistic</option>
+          <option value="SF">selfish first</option>
+          <option value="EQ">equal treatment</option>
+        </select>
+        <button type="button" onclick="setPlayerType()"> Change mindset! </button>
+      </li>
+
+      <li> Compute scores of this partition:
+        <button type="button" onclick="displayScores()">Compute!</button>
+        <p id="scoreParagraph"> </p>
+      </li>
+
+      <li> Check stability of this partition:
+        <ul>
+          <li>individually rational?
+            <button type="button" onclick="individuallyRationalButton()">Check!</button>
+            <p id="individuallyRationalParagraph"> </p>
+          </li>
+          <li>Nash-stable? (not implemented yet)
+            <button type="button">Check!</button>
+            <p> </p>
+          </li>
+          <li>individually stable? (not implemented yet)
+            <button type="button">Check!</button>
+            <p> </p>
+          </li>
+          <li>contractually individually stable? (not implemented yet)
+            <button type="button">Check!</button>
+            <p> </p>
+          </li>
+          <li>strictly popular? (not implemented yet)
+            <button type="button">Check!</button>
+            <p> </p>
+          </li>
+          <li>core-stable? (not implemented yet)
+            <button type="button">Check!</button>
+            <p> </p>
+          </li>
+          <li>perfect? (not implemented yet)
+            <button type="button">Check!</button>
+            <p> </p>
+          </li>
+
+        </ul>
+      </li>
+    </ul>
+
+    <p> Public domain dedication. No rights reserved. Look at the source!</p>
+    <p> Hosted on
+    <a href="https://github.com/qpwo/ahd">Github</a>.
+    Using graph library
+    <a href="http://sigmajs.org/">sigmajs</a>.
+    </p>
+
+  </body>
+
+</html>
