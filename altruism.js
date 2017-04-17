@@ -49,10 +49,6 @@ function FOEQScore(graph, node, coalition) {
   return myScore + numFriends * friendsScore;
 }
 
-function isAcceptable(graph, node, coalition) {
-  return (coalition == [node] || arrayIntersect(graph[node], coalition).length > 0); // KNOWN BUG: array equality don't work this way
-}
-
 function isIndividuallyRational(graph, partition) {
   var nodes = Object.keys(graph);
   for (const coalition of partition) {
@@ -63,6 +59,17 @@ function isIndividuallyRational(graph, partition) {
     }
   }
   return [true, undefined];
+}
+
+function isAcceptable(graph, node, coalition) {
+  return arrayEqual(coalition, [node]) ||
+    arrayIntersect(graph[node], coalition).length > 0;
+}
+
+
+function arrayEqual(arr1, arr2) {
+  return (arr1.length == arr2.length) &&
+    arr1.every((element, index) => (element == arr2[index]));
 }
 
 function arrayIntersect(bigArray, smallArray) {

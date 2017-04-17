@@ -111,3 +111,13 @@ function setPlayerType() {
   var selection = document.getElementById("playerTypePicker").value;
   scoreFunc = nameToFunc[selection];
 }
+
+function individuallyRationalButton() {
+  [isIR, node] = isIndividuallyRational(collectGraph(), partition);
+  var result = "";
+  if (isIR)
+    result = "Yes this partition is individually rational!";
+  else
+    result = "No. Node '" + node + "' would rather be alone.";
+  document.getElementById("individuallyRationalParagraph").innerHTML = result;
+}
