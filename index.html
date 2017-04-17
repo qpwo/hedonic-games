@@ -2,6 +2,7 @@
 <html>
 
   <head>
+    <title>altruistic hedonic game simulator</title>
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
 
@@ -13,8 +14,14 @@
     <script src="main.js"></script>
 
     <ul>
-      <li> Enter adjacency list: <textarea id="graphTextField" cols="40" rows="5"></textarea> <button type=button onclick="drawGraphFromText()">Draw!</button> </li>
-      <li> Enter partition: <textarea id="partitionTextField" cols="40" rows="5"></textarea> </li>
+      <li> Enter adjacency list:
+        <textarea id="graphTextField" cols="40" rows="5"></textarea>
+        <button type=button onclick="drawGraphFromText()">Draw!</button>
+      </li>
+      <li> Enter partition:
+        <textarea id="partitionTextField" cols="40" rows="5"></textarea>
+        <button type=button onclick="makePartitionFromText()">Color!</button>
+      </li>
     </ul>
 
   </body>
