@@ -26,14 +26,14 @@
       <li> Enter adjacency list:
         <textarea id="graphTextField" cols="40" rows="5">a: b, c, d
 c: d, e</textarea>
-        <button type="button" onclick="drawGraphFromText()">Draw!</button>
+        <button type="button" onclick="drawGraphFromTextButton()">Draw!</button>
       </li>
 
       <li> Enter partition:
         <textarea id="partitionTextField" cols="40" rows="5">a,b
 c,d
 e</textarea>
-        <button type="button" onclick="makePartitionFromText()">Color!</button>
+        <button type="button" onclick="makePartitionFromTextButton()">Color!</button>
       </li>
 
       <li> Select player type:
@@ -43,11 +43,11 @@ e</textarea>
           <option value="SF">selfish first</option>
           <option value="EQ">equal treatment</option>
         </select>
-        <button type="button" onclick="setPlayerType()"> Change mindset! </button>
+        <button type="button" onclick="setPlayerTypeButton()"> Change mindset! </button>
       </li>
 
       <li> Compute scores of this partition:
-        <button type="button" onclick="displayScores()">Compute!</button>
+        <button type="button" onclick="displayScoresButton()">Compute!</button>
         <p id="scoreParagraph"> </p>
       </li>
 

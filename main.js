@@ -6,7 +6,7 @@ var scoreFunc = FOScore; // function to use for player type
 function addNode(name, x=Math.random(), y=Math.random()) {
   // add a node to the graph
   name = (name ? name : 'n' + s.graph.nodes().length.toString());
-  if (s.graph.nodes(name)) return;
+  if (s.graph.nodes(name)) return; // don't add the node if there's already one with the same name
   s.graph.addNode({
     id: name,
     label: name,
@@ -18,6 +18,7 @@ function addNode(name, x=Math.random(), y=Math.random()) {
   s.refresh();
 }
 
+// add a few random nodes just to have something displayed
 addNode();
 addNode();
 addNode();
@@ -33,7 +34,7 @@ function addEdge(source, target) {
   });
 }
 
-function drawGraphFromText() {
+function drawGraphFromTextButton() {
   // replace the current graph with the one described in the big text box on the webpage
   s.graph.clear();
   var bigString = document.getElementById('graphTextField').value;
@@ -53,8 +54,9 @@ function drawGraphFromText() {
 }
 
 
-function makePartitionFromText() {
+function makePartitionFromTextButton() {
   // set the partitions to the ones described by the user and color them
+  // TODO: have a dialogue box pop up if the input is invalid
   var bigString = document.getElementById('partitionTextField').value;
   var lines = bigString.split('\n');
   partition = lines.map(function(line) {return line.replace(/ /g, '').split(',');});
@@ -65,9 +67,8 @@ function makePartitionFromText() {
 
 function colorSubgraph(nodes, color) {
   // color a subgraph induced by a set of nodes
-  for (let nodeObject of s.graph.nodes(nodes)) {
+  for (let nodeObject of s.graph.nodes(nodes))
     nodeObject.color = color;
-  }
   s.refresh();
 }
 
@@ -78,22 +79,19 @@ function randomColor() {
 
 function collectGraph() {
   var graph = {};
-  for (const node of s.graph.nodes()) {
+  for (const node of s.graph.nodes())
     graph[node.id] = [];
-  }
-  for (const edge of s.graph.edges()) {
+  for (const edge of s.graph.edges())
     graph[edge.source].push(edge.target);
-  }
   return graph;
 }
 
-function displayScores() {
+function displayScoresButton() {
   var graph = collectGraph();
   result = "<table>";
   result += "<tr><th></th>";
-  for (const coalition of partition) {
+  for (const coalition of partition)
     result += "<th>" + coalition.toString() + "</th>";
-  }
   result += "</tr>";
   for (const node of Object.keys(graph)) {
     result += "<tr> <th>" + node + "</th>"; // start a new row
@@ -107,13 +105,14 @@ function displayScores() {
   document.getElementById("scoreParagraph").innerHTML = result;
 }
 
-function setPlayerType() {
+function setPlayerTypeButton() {
   var nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
   var selection = document.getElementById("playerTypePicker").value;
   scoreFunc = nameToFunc[selection];
 }
 
 function individuallyRationalButton() {
+  // check if the partition is individually rational and display result
   [isIR, node] = isIndividuallyRational(collectGraph(), partition);
   var result = "";
   if (isIR)
@@ -124,6 +123,7 @@ function individuallyRationalButton() {
 }
 
 function perfectButton() {
+  // check if the partition is perfect and display result
   [isP, node, favoriteCoalitions] = isPerfect(collectGraph(), partition, scoreFunc);
   var result = "";
   if (isP)
