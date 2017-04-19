@@ -1,16 +1,17 @@
-var s = new sigma("innergraphbox");
-var partition = [];
-var scoreFunc = FOScore;
+var s = new sigma("innergraphbox"); // the thing controlling/displaying the graph
+sigma.plugins.dragNodes(s, s.renderers[0]); // enable click and drag
+var partition = []; // current partition of the vertices
+var scoreFunc = FOScore; // function to use for player type
 
-function addNode(name, x, y) {
-  // add a random node to the graph
+function addNode(name, x=Math.random(), y=Math.random()) {
+  // add a node to the graph
   name = (name ? name : 'n' + s.graph.nodes().length.toString());
   if (s.graph.nodes(name)) return;
   s.graph.addNode({
     id: name,
     label: name,
-    x: (x ? x : Math.random()),
-    y: (y ? y : Math.random()),
+    x: x,
+    y: y,
     size: 1,
     color: '#000'
   });
@@ -22,9 +23,9 @@ addNode();
 addNode();
 
 function addEdge(source, target) {
-  if (source == target) return;
+  if (source == target) return; // don't add edge loops
   name = source + '-' + target;
-  if (s.graph.edges(name)) return;
+  if (s.graph.edges(name)) return; // don't add already existing edges
   s.graph.addEdge({
     id: name,
     source: source,
