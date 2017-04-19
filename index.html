@@ -52,7 +52,7 @@ e</textarea>
 
       <li> Check stability of this partition:
         <ul>
-          <li>individually rational?
+          <li>individually rational? (fast)
             <button type="button" onclick="individuallyRationalButton()">Check!</button>
             <p id="individuallyRationalParagraph"> </p>
           </li>
@@ -76,9 +76,9 @@ e</textarea>
             <button type="button">Check!</button>
             <p> </p>
           </li>
-          <li>perfect? (not implemented yet)
-            <button type="button">Check!</button>
-            <p> </p>
+          <li>perfect? (slow)
+            <button type="button" onclick="perfectButton()">Check!</button>
+            <p id="perfectParagraph"> </p>
           </li>
 
         </ul>

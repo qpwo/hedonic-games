@@ -121,3 +121,19 @@ function individuallyRationalButton() {
     result = "No. Node '" + node + "' would rather be alone.";
   document.getElementById("individuallyRationalParagraph").innerHTML = result;
 }
+
+function perfectButton() {
+  [isP, node, favoriteCoalitions] = isPerfect(collectGraph(), partition, scoreFunc);
+  var result = "";
+  if (isP)
+    result = "Yes, this is the perfect partition.";
+  else {
+    result = "No, node '" + node + "' would rather be in coalition [" +
+      favoriteCoalitions[node] + "].\n";
+    result += "All favorite coalitions:\n <ul>";
+    for (const node of Object.keys(favoriteCoalitions))
+      result += "<li>" +  node + " : " + favoriteCoalitions[node] + "</li>\n";
+    result += "</ul>";
+  }
+  document.getElementById("perfectParagraph").innerHTML = result;
+}
