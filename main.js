@@ -59,10 +59,16 @@ function makePartitionFromTextButton() {
   // TODO: have a dialogue box pop up if the input is invalid
   var bigString = document.getElementById('partitionTextField').value;
   var lines = bigString.split('\n');
-  partition = lines.map(function(line) {return line.replace(/ /g, '').split(',');});
-  for (let coalition of partition) {
-    colorSubgraph(coalition, randomColor());
+  var possiblePartition = lines.map(line => line.replace(/ /g, '').split(','));
+  var nodes = s.graph.nodes().map(nodeO => nodeO.id);
+  if (!isPartition(nodes, possiblePartition)) {
+    window.alert("This is not a valid partition. Every node must occur on " +
+      "exactly one line. (Commas seperate nodes.)");
+    return;
   }
+  partition = possiblePartition;
+  for (let coalition of partition)
+    colorSubgraph(coalition, randomColor());
 }
 
 function colorSubgraph(nodes, color) {
@@ -137,4 +143,10 @@ function perfectButton() {
     result += "</ul>";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
+}
+
+function isPartition(arr, arrArr) {
+  // checks if the arrArr is a partition of the arr
+  var concatified = [].concat.apply([],arrArr);
+  return (concatified.length == arr.length) && arr.every(x => concatified.includes(x));
 }

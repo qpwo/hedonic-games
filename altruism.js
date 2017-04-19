@@ -8,10 +8,9 @@ function FOScore(graph, node, coalition) {
   var n = Object.keys(graph).length;
   var friends = graph[node];
   var score = 0;
-  for (const node2 of coalition) {
+  for (const node2 of coalition)
     if (node != node2)
       score += (friends.includes(node2) ? n : -1);
-  }
   return score;
 }
 
