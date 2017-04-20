@@ -153,6 +153,16 @@ function coreStableButton() {
   document.getElementById("coreStableParagraph").innerHTML = result;
 }
 
+function nashStableButton() {
+  [isNS, node, coalition] = isNashStable(collectGraph(), partition, scoreFunc);
+  var result = "";
+  if (isNS)
+    result = "Yes, this partition is Nash stable.";
+  else
+    result = "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
+  document.getElementById("nashStableParagraph").innerHTML = result;
+}
+
 function isPartition(arr, arrArr) {
   // checks if the arrArr is a partition of the arr
   var concatified = [].concat.apply([],arrArr);

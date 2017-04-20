@@ -7,7 +7,8 @@ function FOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
   var n = Object.keys(graph).length;
   var friends = graph[node];
-  return coalition.map(node2 => (node2 == node ? 0 : (friends.includes(node2) ? n : -1))).sum();
+  return coalition.map(node2 =>
+    (node2 == node ? 0 : (friends.includes(node2) ? n : -1))).sum();
 }
 
 function FOSFScore(graph, node, coalition) {
@@ -37,7 +38,7 @@ function FOEQScore(graph, node, coalition) {
 
 function isIndividuallyRational(graph, partition) {
   // returns true if every node in every coalition in partition is happier in
-  // her current coalition than she would be alone
+  // its current coalition than it would be alone
   var nodes = Object.keys(graph);
   for (const coalition of partition)
     for (const node of coalition)
@@ -50,13 +51,14 @@ function isPerfect(graph, partition, scoreFunc) {
   var favoriteCoalitions = findFavoriteCoalitions(graph, scoreFunc);
   for (const coalition of partition)
     for (const node of coalition)
-      if (favoriteCoalitions[node] != coalition)
+      if (!favoriteCoalitions[node].setEquals(coalition))
         return [false, node, favoriteCoalitions];
   return [true, null, null]
 }
 
 function isCoreStable(graph, partition, scoreFunc) {
-  // returns whether or not a given partition is core stable
+  // returns true if the partition is core stable, otherwise
+  // returns a blocking coalition
   var scores = {};
   for (const coalition of partition)
     for (const node of coalition)
@@ -73,6 +75,21 @@ function isCoreStable(graph, partition, scoreFunc) {
       return [false, coalition];
   }
   return [true, null];
+}
+
+function isNashStable(graph, partition, scoreFunc) {
+  for (const currentCoalition of partition)
+    for (const node of currentCoalition) {
+      var homeScore = scoreFunc(graph, node, currentCoalition);
+      for (const otherCoalition of partition) {
+        if (otherCoalition.equals(currentCoalition))
+          continue;
+        var newScore = scoreFunc(graph, node, otherCoalition);
+        if (newScore > homeScore)
+          return [false, node, otherCoalition];
+      }
+    }
+  return [true, null, null];
 }
 
 function findFavoriteCoalitions(graph, scoreFunc) {
@@ -125,9 +142,14 @@ Array.prototype.powerset = function() {
   return this.reduceRight((a, x) => a.concat(a.map(y => [x].concat(y))), [[]]);
 }
 
+Array.prototype.setEquals = function(arr) {
+  // returns true if the arrays would be equal as sets
+  return (this.length == arr.length) && this.every(x => arr.includes(x));
+}
+
 Array.prototype.equals = function(arr) {
-  // returns true if the elements are pairwise equal
-  return (this.length == arr.length) && this.every((x, i) => (x == arr[i]));
+  // returns true if the arrays are pairwise equal
+  return (this.length == arr.length) && this.every((x,i) => x==arr[i]);
 }
 
 Array.prototype.intersect = function(arr) {
