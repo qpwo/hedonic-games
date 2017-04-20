@@ -56,7 +56,6 @@ function drawGraphFromTextButton() {
 
 function makePartitionFromTextButton() {
   // set the partitions to the ones described by the user and color them
-  // TODO: have a dialogue box pop up if the input is invalid
   var bigString = document.getElementById('partitionTextField').value;
   var lines = bigString.split('\n');
   var possiblePartition = lines.map(line => line.replace(/ /g, '').split(','));
@@ -67,8 +66,7 @@ function makePartitionFromTextButton() {
     return;
   }
   partition = possiblePartition;
-  for (let coalition of partition)
-    colorSubgraph(coalition, randomColor());
+  partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
 }
 
 function colorSubgraph(nodes, color) {
@@ -143,6 +141,16 @@ function perfectButton() {
     result += "</ul>";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
+}
+
+function coreStableButton() {
+  [isCS, coalition] = isCoreStable(collectGraph(), partition, scoreFunc);
+  var result = "";
+  if (isCS)
+    result = "Yes, this partition is core stable";
+  else
+    result = "No, the coalition [" + coalition + "] wants to elope.";
+  document.getElementById("coreStableParagraph").innerHTML = result;
 }
 
 function isPartition(arr, arrArr) {

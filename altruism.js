@@ -7,11 +7,7 @@ function FOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
   var n = Object.keys(graph).length;
   var friends = graph[node];
-  var score = 0;
-  for (const node2 of coalition)
-    if (node != node2)
-      score += (friends.includes(node2) ? n : -1);
-  return score;
+  return coalition.map(node2 => (node2 == node ? 0 : (friends.includes(node2) ? n : -1))).sum();
 }
 
 function FOSFScore(graph, node, coalition) {
@@ -59,6 +55,26 @@ function isPerfect(graph, partition, scoreFunc) {
   return [true, null, null]
 }
 
+function isCoreStable(graph, partition, scoreFunc) {
+  // returns whether or not a given partition is core stable
+  var scores = {};
+  for (const coalition of partition)
+    for (const node of coalition)
+      scores[node] = scoreFunc(graph, node, coalition);
+  var nodes = Object.keys(graph);
+  for (const coalition of nodes.powerset()) {
+    if (coalition.length==0)
+      continue;
+    var newScores = {}
+    for (const node of coalition)
+      newScores[node] = scoreFunc(graph, node, coalition)
+    if (coalition.every(node => newScores[node] >= scores[node]) &&
+      coalition.some(node => newScores[node] > scores[node]))
+      return [false, coalition];
+  }
+  return [true, null];
+}
+
 function findFavoriteCoalitions(graph, scoreFunc) {
   // returns an object containing every node's favorite coalition
   // slow. brute force.
@@ -78,12 +94,11 @@ function friendAverage(graph, node, coalition) {
   var total = 0;
   var friendCount = 0;
   var friends = graph[node];
-  for (const node2 of coalition) {
+  for (const node2 of coalition)
     if (friends.includes(node2)) {
       total += FOScore(graph, node2, coalition);
       friendCount += 1;
     }
-  }
   return (total > 0 ? total / friendCount : 0);
 }
 
@@ -122,5 +137,7 @@ Array.prototype.intersect = function(arr) {
 
 Array.prototype.sum = function() {
   // returns the sum of the elements of an array
+  if (this.length==0)
+    return 0;
   return this.reduce((sum, x) => sum + x);
 }
