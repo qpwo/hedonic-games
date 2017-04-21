@@ -138,10 +138,55 @@ function individuallyRationalButton() {
   [isIR, node] = isIndividuallyRational(graph, partition);
   var result = "";
   if (isIR)
-    result = "Yes this partition is individually rational!";
+    result += "Yes this partition is individually rational!";
   else
-    result = "No. Node '" + node + "' would rather be alone.";
+    result += "No. Node '" + node + "' would rather be alone.";
   document.getElementById("individuallyRationalParagraph").innerHTML = result;
+}
+
+function nashStableButton() {
+  var isNS, node, coalition;
+  [isNS, node, coalition] = isNashStable(graph, partition, scoreFunc);
+  var result = "";
+  if (isNS)
+    result += "Yes, this partition is Nash stable.";
+  else
+    result += "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
+  document.getElementById("nashStableParagraph").innerHTML = result;
+}
+
+function individuallyStableButton() {
+  var isIS, node, coalition;
+  [isIS, node, coalition] = isIndividuallyStable(graph, partition, scoreFunc);
+  var result = ""
+  if (isIS)
+    result += "Yes, this partition is individually stable";
+  else
+    result = "No, node '" + node + "' would rather be in coalition [" + coalition +
+      "] and everyone in that coalition is okay with adding that node.";
+  document.getElementById("individuallyStableParagraph").innerHTML = result;
+}
+
+function strictlyPopularButton() {
+  var isSP, betterPartition;
+  [isSP, betterPartition] = isStrictlyPopular(graph, partition, scoreFunc);
+  var result = "";
+  if (isSP)
+    result += "Yes, this partition is Strictly Popular.";
+  else
+    result += "No, partition " + JSON.stringify(betterPartition) + " is preferred overall.";
+  document.getElementById("strictlyPopularParagraph").innerHTML = result;
+}
+
+function coreStableButton() {
+  var isCS, coalition;
+  [isCS, coalition] = isCoreStable(graph, partition, scoreFunc);
+  var result = "";
+  if (isCS)
+    result += "Yes, this partition is core stable";
+  else
+    result += "No, the coalition [" + coalition + "] wants to elope.";
+  document.getElementById("coreStableParagraph").innerHTML = result;
 }
 
 function perfectButton() {
@@ -150,9 +195,9 @@ function perfectButton() {
   [isP, node, favoriteCoalitions] = isPerfect(graph, partition, scoreFunc);
   var result = "";
   if (isP)
-    result = "Yes, this is the perfect partition.";
+    result += "Yes, this is the perfect partition.";
   else {
-    result = "No, node '" + node + "' would rather be in coalition [" +
+    result += "No, node '" + node + "' would rather be in coalition [" +
       favoriteCoalitions[node] + "].\n";
     result += "All favorite coalitions:\n <ul>";
     for (const node of Object.keys(favoriteCoalitions))
@@ -160,39 +205,6 @@ function perfectButton() {
     result += "</ul>";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
-}
-
-function coreStableButton() {
-  var isCS, coalition;
-  [isCS, coalition] = isCoreStable(graph, partition, scoreFunc);
-  var result = "";
-  if (isCS)
-    result = "Yes, this partition is core stable";
-  else
-    result = "No, the coalition [" + coalition + "] wants to elope.";
-  document.getElementById("coreStableParagraph").innerHTML = result;
-}
-
-function nashStableButton() {
-  var isNS, node, coalition;
-  [isNS, node, coalition] = isNashStable(graph, partition, scoreFunc);
-  var result = "";
-  if (isNS)
-    result = "Yes, this partition is Nash stable.";
-  else
-    result = "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
-  document.getElementById("nashStableParagraph").innerHTML = result;
-}
-
-function strictlyPopularButton() {
-  var isSP, betterPartition;
-  [isSP, betterPartition] = isStrictlyPopular(graph, partition, scoreFunc);
-  var result = "";
-  if (isSP)
-    result = "Yes, this partition is Strictly Popular.";
-  else
-    result = "No, partition " + JSON.stringify(betterPartition) + " is preferred overall.";
-  document.getElementById("strictlyPopularParagraph").innerHTML = result;
 }
 
 // ** Helper Functions for Buttons **

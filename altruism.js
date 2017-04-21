@@ -51,49 +51,31 @@ function isIndividuallyRational(graph, partition) {
   return [true, null];
 }
 
-function isIndividuallyStable(graph, partition) {
-  // TODO
-}
 
-function isPerfect(graph, partition, scoreFunc) {
-  var favoriteCoalitions = findFavoriteCoalitions(graph, scoreFunc);
+function isNashStable(graph, partition, scoreFunc) {
   for (const coalition of partition)
-    for (const node of coalition)
-      if (!favoriteCoalitions[node].setEquals(coalition))
-        return [false, node, favoriteCoalitions];
+    for (const node of coalition) {
+      var homeScore = scoreFunc(graph, node, coalition);
+      for (const otherCoalition of partition.concat([[]])) {
+        if (otherCoalition.equals(coalition)) continue;
+        if (scoreFunc(graph, node, otherCoalition) > homeScore)
+          return [false, node, otherCoalition];
+      }
+    }
   return [true, null, null];
 }
 
-function isCoreStable(graph, partition, scoreFunc) {
-  // returns true if the partition is core stable, otherwise
-  // returns a blocking coalition
-  var scores = {};
+function isIndividuallyStable(graph, partition, scoreFunc) {
   for (const coalition of partition)
-    for (const node of coalition)
-      scores[node] = scoreFunc(graph, node, coalition);
-  var nodes = Object.keys(graph);
-  for (const coalition of nodes.powerset()) {
-    if (coalition.length==0)
-      continue;
-    var newScores = {}
-    for (const node of coalition)
-      newScores[node] = scoreFunc(graph, node, coalition)
-    if (coalition.every(node => newScores[node] >= scores[node]) &&
-      coalition.some(node => newScores[node] > scores[node]))
-      return [false, coalition];
-  }
-  return [true, null];
-}
-
-function isNashStable(graph, partition, scoreFunc) {
-  for (const currentCoalition of partition)
-    for (const node of currentCoalition) {
-      var homeScore = scoreFunc(graph, node, currentCoalition);
+    for (const node of coalition) {
+      var homeScore = scoreFunc(graph, node, coalition);
       for (const otherCoalition of partition.concat([[]])) {
-        if (otherCoalition.equals(currentCoalition))
+        if (otherCoalition.equals(coalition)) continue;
+        if (scoreFunc(graph, node, otherCoalition) <= homeScore) // do you want to move there?
           continue;
-        var newScore = scoreFunc(graph, node, otherCoalition);
-        if (newScore > homeScore)
+        if (otherCoalition.every(node2 => // do they want to host you?
+            scoreFunc(graph, node2, otherCoalition) <=
+            scoreFunc(graph, node2, otherCoalition.concat([node]))))
           return [false, node, otherCoalition];
       }
     }
@@ -129,6 +111,36 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
       return [false, otherPartition];
   }
   return [true, otherScores]
+}
+
+function isCoreStable(graph, partition, scoreFunc) {
+  // returns true if the partition is core stable, otherwise
+  // returns a blocking coalition
+  var scores = {};
+  for (const coalition of partition)
+    for (const node of coalition)
+      scores[node] = scoreFunc(graph, node, coalition);
+  var nodes = Object.keys(graph);
+  for (const coalition of nodes.powerset()) {
+    if (coalition.length==0)
+      continue;
+    var newScores = {}
+    for (const node of coalition)
+      newScores[node] = scoreFunc(graph, node, coalition)
+    if (coalition.every(node => newScores[node] >= scores[node]) &&
+      coalition.some(node => newScores[node] > scores[node]))
+      return [false, coalition];
+  }
+  return [true, null];
+}
+
+function isPerfect(graph, partition, scoreFunc) {
+  var favoriteCoalitions = findFavoriteCoalitions(graph, scoreFunc);
+  for (const coalition of partition)
+    for (const node of coalition)
+      if (!favoriteCoalitions[node].setEquals(coalition))
+        return [false, node, favoriteCoalitions];
+  return [true, null, null];
 }
 
 // ** Helper Functions **
