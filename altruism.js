@@ -106,10 +106,6 @@ function pairwiseWinner(nodePartitionScoreMatrix) {
   // todo for strict popularity
 }
 
-function enumeratePartitions(array) {
-  // todo for strict popularity
-}
-
 function findFavoriteCoalitions(graph, scoreFunc) {
   // returns an object containing every node's favorite coalition
   // slow. brute force.
@@ -155,11 +151,6 @@ Array.prototype.max = function(key=(x=>x)) {
   return best;
 }
 
-Array.prototype.powerset = function() {
-  // returns all the subsets of an array
-  return this.reduceRight((a, x) => a.concat(a.map(y => [x].concat(y))), [[]]);
-}
-
 Array.prototype.setEquals = function(arr) {
   // returns true if the arrays would be equal as sets
   return (this.length == arr.length) && this.every(x => arr.includes(x));
@@ -180,4 +171,50 @@ Array.prototype.sum = function() {
   if (this.length==0)
     return 0;
   return this.reduce((sum, x) => sum + x);
+}
+
+Array.prototype.powerset = function() {
+  // returns all the subsets of an array
+  return this.reduceRight((a, x) => a.concat(a.map(y => [x].concat(y))), [[]]);
+}
+
+Array.prototype.partitionSet = function() {
+  // implemented from Knuth's TOACP volume 4a
+  // returns the set of all partitions of a set
+  var n = this.length;
+  var partitions = [];
+  var a = Array(n).fill().map(_ => 0);
+  var b = Array(n).fill().map(_ => 1);
+  var m = 1;
+  while (true) {
+    partitions.push(restrictedGrowthStringToPartition(a, this));
+    while (a[n-1] != m) {
+      a[n-1]++;
+      partitions.push(restrictedGrowthStringToPartition(a, this));
+    }
+    var j = n - 2;
+    while (a[j] == b[j])
+      j--;
+    if (j==0)
+      break;
+    a[j]++;
+    m = b[j] + (a[j]==b[j]);
+    j++;
+    while (j<n-1) {
+      a[j] = 0;
+      b[j] = m;
+      j++;
+    }
+    a[n-1] = 0;
+  }
+  return partitions;
+}
+
+function restrictedGrowthStringToPartition(string, arr) {
+  // converts a restriced growth string and an array into a partition of that
+  // array. helper for Array.prototype.powerset.
+  var numBlocks = Math.max.apply(null, string);
+  var partition = Array(numBlocks+1).fill().map(_ => []);
+  string.forEach((blockNum, index) => partition[blockNum].push(arr[index]));
+  return partition;
 }
