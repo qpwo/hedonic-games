@@ -134,6 +134,7 @@ function setPlayerTypeButton() {
 
 function individuallyRationalButton() {
   // check if the partition is individually rational and display result
+  var isIR, node;
   [isIR, node] = isIndividuallyRational(graph, partition);
   var result = "";
   if (isIR)
@@ -145,6 +146,7 @@ function individuallyRationalButton() {
 
 function perfectButton() {
   // check if the partition is perfect and display result
+  var isP, node, favoriteCoalitions;
   [isP, node, favoriteCoalitions] = isPerfect(graph, partition, scoreFunc);
   var result = "";
   if (isP)
@@ -161,6 +163,7 @@ function perfectButton() {
 }
 
 function coreStableButton() {
+  var isCS, coalition;
   [isCS, coalition] = isCoreStable(graph, partition, scoreFunc);
   var result = "";
   if (isCS)
@@ -171,6 +174,7 @@ function coreStableButton() {
 }
 
 function nashStableButton() {
+  var isNS, node, coalition;
   [isNS, node, coalition] = isNashStable(graph, partition, scoreFunc);
   var result = "";
   if (isNS)
@@ -181,12 +185,13 @@ function nashStableButton() {
 }
 
 function strictlyPopularButton() {
-  [isSP, partition] = isStrictlyPopular(graph, partition, scoreFunc);
+  var isSP, betterPartition;
+  [isSP, betterPartition] = isStrictlyPopular(graph, partition, scoreFunc);
   var result = "";
   if (isSP)
     result = "Yes, this partition is Strictly Popular.";
   else
-    result = "No, partition " + JSON.stringify(partition) + " is preferred overall.";
+    result = "No, partition " + JSON.stringify(betterPartition) + " is preferred overall.";
   document.getElementById("strictlyPopularParagraph").innerHTML = result;
 }
 

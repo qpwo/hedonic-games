@@ -51,6 +51,10 @@ function isIndividuallyRational(graph, partition) {
   return [true, null];
 }
 
+function isIndividuallyStable(graph, partition) {
+  // TODO
+}
+
 function isPerfect(graph, partition, scoreFunc) {
   var favoriteCoalitions = findFavoriteCoalitions(graph, scoreFunc);
   for (const coalition of partition)
