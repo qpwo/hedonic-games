@@ -4,6 +4,7 @@
 var s = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(s, s.renderers[0]); // enable click and drag
 var partition = []; // current partition of the vertices
+var graph = {}; // a map from nodes to arrays of nodes
 var scoreFunc = FOScore; // function to use for player type
 
 // ** Useful Methods for Graphs **
@@ -22,11 +23,6 @@ function addNode(name, x=Math.random(), y=Math.random()) {
   });
   s.refresh();
 }
-
-// add a few random nodes just to have something displayed
-addNode();
-addNode();
-addNode();
 
 function addEdge(source, target) {
   if (source == target) return; // don't add edge loops
@@ -50,18 +46,20 @@ function drawGraphFromTextButton() {
     var targets = colonSplit[1].split(',');
     addNode(source);
     for (let target of targets) {
+      if (!target) continue; // empty target list
       addNode(target);
       addEdge(source, target);
       addEdge(target, source);
     }
   }
+  graph = collectGraph(); // update the global graph object
   s.refresh();
 }
 
 
 function makePartitionFromTextButton() {
   // set the partitions to the ones described by the user and color them
-  // TODO: sort alphabetically
+  // also, it sorts everything
   var bigString = document.getElementById('partitionTextField').value;
   var lines = bigString.split('\n');
   var possiblePartition = lines.map(line => line.replace(/ /g, '').split(','));
@@ -71,7 +69,14 @@ function makePartitionFromTextButton() {
       "exactly one line. (Commas seperate nodes.)");
     return;
   }
-  partition = possiblePartition;
+  partition = [];
+  partition = possiblePartition.map(arr => arr.sort()).sort(
+    function(arr1,arr2) {
+      var str1 = JSON.stringify(arr1);
+      var str2 = JSON.stringify(arr2);
+      if (str1 > str2) return 1;
+      if (str1 < str2) return -1;
+      return 0;});
   partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
 }
 
@@ -88,19 +93,22 @@ function randomColor() {
 }
 
 function collectGraph() {
-  // TODO: sort alphabetically
+  // make a simple node to node array map from the complex nodejs graph
+  // also, it sorts everything
   var graph = {};
-  for (const node of s.graph.nodes())
-    graph[node.id] = [];
+  var nodes = s.graph.nodes().map(node=>node.id).sort();
+  for (const node of nodes)
+    graph[node] = [];
   for (const edge of s.graph.edges())
     graph[edge.source].push(edge.target);
+  for (const node of nodes)
+    graph[node].sort();
   return graph;
 }
 
 // ** Buttons for Webpage **
 
 function displayScoresButton() {
-  var graph = collectGraph();
   result = "<table>";
   result += "<tr><th></th>";
   for (const coalition of partition)
@@ -126,7 +134,7 @@ function setPlayerTypeButton() {
 
 function individuallyRationalButton() {
   // check if the partition is individually rational and display result
-  [isIR, node] = isIndividuallyRational(collectGraph(), partition);
+  [isIR, node] = isIndividuallyRational(graph, partition);
   var result = "";
   if (isIR)
     result = "Yes this partition is individually rational!";
@@ -137,7 +145,7 @@ function individuallyRationalButton() {
 
 function perfectButton() {
   // check if the partition is perfect and display result
-  [isP, node, favoriteCoalitions] = isPerfect(collectGraph(), partition, scoreFunc);
+  [isP, node, favoriteCoalitions] = isPerfect(graph, partition, scoreFunc);
   var result = "";
   if (isP)
     result = "Yes, this is the perfect partition.";
@@ -153,7 +161,7 @@ function perfectButton() {
 }
 
 function coreStableButton() {
-  [isCS, coalition] = isCoreStable(collectGraph(), partition, scoreFunc);
+  [isCS, coalition] = isCoreStable(graph, partition, scoreFunc);
   var result = "";
   if (isCS)
     result = "Yes, this partition is core stable";
@@ -163,7 +171,7 @@ function coreStableButton() {
 }
 
 function nashStableButton() {
-  [isNS, node, coalition] = isNashStable(collectGraph(), partition, scoreFunc);
+  [isNS, node, coalition] = isNashStable(graph, partition, scoreFunc);
   var result = "";
   if (isNS)
     result = "Yes, this partition is Nash stable.";
@@ -173,7 +181,7 @@ function nashStableButton() {
 }
 
 function strictlyPopularButton() {
-  [isSP, partition] = isStrictlyPopular(collectGraph(), partition, scoreFunc);
+  [isSP, partition] = isStrictlyPopular(graph, partition, scoreFunc);
   var result = "";
   if (isSP)
     result = "Yes, this partition is Strictly Popular.";

@@ -104,7 +104,7 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
       currentScores[node] = scoreFunc(graph, node, coalition);
   var nodes = Object.keys(graph)
   var n = nodes.length;
-  var otherScores = {};
+  var otherScores = {}; // will map nodes to node-coalition-value maps
   for (const node of nodes)
     otherScores[node] = {};
   for (const otherPartition of nodes.partitionSet()) {
@@ -116,12 +116,12 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
         if (!otherScores[node][coalitionString])
           otherScores[node][coalitionString] = scoreFunc(graph, node, coalition);
         if (currentScores[node] > otherScores[node][coalitionString])
-          total += 1;
+          total++;
         if (currentScores[node] < otherScores[node][coalitionString])
-          total -= 1;
+          total--;
       }
     }
-    if (total < 0)
+    if (total <= 0)
       return [false, otherPartition];
   }
   return [true, otherScores]
@@ -151,7 +151,7 @@ function friendAverage(graph, node, coalition) {
   for (const node2 of coalition)
     if (friends.includes(node2)) {
       total += FOScore(graph, node2, coalition);
-      friendCount += 1;
+      friendCount++;
     }
   return (total > 0 ? total / friendCount : 0);
 }
