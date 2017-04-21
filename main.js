@@ -1,7 +1,12 @@
+
+// ** necessary globals for setting up a user session **
+
 var s = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(s, s.renderers[0]); // enable click and drag
 var partition = []; // current partition of the vertices
 var scoreFunc = FOScore; // function to use for player type
+
+// ** Useful Methods for Graphs **
 
 function addNode(name, x=Math.random(), y=Math.random()) {
   // add a node to the graph
@@ -90,6 +95,8 @@ function collectGraph() {
   return graph;
 }
 
+// ** Buttons for Webpage **
+
 function displayScoresButton() {
   var graph = collectGraph();
   result = "<table>";
@@ -162,6 +169,8 @@ function nashStableButton() {
     result = "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
   document.getElementById("nashStableParagraph").innerHTML = result;
 }
+
+// ** Helper Functions for Buttons **
 
 function isPartition(arr, arrArr) {
   // checks if the arrArr is a partition of the arr

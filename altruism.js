@@ -3,6 +3,8 @@
 // Todo eventually: have a button to calculate everyone's FOScore just once.
 // Then re-use the values.
 
+// ** Score Functions **
+
 function FOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
   var n = Object.keys(graph).length;
@@ -36,6 +38,8 @@ function FOEQScore(graph, node, coalition) {
   return myScore + numFriends * friendsScore;
 }
 
+// ** Stability Concepts **
+
 function isIndividuallyRational(graph, partition) {
   // returns true if every node in every coalition in partition is happier in
   // its current coalition than it would be alone
@@ -53,7 +57,7 @@ function isPerfect(graph, partition, scoreFunc) {
     for (const node of coalition)
       if (!favoriteCoalitions[node].setEquals(coalition))
         return [false, node, favoriteCoalitions];
-  return [true, null, null]
+  return [true, null, null];
 }
 
 function isCoreStable(graph, partition, scoreFunc) {
@@ -81,7 +85,7 @@ function isNashStable(graph, partition, scoreFunc) {
   for (const currentCoalition of partition)
     for (const node of currentCoalition) {
       var homeScore = scoreFunc(graph, node, currentCoalition);
-      for (const otherCoalition of partition) {
+      for (const otherCoalition of partition.concat([[]])) {
         if (otherCoalition.equals(currentCoalition))
           continue;
         var newScore = scoreFunc(graph, node, otherCoalition);
@@ -90,6 +94,20 @@ function isNashStable(graph, partition, scoreFunc) {
       }
     }
   return [true, null, null];
+}
+
+function isStrictlyPopular(graph, partition, scoreFunc) {
+  // todo
+}
+
+// ** Helper Functions **
+
+function pairwiseWinner(nodePartitionScoreMatrix) {
+  // todo for strict popularity
+}
+
+function enumeratePartitions(array) {
+  // todo for strict popularity
 }
 
 function findFavoriteCoalitions(graph, scoreFunc) {
