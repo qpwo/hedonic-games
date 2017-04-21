@@ -167,6 +167,19 @@ function individuallyStableButton() {
   document.getElementById("individuallyStableParagraph").innerHTML = result;
 }
 
+function contractuallyIndividuallyStableButton() {
+  var isCIS, node, coalition;
+  [isCIS, node, coalition] = isContractuallyIndividuallyStable(graph, partition, scoreFunc);
+  var result = ""
+  if (isCIS)
+    result += "Yes, this partition is contractually individually stable";
+  else
+    result = "No, node '" + node + "' would rather be in coalition [" + coalition +
+      "] and everyone in that coalition is okay with adding that node" +
+      " and everyone in that node's home coalition is okay with it leaving.";
+  document.getElementById("contractuallyIndividuallyStableParagraph").innerHTML = result;
+}
+
 function strictlyPopularButton() {
   var isSP, betterPartition;
   [isSP, betterPartition] = isStrictlyPopular(graph, partition, scoreFunc);

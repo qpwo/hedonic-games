@@ -51,6 +51,7 @@ function isIndividuallyRational(graph, partition) {
   return [true, null];
 }
 
+// TODO: compress the following three functions down into one
 
 function isNashStable(graph, partition, scoreFunc) {
   for (const coalition of partition)
@@ -58,7 +59,7 @@ function isNashStable(graph, partition, scoreFunc) {
       var homeScore = scoreFunc(graph, node, coalition);
       for (const otherCoalition of partition.concat([[]])) {
         if (otherCoalition.equals(coalition)) continue;
-        if (scoreFunc(graph, node, otherCoalition) > homeScore)
+        if (scoreFunc(graph, node, otherCoalition) > homeScore) // do you want to move there?
           return [false, node, otherCoalition];
       }
     }
@@ -78,6 +79,28 @@ function isIndividuallyStable(graph, partition, scoreFunc) {
             scoreFunc(graph, node2, otherCoalition.concat([node]))))
           return [false, node, otherCoalition];
       }
+    }
+  return [true, null, null];
+}
+
+function isContractuallyIndividuallyStable(graph, partition, scoreFunc) {
+  for (const coalition of partition)
+    for (const node of coalition) {
+      var homeScore = scoreFunc(graph, node, coalition);
+      for (const otherCoalition of partition.concat([[]])) {
+        if (otherCoalition.equals(coalition)) continue;
+        if (scoreFunc(graph, node, otherCoalition) <= homeScore) // do you want to move there?
+          continue;
+        if (otherCoalition.every(node2 => // do they want to host you?
+          scoreFunc(graph, node2, otherCoalition) >
+          scoreFunc(graph, node2, otherCoalition.concat([node]))))
+          continue;
+        var withoutNode = coalition.filter(node2 => node2!=node);
+        if (withoutNode.every(node2 => // is your family okay with you leaving?
+          scoreFunc(graph, node2, withoutNode) >=
+          scoreFunc(graph, node2, coalition)))
+          return [false, node, otherCoalition];
+        }
     }
   return [true, null, null];
 }
@@ -133,6 +156,7 @@ function isCoreStable(graph, partition, scoreFunc) {
   }
   return [true, null];
 }
+
 
 function isPerfect(graph, partition, scoreFunc) {
   var favoriteCoalitions = findFavoriteCoalitions(graph, scoreFunc);
