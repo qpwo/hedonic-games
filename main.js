@@ -61,6 +61,7 @@ function drawGraphFromTextButton() {
 
 function makePartitionFromTextButton() {
   // set the partitions to the ones described by the user and color them
+  // TODO: sort alphabetically
   var bigString = document.getElementById('partitionTextField').value;
   var lines = bigString.split('\n');
   var possiblePartition = lines.map(line => line.replace(/ /g, '').split(','));
@@ -87,6 +88,7 @@ function randomColor() {
 }
 
 function collectGraph() {
+  // TODO: sort alphabetically
   var graph = {};
   for (const node of s.graph.nodes())
     graph[node.id] = [];
@@ -168,6 +170,16 @@ function nashStableButton() {
   else
     result = "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
   document.getElementById("nashStableParagraph").innerHTML = result;
+}
+
+function strictlyPopularButton() {
+  [isSP, partition] = isStrictlyPopular(collectGraph(), partition, scoreFunc);
+  var result = "";
+  if (isSP)
+    result = "Yes, this partition is Strictly Popular.";
+  else
+    result = "No, partition " + JSON.stringify(partition) + " is preferred overall.";
+  document.getElementById("strictlyPopularParagraph").innerHTML = result;
 }
 
 // ** Helper Functions for Buttons **

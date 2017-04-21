@@ -1,6 +1,6 @@
 // I think this code is completely functional. No globals or anything.
 
-// Todo eventually: have a button to calculate everyone's FOScore just once.
+// TODO eventually: have a button to calculate everyone's FOScore just once.
 // Then re-use the values.
 
 // ** Score Functions **
@@ -97,14 +97,37 @@ function isNashStable(graph, partition, scoreFunc) {
 }
 
 function isStrictlyPopular(graph, partition, scoreFunc) {
-  // todo
+  // expects the partition and the graph to be sorted lexicographically
+  var currentScores = {}
+  for (const coalition of partition)
+    for (const node of coalition)
+      currentScores[node] = scoreFunc(graph, node, coalition);
+  var nodes = Object.keys(graph)
+  var n = nodes.length;
+  var otherScores = {};
+  for (const node of nodes)
+    otherScores[node] = {};
+  for (const otherPartition of nodes.partitionSet()) {
+    if (partition.equals(otherPartition)) continue;
+    var total = 0;
+    for (const coalition of otherPartition) {
+      var coalitionString = JSON.stringify(coalition);
+      for (const node of coalition) {
+        if (!otherScores[node][coalitionString])
+          otherScores[node][coalitionString] = scoreFunc(graph, node, coalition);
+        if (currentScores[node] > otherScores[node][coalitionString])
+          total += 1;
+        if (currentScores[node] < otherScores[node][coalitionString])
+          total -= 1;
+      }
+    }
+    if (total < 0)
+      return [false, otherPartition];
+  }
+  return [true, otherScores]
 }
 
 // ** Helper Functions **
-
-function pairwiseWinner(nodePartitionScoreMatrix) {
-  // todo for strict popularity
-}
 
 function findFavoriteCoalitions(graph, scoreFunc) {
   // returns an object containing every node's favorite coalition
@@ -139,30 +162,18 @@ function isAcceptable(graph, node, coalition) {
     graph[node].intersect(coalition).length > 0;
 }
 
-Array.prototype.max = function(key=(x=>x)) {
-  // return the maximum element of an array according to the key
-  var best = this[0];
-  var bestScore = key(best);
-  for (i = 1; i < this.length; i++) {
-    var score = key(this[i]);
-    if (score > bestScore)
-      [best, bestScore] = [this[i], score];
-  }
-  return best;
-}
-
 Array.prototype.setEquals = function(arr) {
   // returns true if the arrays would be equal as sets
   return (this.length == arr.length) && this.every(x => arr.includes(x));
 }
 
 Array.prototype.equals = function(arr) {
-  // returns true if the arrays are pairwise equal
-  return (this.length == arr.length) && this.every((x,i) => x==arr[i]);
+  return JSON.stringify(this)==JSON.stringify(arr);
 }
 
 Array.prototype.intersect = function(arr) {
   // returns an array of the elements that are in both arrays
+  // TODO: make this the fast version for sorted arrays
   return this.filter(x => arr.includes(x));
 }
 
@@ -178,9 +189,22 @@ Array.prototype.powerset = function() {
   return this.reduceRight((a, x) => a.concat(a.map(y => [x].concat(y))), [[]]);
 }
 
+Array.prototype.max = function(key=(x=>x)) {
+  // return the maximum element of an array according to the key
+  var best = this[0];
+  var bestScore = key(best);
+  for (i = 1; i < this.length; i++) {
+    var score = key(this[i]);
+    if (score > bestScore)
+      [best, bestScore] = [this[i], score];
+  }
+  return best;
+}
+
 Array.prototype.partitionSet = function() {
-  // implemented from Knuth's TOACP volume 4a
-  // returns the set of all partitions of a set
+  // Implemented from Knuth's TOACP volume 4a.
+  // Returns the set of all partitions of a set.
+  // More items than 2^n but fewer than n!
   var n = this.length;
   var partitions = [];
   var a = Array(n).fill().map(_ => 0);
@@ -211,8 +235,8 @@ Array.prototype.partitionSet = function() {
 }
 
 function restrictedGrowthStringToPartition(string, arr) {
-  // converts a restriced growth string and an array into a partition of that
-  // array. helper for Array.prototype.powerset.
+  // Converts a restricted growth string and an array into a partition of that array.
+  // Helper for Array.prototype.powerset.
   var numBlocks = Math.max.apply(null, string);
   var partition = Array(numBlocks+1).fill().map(_ => []);
   string.forEach((blockNum, index) => partition[blockNum].push(arr[index]));

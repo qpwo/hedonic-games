@@ -4,6 +4,7 @@
   <head>
     <title>altruistic hedonic game simulator</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
   </head>
 
   <body>
@@ -69,9 +70,9 @@ e</textarea>
             <button type="button">Check!</button>
             <p> </p>
           </li>
-          <li>strictly popular? (not implemented yet)
-            <button type="button">Check!</button>
-            <p> </p>
+          <li>strictly popular? (buggy and very slow)
+            <button type="button" onclick="strictlyPopularButton()">Check!</button>
+            <p id="strictlyPopularParagraph"> </p>
           </li>
           <li>core-stable? (slow)
             <button type="button" onclick="coreStableButton()">Check!</button>
