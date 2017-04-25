@@ -51,90 +51,32 @@ function isIndividuallyRational(graph, partition) {
   return [true, null];
 }
 
-// TODO: compress the following three functions down into one
+[isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable] =
+  (function(){
+    // four different tests used in stability:
+    // (G=graph,P=partition,n=node,C1=homeCoalition,C2=otherCoalition,SF=scoreFunc)
+    // Is it actually a different coalition?
+    var test0 = (G, P, n, C1, C2, SF) => (!C1.equals(C2));
+    // Do I (the node) want to leave my home?
+    var test1 = (G, P, n, C1, C2, SF) => (SF(G, n, C2) > SF(G, n, C1));
+    // Is the new coalition okay with having me?
+    var test2 = (G, P, n, C1, C2, SF) => (C2.every(n2 => SF(G, n2, C2.concat([n])) >= SF(G, n2, C2)));
+    // Is my home okay with me leaving?
+    var test3 = (G, P, n, C1, C2, SF) => ((C1wn => C1wn.every(n1 => SF(G,n1,C1wn) >= SF(G,n1,C1)))(C1.filter(n1=>n1!=n)));
 
-function isNashStable(graph, partition, scoreFunc) {
-  for (const coalition of partition)
-    for (const node of coalition) {
-      var homeScore = scoreFunc(graph, node, coalition);
-      for (const otherCoalition of partition.concat([[]])) {
-        if (otherCoalition.equals(coalition)) continue;
-        if (scoreFunc(graph, node, otherCoalition) > homeScore) // do you want to move there?
-          return [false, node, otherCoalition];
+    // check if any possible vertex with a home coalition and a new coalition passes every test
+    var makeCheckFunc = tests =>
+      function(G, P, SF) {
+        for (const C1 of P) for (const n of C1) for (const C2 of P.concat([[]]))
+          if (tests.every(test => test(G, P, n, C1, C2, SF))) // if this situation passes every test
+            return [false, n, C2];
+        return [true, null, null];
       }
-    }
-  return [true, null, null];
-}
 
-function isIndividuallyStable(graph, partition, scoreFunc) {
-  for (const coalition of partition)
-    for (const node of coalition) {
-      var homeScore = scoreFunc(graph, node, coalition);
-      for (const otherCoalition of partition.concat([[]])) {
-        if (otherCoalition.equals(coalition)) continue;
-        if (scoreFunc(graph, node, otherCoalition) <= homeScore) // do you want to move there?
-          continue;
-        if (otherCoalition.every(node2 => // do they want to host you?
-            scoreFunc(graph, node2, otherCoalition) <=
-            scoreFunc(graph, node2, otherCoalition.concat([node]))))
-          return [false, node, otherCoalition];
-      }
-    }
-  return [true, null, null];
-}
-
-function isContractuallyIndividuallyStable(graph, partition, scoreFunc) {
-  for (const coalition of partition)
-    for (const node of coalition) {
-      var homeScore = scoreFunc(graph, node, coalition);
-      for (const otherCoalition of partition.concat([[]])) {
-        if (otherCoalition.equals(coalition)) continue;
-        if (scoreFunc(graph, node, otherCoalition) <= homeScore) // do you want to move there?
-          continue;
-        if (otherCoalition.every(node2 => // do they want to host you?
-          scoreFunc(graph, node2, otherCoalition) >
-          scoreFunc(graph, node2, otherCoalition.concat([node]))))
-          continue;
-        var withoutNode = coalition.filter(node2 => node2!=node);
-        if (withoutNode.every(node2 => // is your family okay with you leaving?
-          scoreFunc(graph, node2, withoutNode) >=
-          scoreFunc(graph, node2, coalition)))
-          return [false, node, otherCoalition];
-        }
-    }
-  return [true, null, null];
-}
-
-function isStrictlyPopular(graph, partition, scoreFunc) {
-  // expects the partition and the graph to be sorted lexicographically
-  var currentScores = {}
-  for (const coalition of partition)
-    for (const node of coalition)
-      currentScores[node] = scoreFunc(graph, node, coalition);
-  var nodes = Object.keys(graph)
-  var n = nodes.length;
-  var otherScores = {}; // will map nodes to node-coalition-value maps
-  for (const node of nodes)
-    otherScores[node] = {};
-  for (const otherPartition of nodes.partitionSet()) {
-    if (partition.equals(otherPartition)) continue;
-    var total = 0;
-    for (const coalition of otherPartition) {
-      var coalitionString = JSON.stringify(coalition);
-      for (const node of coalition) {
-        if (!otherScores[node][coalitionString])
-          otherScores[node][coalitionString] = scoreFunc(graph, node, coalition);
-        if (currentScores[node] > otherScores[node][coalitionString])
-          total++;
-        if (currentScores[node] < otherScores[node][coalitionString])
-          total--;
-      }
-    }
-    if (total <= 0)
-      return [false, otherPartition];
-  }
-  return [true, otherScores]
-}
+    return [makeCheckFunc([test0, test1]),
+      makeCheckFunc([test0, test1, test2]),
+      makeCheckFunc([test0, test1, test2, test3])];
+  })();
 
 function isCoreStable(graph, partition, scoreFunc) {
   // returns true if the partition is core stable, otherwise
@@ -200,85 +142,4 @@ function isAcceptable(graph, node, coalition) {
   // returns true if this coalition is acceptable to the node
   return coalition.equals([node]) ||
     graph[node].intersect(coalition).length > 0;
-}
-
-Array.prototype.setEquals = function(arr) {
-  // returns true if the arrays would be equal as sets
-  return (this.length == arr.length) && this.every(x => arr.includes(x));
-}
-
-Array.prototype.equals = function(arr) {
-  return JSON.stringify(this)==JSON.stringify(arr);
-}
-
-Array.prototype.intersect = function(arr) {
-  // returns an array of the elements that are in both arrays
-  // TODO: make this the fast version for sorted arrays
-  return this.filter(x => arr.includes(x));
-}
-
-Array.prototype.sum = function() {
-  // returns the sum of the elements of an array
-  if (this.length==0)
-    return 0;
-  return this.reduce((sum, x) => sum + x);
-}
-
-Array.prototype.powerset = function() {
-  // returns all the subsets of an array
-  return this.reduceRight((a, x) => a.concat(a.map(y => [x].concat(y))), [[]]);
-}
-
-Array.prototype.max = function(key=(x=>x)) {
-  // return the maximum element of an array according to the key
-  var best = this[0];
-  var bestScore = key(best);
-  for (i = 1; i < this.length; i++) {
-    var score = key(this[i]);
-    if (score > bestScore)
-      [best, bestScore] = [this[i], score];
-  }
-  return best;
-}
-
-Array.prototype.partitionSet = function() {
-  // Implemented from Knuth's TOACP volume 4a.
-  // Returns the set of all partitions of a set.
-  // More items than 2^n but fewer than n!
-  var n = this.length;
-  var partitions = [];
-  var a = Array(n).fill().map(_ => 0);
-  var b = Array(n).fill().map(_ => 1);
-  var m = 1;
-  while (true) {
-    partitions.push(restrictedGrowthStringToPartition(a, this));
-    while (a[n-1] != m) {
-      a[n-1]++;
-      partitions.push(restrictedGrowthStringToPartition(a, this));
-    }
-    var j = n - 2;
-    while (a[j] == b[j])
-      j--;
-    if (j==0)
-      break;
-    a[j]++;
-    m = b[j] + (a[j]==b[j]);
-    j++;
-    while (j<n-1) {
-      a[j] = 0;
-      b[j] = m;
-      j++;
-    }
-    a[n-1] = 0;
-  }
-  return partitions;
-}
-
-function restrictedGrowthStringToPartition(string, arr) {
-  // Converts a restricted growth string and an array into a partition of that array.
-  // Helper for Array.prototype.powerset.
-  var numBlocks = Math.max.apply(null, string);
-  var partition = Array(numBlocks+1).fill().map(_ => []);
-  string.forEach((blockNum, index) => partition[blockNum].push(arr[index]));
-  return partition;
 }
