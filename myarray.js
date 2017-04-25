@@ -1,32 +1,35 @@
+// Luke Miles, April 2017
+// Useful algorithms for arrays
+
 Array.prototype.setEquals = function(arr) {
-  // returns true if the arrays would be equal as sets
+  // Would the arrays be equal as sets?
   return this.every(x => arr.includes(x)) && arr.every(x => this.includes(x));
 }
 
 Array.prototype.equals = function(arr) {
+  // Do the arrays have the same string representation?
   return JSON.stringify(this)==JSON.stringify(arr);
 }
 
 Array.prototype.intersect = function(arr) {
-  // returns an array of the elements that are in both arrays
-  // maybe TODO: make this the fast version for sorted arrays
+  // an array of the elements that are in both arrays
   return this.filter(x => arr.includes(x));
 }
 
 Array.prototype.sum = function() {
-  // returns the sum of the elements of an array
+  // the sum of the elements of an array
   if (this.length==0)
     return 0;
   return this.reduce((sum, x) => sum + x);
 }
 
 Array.prototype.powerset = function() {
-  // returns all the subsets of an array
+  // all the subsets of an array
   return this.reduceRight((a, x) => a.concat(a.map(y => [x].concat(y))), [[]]);
 }
 
 Array.prototype.max = function(key=(x=>x)) {
-  // return the maximum element of an array according to the key
+  // the maximum element of an array according to the key
   var best = this[0];
   var bestScore = key(best);
   for (i = 1; i < this.length; i++) {
@@ -38,9 +41,9 @@ Array.prototype.max = function(key=(x=>x)) {
 }
 
 Array.prototype.partitionSet = function() {
+  // The set of all partitions of a set.
   // Implemented from Knuth's TOACP volume 4a.
-  // Returns the set of all partitions of a set.
-  // More items than 2^n but fewer than n!
+  // More items than 2^n but fewer than n!.
   var n = this.length;
   var partitions = [];
   var a = Array(n).fill().map(_ => 0);
@@ -72,7 +75,7 @@ Array.prototype.partitionSet = function() {
 
 function restrictedGrowthStringToPartition(string, arr) {
   // Converts a restricted growth string and an array into a partition of that array.
-  // Helper for Array.prototype.powerset.
+  // Helper for Array.prototype.partitionSet.
   var numBlocks = Math.max.apply(null, string);
   var partition = Array(numBlocks+1).fill().map(_ => []);
   string.forEach((blockNum, index) => partition[blockNum].push(arr[index]));

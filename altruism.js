@@ -1,7 +1,5 @@
-// I think this code is completely functional. No globals or anything.
-
-// TODO eventually: have a button to calculate everyone's FOScore just once.
-// Then re-use the values.
+// Luke Miles, April 2017
+// Algorithms for altruistic hedonic games
 
 // ** Score Functions **
 
@@ -41,8 +39,8 @@ function FOEQScore(graph, node, coalition) {
 // ** Stability Concepts **
 
 function isIndividuallyRational(graph, partition) {
-  // returns true if every node in every coalition in partition is happier in
-  // its current coalition than it would be alone
+  // Is every node in every coalition in partition happier in its current coalition than it would be alone?
+  // If not, return a counter-example.
   var nodes = Object.keys(graph);
   for (const coalition of partition)
     for (const node of coalition)
@@ -51,18 +49,19 @@ function isIndividuallyRational(graph, partition) {
   return [true, null];
 }
 
+// The next three stability concepts repeatedly use the same tests, so it is better to define them all at once
 [isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable] =
   (function(){
     // four different tests used in stability:
-    // (G=graph,P=partition,n=node,C1=homeCoalition,C2=otherCoalition,SF=scoreFunc)
+    // G=graph, P=partition, n=node, C1=homeCoalition, C2=otherCoalition, SF=scoreFunc
     // Is it actually a different coalition?
-    var test0 = (G, P, n, C1, C2, SF) => (!C1.equals(C2));
+    var test0 = (G, P, n, C1, C2, SF) => !C1.equals(C2);
     // Do I (the node) want to leave my home?
-    var test1 = (G, P, n, C1, C2, SF) => (SF(G, n, C2) > SF(G, n, C1));
+    var test1 = (G, P, n, C1, C2, SF) => SF(G, n, C2) > SF(G, n, C1);
     // Is the new coalition okay with having me?
-    var test2 = (G, P, n, C1, C2, SF) => (C2.every(n2 => SF(G, n2, C2.concat([n])) >= SF(G, n2, C2)));
+    var test2 = (G, P, n, C1, C2, SF) => C2.every(n2 => SF(G, n2, C2.concat([n])) >= SF(G, n2, C2));
     // Is my home okay with me leaving?
-    var test3 = (G, P, n, C1, C2, SF) => ((C1wn => C1wn.every(n1 => SF(G,n1,C1wn) >= SF(G,n1,C1)))(C1.filter(n1=>n1!=n)));
+    var test3 = (G, P, n, C1, C2, SF) => (C1wn => C1wn.every(n1 => SF(G,n1,C1wn) >= SF(G,n1,C1)))(C1.filter(n1=>n1!=n));
 
     // check if any possible vertex with a home coalition and a new coalition passes every test
     var makeCheckFunc = tests =>
@@ -73,14 +72,16 @@ function isIndividuallyRational(graph, partition) {
         return [true, null, null];
       }
 
-    return [makeCheckFunc([test0, test1]),
+    return [
+      makeCheckFunc([test0, test1]),
       makeCheckFunc([test0, test1, test2]),
-      makeCheckFunc([test0, test1, test2, test3])];
+      makeCheckFunc([test0, test1, test2, test3])
+    ];
   })();
 
 function isCoreStable(graph, partition, scoreFunc) {
-  // returns true if the partition is core stable, otherwise
-  // returns a blocking coalition
+  // Is this partition core-stable?
+  // If not, give a counter-example.
   var scores = {};
   for (const coalition of partition)
     for (const node of coalition)
@@ -101,6 +102,8 @@ function isCoreStable(graph, partition, scoreFunc) {
 
 
 function isPerfect(graph, partition, scoreFunc) {
+  // Is this partition perfect?
+  // If not, give a counter-example.
   var favoriteCoalitions = findFavoriteCoalitions(graph, scoreFunc);
   for (const coalition of partition)
     for (const node of coalition)
@@ -139,7 +142,7 @@ function friendAverage(graph, node, coalition) {
 }
 
 function isAcceptable(graph, node, coalition) {
-  // returns true if this coalition is acceptable to the node
+  // Is this coalition acceptable to node?
   return coalition.equals([node]) ||
     graph[node].intersect(coalition).length > 0;
 }

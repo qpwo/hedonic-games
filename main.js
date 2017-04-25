@@ -1,3 +1,5 @@
+// Luke Miles, April 2017
+// Code for all the buttons and things on lukexmiles.com/hedonic-games
 
 // ** necessary globals for setting up a user session **
 
@@ -7,7 +9,7 @@ var partition = []; // current partition of the vertices
 var graph = {}; // a map from nodes to arrays of nodes
 var scoreFunc = FOScore; // function to use for player type
 
-// ** Useful Methods for Graphs **
+// ** Functions for Reading and Changing the Graph **
 
 function addNode(name, x=Math.random(), y=Math.random()) {
   // add a node to the graph
@@ -25,6 +27,7 @@ function addNode(name, x=Math.random(), y=Math.random()) {
 }
 
 function addEdge(source, target) {
+  // add an edge to the graph
   if (source == target) return; // don't add edge loops
   name = source + '-' + target;
   if (s.graph.edges(name)) return; // don't add already existing edges
@@ -35,8 +38,25 @@ function addEdge(source, target) {
   });
 }
 
+function collectGraph() {
+  // Make a simple adjacency list object from the complex nodejs graph.
+  // Also, it sorts everything alphabetically.
+  var graph = {};
+  var nodes = s.graph.nodes().map(node=>node.id).sort();
+  for (const node of nodes)
+    graph[node] = [];
+  for (const edge of s.graph.edges())
+    graph[edge.source].push(edge.target);
+  for (const node of nodes)
+    graph[node].sort();
+  return graph;
+}
+
+
+// ** Functions for Taking User Input **
+
 function drawGraphFromTextButton() {
-  // replace the current graph with the one described in the big text box on the webpage
+  // Replace the current graph with the one described in the big text box on the webpage.
   s.graph.clear();
   var bigString = document.getElementById('graphTextField').value;
   var lines = bigString.split('\n');
@@ -53,13 +73,13 @@ function drawGraphFromTextButton() {
     }
   }
   graph = collectGraph(); // update the global graph object
-  s.refresh();
+  s.refresh(); // update the displayed picture
 }
 
 
 function makePartitionFromTextButton() {
-  // set the partitions to the ones described by the user and color them
-  // also, it sorts everything
+  // Set the partition to the one described by the user and color the coalitions.
+  // Also, it sorts everything alphabetically.
   var bigString = document.getElementById('partitionTextField').value;
   var lines = bigString.split('\n');
   var possiblePartition = lines.map(line => line.replace(/ /g, '').split(','));
@@ -78,13 +98,19 @@ function makePartitionFromTextButton() {
       if (str1 < str2) return -1;
       return 0;});
   partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
+  s.refresh(); // update the displayed picture
+}
+
+function isPartition(arr, arrArr) {
+  // checks if the arrArr is a partition of the arr
+  var concatified = [].concat.apply([],arrArr);
+  return (concatified.length == arr.length) && arr.every(x => concatified.includes(x));
 }
 
 function colorSubgraph(nodes, color) {
   // color a subgraph induced by a set of nodes
   for (let nodeObject of s.graph.nodes(nodes))
     nodeObject.color = color;
-  s.refresh();
 }
 
 function randomColor() {
@@ -92,23 +118,10 @@ function randomColor() {
   return '#'+Math.random().toString(16).substr(-6);
 }
 
-function collectGraph() {
-  // make a simple node to node array map from the complex nodejs graph
-  // also, it sorts everything
-  var graph = {};
-  var nodes = s.graph.nodes().map(node=>node.id).sort();
-  for (const node of nodes)
-    graph[node] = [];
-  for (const edge of s.graph.edges())
-    graph[edge.source].push(edge.target);
-  for (const node of nodes)
-    graph[node].sort();
-  return graph;
-}
-
-// ** Buttons for Webpage **
+// ** Buttons for Displaying Calculations **
 
 function displayScoresButton() {
+  // Displays every node's score of every coalition in the partition.
   result = "<table>";
   result += "<tr><th></th>";
   for (const coalition of partition)
@@ -127,13 +140,13 @@ function displayScoresButton() {
 }
 
 function setPlayerTypeButton() {
+  // Set the global player type.
   var nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
   var selection = document.getElementById("playerTypePicker").value;
   scoreFunc = nameToFunc[selection];
 }
 
 function individuallyRationalButton() {
-  // check if the partition is individually rational and display result
   var isIR, node;
   [isIR, node] = isIndividuallyRational(graph, partition);
   var result = "";
@@ -218,12 +231,4 @@ function perfectButton() {
     result += "</ul>";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
-}
-
-// ** Helper Functions for Buttons **
-
-function isPartition(arr, arrArr) {
-  // checks if the arrArr is a partition of the arr
-  var concatified = [].concat.apply([],arrArr);
-  return (concatified.length == arr.length) && arr.every(x => concatified.includes(x));
 }
