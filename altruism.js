@@ -100,6 +100,38 @@ function isCoreStable(graph, partition, scoreFunc) {
   return [true, null];
 }
 
+function isStrictlyPopular(graph, partition, scoreFunc) {
+  // Is this partition stictly popular?
+  // If not, give a counter-example.
+  var currentScores = {}
+  for (const coalition of partition)
+    for (const node of coalition)
+      currentScores[node] = scoreFunc(graph, node, coalition);
+  var nodes = Object.keys(graph)
+  var n = nodes.length;
+  var otherScores = {}; // will map nodes to node-coalition-value maps
+  for (const node of nodes)
+    otherScores[node] = {}; // This map is useful because the same subset occurs in many partitions.
+  for (const otherPartition of nodes.partitionSet()) {
+    if (partition.equals(otherPartition)) continue;
+    var winCount = 0;
+    for (const coalition of otherPartition) {
+      var coalitionString = JSON.stringify(coalition);
+      for (const node of coalition) {
+        if (!otherScores[node][coalitionString])
+          otherScores[node][coalitionString] = scoreFunc(graph, node, coalition);
+        if (currentScores[node] > otherScores[node][coalitionString])
+          winCount++;
+        if (currentScores[node] < otherScores[node][coalitionString])
+          winCount--;
+      }
+    }
+    if (winCount <= 0)
+      return [false, otherPartition, winCount];
+  }
+  return [true, null, null]
+}
+
 
 function isPerfect(graph, partition, scoreFunc) {
   // Is this partition perfect?
@@ -122,7 +154,7 @@ function findFavoriteCoalitions(graph, scoreFunc) {
   for (const node of nodes) {
     var otherNodes = nodes.filter(n => (n != node));
     favoriteCoalitions[node] = otherNodes.powerset().max(coalition =>
-      scoreFunc(graph,  node, coalition)).concat(node);
+      scoreFunc(graph, node, coalition)).concat(node);
   }
   return favoriteCoalitions;
 }
@@ -143,6 +175,5 @@ function friendAverage(graph, node, coalition) {
 
 function isAcceptable(graph, node, coalition) {
   // Is this coalition acceptable to node?
-  return coalition.equals([node]) ||
-    graph[node].intersect(coalition).length > 0;
+  return coalition.equals([node]) || graph[node].intersect(coalition).length > 0;
 }

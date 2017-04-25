@@ -194,13 +194,13 @@ function contractuallyIndividuallyStableButton() {
 }
 
 function strictlyPopularButton() {
-  var isSP, betterPartition;
-  [isSP, betterPartition] = isStrictlyPopular(graph, partition, scoreFunc);
+  var isSP, betterPartition, winCount;
+  [isSP, betterPartition, winCount] = isStrictlyPopular(graph, partition, scoreFunc);
   var result = "";
   if (isSP)
     result += "Yes, this partition is Strictly Popular.";
   else
-    result += "No, partition " + JSON.stringify(betterPartition) + " is preferred overall.";
+    result += "No, partition " + JSON.stringify(betterPartition) + " is preferred overall by " + (-winCount) + " votes.";
   document.getElementById("strictlyPopularParagraph").innerHTML = result;
 }
 
