@@ -11,6 +11,19 @@ function FOScore(graph, node, coalition) {
     (node2 == node ? 0 : (friends.includes(node2) ? n : -1))).sum();
 }
 
+function friendAverage(graph, node, coalition) {
+  // the average happiness of a node's friends in a given coalition
+  var total = 0;
+  var friendCount = 0;
+  var friends = graph[node];
+  for (const node2 of coalition)
+    if (friends.includes(node2)) {
+      total += FOScore(graph, node2, coalition);
+      friendCount++;
+    }
+  return (total > 0 ? total / friendCount : 0);
+}
+
 function FOSFScore(graph, node, coalition) {
   // node's selfish-first score of coalition
   var n = Object.keys(graph).length;
@@ -47,6 +60,11 @@ function isIndividuallyRational(graph, partition) {
       if (!isAcceptable(graph, node, coalition))
         return [false, node];
   return [true, null];
+}
+
+function isAcceptable(graph, node, coalition) {
+  // Is this coalition acceptable to node?
+  return coalition.equals([node]) || graph[node].intersect(coalition).length > 0;
 }
 
 // The next three stability concepts repeatedly use the same tests, so it is better to define them all at once
@@ -145,24 +163,4 @@ function isPerfect(graph, partition, scoreFunc) {
           return [false, node, otherCoalition];
     }
   return [true, null, null];
-}
-
-// ** Helper Functions **
-
-function friendAverage(graph, node, coalition) {
-  // the average happiness of a node's friends in a given coalition
-  var total = 0;
-  var friendCount = 0;
-  var friends = graph[node];
-  for (const node2 of coalition)
-    if (friends.includes(node2)) {
-      total += FOScore(graph, node2, coalition);
-      friendCount++;
-    }
-  return (total > 0 ? total / friendCount : 0);
-}
-
-function isAcceptable(graph, node, coalition) {
-  // Is this coalition acceptable to node?
-  return coalition.equals([node]) || graph[node].intersect(coalition).length > 0;
 }
