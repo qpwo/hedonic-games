@@ -217,18 +217,13 @@ function coreStableButton() {
 
 function perfectButton() {
   // check if the partition is perfect and display result
-  var isP, node, favoriteCoalitions;
-  [isP, node, favoriteCoalitions] = isPerfect(graph, partition, scoreFunc);
+  var isP, node, otherCoalition;
+  [isP, node, otherCoalition] = isPerfect(graph, partition, scoreFunc);
   var result = "";
   if (isP)
     result += "Yes, this is the perfect partition.";
   else {
-    result += "No, node '" + node + "' would rather be in coalition [" +
-      favoriteCoalitions[node] + "].\n";
-    result += "All favorite coalitions:\n <ul>";
-    for (const node of Object.keys(favoriteCoalitions))
-      result += "<li>" +  node + " : " + favoriteCoalitions[node] + "</li>\n";
-    result += "</ul>";
+    result += "No, node '" + node + "' would rather be in coalition [" + otherCoalition + "].";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
 }

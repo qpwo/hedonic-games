@@ -136,29 +136,18 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
 function isPerfect(graph, partition, scoreFunc) {
   // Is this partition perfect?
   // If not, give a counter-example.
-  var favoriteCoalitions = findFavoriteCoalitions(graph, scoreFunc);
+  var nodes = Object.keys(graph);
   for (const coalition of partition)
-    for (const node of coalition)
-      if (!favoriteCoalitions[node].setEquals(coalition))
-        return [false, node, favoriteCoalitions];
+    for (const node of coalition) {
+      var homeScore = scoreFunc(graph, node, coalition);
+      for (const otherCoalition of nodes.filter(n=>n!=node).powerset())
+        if (scoreFunc(graph, node, otherCoalition) > homeScore)
+          return [false, node, otherCoalition];
+    }
   return [true, null, null];
 }
 
 // ** Helper Functions **
-
-function findFavoriteCoalitions(graph, scoreFunc) {
-  // returns an object containing every node's favorite coalition
-  // slow. brute force.
-  var favoriteCoalitions = {};
-  var nodes = Object.keys(graph);
-  for (const node of nodes) {
-    var otherNodes = nodes.filter(n => (n != node));
-    favoriteCoalitions[node] = otherNodes.powerset().max(coalition =>
-      scoreFunc(graph, node, coalition)).concat(node);
-  }
-  return favoriteCoalitions;
-}
-
 
 function friendAverage(graph, node, coalition) {
   // the average happiness of a node's friends in a given coalition
