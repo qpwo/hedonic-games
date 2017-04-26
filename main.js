@@ -52,7 +52,6 @@ function collectGraph() {
   return graph;
 }
 
-
 // ** Functions for Taking User Input **
 
 function drawGraphFromTextButton() {
@@ -75,7 +74,6 @@ function drawGraphFromTextButton() {
   graph = collectGraph(); // update the global graph object
   s.refresh(); // update the displayed picture
 }
-
 
 function makePartitionFromTextButton() {
   // Set the partition to the one described by the user and color the coalitions.
@@ -131,7 +129,7 @@ function displayScoresButton() {
     result += "<tr> <th>" + node + "</th>"; // start a new row
     for (const coalition of partition) {
       var score = scoreFunc(graph, node, coalition); 
-      result += "<td>" + score.toString() + "</td>"; // add a score
+      result += "<td>" + ((score%1==0)? score : score.toFixed(2)) + "</td>"; // add a score
     }
     result += "</tr>";
   }

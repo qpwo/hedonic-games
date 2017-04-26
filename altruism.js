@@ -14,14 +14,12 @@ function FOScore(graph, node, coalition) {
 function friendAverage(graph, node, coalition) {
   // the average happiness of a node's friends in a given coalition
   var total = 0;
-  var friendCount = 0;
-  var friends = graph[node];
-  for (const node2 of coalition)
-    if (friends.includes(node2)) {
-      total += FOScore(graph, node2, coalition);
-      friendCount++;
-    }
-  return (total > 0 ? total / friendCount : 0);
+  var count = 0;
+  for (const friend of coalition.intersect(graph[node])) {
+    total += FOScore(graph, friend, coalition);
+    count++;
+  }
+  return (count > 0 ? total / friendCount : 0);
 }
 
 function FOSFScore(graph, node, coalition) {
@@ -43,10 +41,13 @@ function FOALScore(graph, node, coalition) {
 function FOEQScore(graph, node, coalition) {
   // node's equal treatment score of coalition
   var n = Object.keys(graph).length;
-  var myScore = FOScore(graph, node, coalition);
-  var friendsScore = friendAverage(graph, node, coalition);
-  var numFriends = coalition.intersect(graph[node]).length;
-  return myScore + numFriends * friendsScore;
+  var total = FOScore(graph, node, coalition);
+  var count = 1;
+  for (const friend of coalition.intersect(graph[node])) {
+    total += FOScore(graph, friend, coalition)
+    count++;
+  }
+  return total/count;
 }
 
 // ** Stability Concepts **
@@ -149,7 +150,6 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
   }
   return [true, null, null]
 }
-
 
 function isPerfect(graph, partition, scoreFunc) {
   // Is this partition perfect?
