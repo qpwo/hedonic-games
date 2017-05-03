@@ -19,7 +19,7 @@ function friendAverage(graph, node, coalition) {
     total += FOScore(graph, friend, coalition);
     count++;
   }
-  return (count > 0 ? total / friendCount : 0);
+  return (count > 0 ? total / count : 0);
 }
 
 function FOSFScore(graph, node, coalition) {
