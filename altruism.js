@@ -38,16 +38,23 @@ function FOALScore(graph, node, coalition) {
   return myScore + Math.pow(n, 5) * friendsScore;
 }
 
+// function FOEQScore(graph, node, coalition) {
+//   // node's equal treatment score of coalition
+//   var n = Object.keys(graph).length;
+//   var total = FOScore(graph, node, coalition);
+//   var count = 1;
+//   for (const friend of coalition.intersect(graph[node])) {
+//     total += FOScore(graph, friend, coalition)
+//     count++;
+//   }
+//   return total/count;
+// }
+
 function FOEQScore(graph, node, coalition) {
   // node's equal treatment score of coalition
   var n = Object.keys(graph).length;
-  var total = FOScore(graph, node, coalition);
-  var count = 1;
-  for (const friend of coalition.intersect(graph[node])) {
-    total += FOScore(graph, friend, coalition)
-    count++;
-  }
-  return total/count;
+  var S = coalition.intersect(graph[node]).concat(node);
+  return S.map(node => coalition.intersect(graph[node]).length).average() * (n+1) - coalition.length + 1;
 }
 
 // ** Stability Concepts **

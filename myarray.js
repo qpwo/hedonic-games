@@ -18,9 +18,13 @@ Array.prototype.intersect = function(arr) {
 
 Array.prototype.sum = function() {
   // the sum of the elements of an array
-  if (this.length==0)
-    return 0;
-  return this.reduce((sum, x) => sum + x);
+  return this.reduce((sum, x) => sum + x, 0);
+}
+
+Array.prototype.average = function() {
+  // the average of the elements of an array
+  if (this.length==0) return 0;
+  return this.sum() / this.length;
 }
 
 Array.prototype.powerset = function() {
