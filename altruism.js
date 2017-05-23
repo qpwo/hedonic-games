@@ -1,5 +1,6 @@
 // Luke Miles, April 2017
 // Algorithms for altruistic hedonic games
+// public domain dedication
 
 // ** Score Functions **
 
@@ -24,6 +25,7 @@ function friendAverage(graph, node, coalition) {
 
 function FOSFScore(graph, node, coalition) {
   // node's selfish-first score of coalition
+  coalition = coalition.union([node]);
   var n = Object.keys(graph).length;
   var myScore = FOScore(graph, node, coalition);
   var friendsScore = friendAverage(graph, node, coalition);
@@ -32,6 +34,7 @@ function FOSFScore(graph, node, coalition) {
 
 function FOALScore(graph, node, coalition) {
   // node's altruistic treatment score of coalition
+  coalition = coalition.union([node]);
   var n = Object.keys(graph).length;
   var myScore = FOScore(graph, node, coalition);
   var friendsScore = friendAverage(graph, node, coalition);
@@ -40,6 +43,7 @@ function FOALScore(graph, node, coalition) {
 
 function FOEQScore(graph, node, coalition) {
   // node's equal treatment score of coalition
+  coalition = coalition.union([node]);
   var n = Object.keys(graph).length;
   var total = FOScore(graph, node, coalition);
   var count = 1;

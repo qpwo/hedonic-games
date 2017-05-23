@@ -1,5 +1,6 @@
 // Luke Miles, April 2017
 // Useful algorithms for arrays
+// public domain dedication
 
 Array.prototype.setEquals = function(arr) {
   // Would the arrays be equal as sets?
@@ -14,6 +15,11 @@ Array.prototype.equals = function(arr) {
 Array.prototype.intersect = function(arr) {
   // an array of the elements that are in both arrays
   return this.filter(x => arr.includes(x));
+}
+
+Array.prototype.union = function(arr) {
+  // an array of elements that are in at least one array
+  return this.concat(arr.filter(x => !this.includes(x)));
 }
 
 Array.prototype.sum = function() {
