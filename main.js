@@ -5,6 +5,7 @@
 
 var s = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(s, s.renderers[0]); // enable click and drag
+s.settings('zoomingRatio', 1); // scroll doesn't zoom
 var partition = []; // current partition of the vertices
 var graph = {}; // a map from nodes to arrays of nodes
 var scoreFunc = FOScore; // function to use for player type

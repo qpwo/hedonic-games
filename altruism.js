@@ -60,13 +60,6 @@ function FOEQScore(graph, node, coalition) {
   return total/count;
 }
 
-//function FOEQScore(graph, node, coalition) {
-//  // node's equal treatment score of coalition
-//  var n = Object.keys(graph).length;
-//  var S = coalition.intersect(graph[node]).concat(node);
-//  return S.map(node => coalition.intersect(graph[node]).length).average() * (n+1) - coalition.length + 1;
-//}
-
 // ** Stability Concepts **
 
 function isIndividuallyRational(graph, partition) {
@@ -180,4 +173,12 @@ function isPerfect(graph, partition, scoreFunc) {
           return [false, node, otherCoalition];
     }
   return [true, null, null];
+}
+
+// ** Other Tools **
+
+function adjustPartition(partition, coalition) {
+  // moves everyone in coalition out of their current coalitions and into a new
+  // one together
+  return partition.map(C => C.filter(n => !coalition.includes(n))).filter(C => C.length > 0).concat([coalition]);
 }
