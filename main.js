@@ -1,6 +1,8 @@
 // Luke Miles, April 2017
 // Code for all the buttons and things on lukexmiles.com/hedonic-games
 
+// TODO: rename global variables to all-caps things
+
 // ** necessary globals for setting up a user session **
 
 var s = new sigma("innergraphbox"); // the thing controlling/displaying the graph
@@ -57,6 +59,7 @@ function collectGraph() {
 
 function drawGraphFromTextButton() {
   // Replace the current graph with the one described in the big text box on the webpage.
+  // TODO: handle empty lines
   s.graph.clear();
   var bigString = document.getElementById('graphTextField').value;
   var lines = bigString.split('\n');
@@ -79,6 +82,7 @@ function drawGraphFromTextButton() {
 function makePartitionFromTextButton() {
   // Set the partition to the one described by the user and color the coalitions.
   // Also, it sorts everything alphabetically.
+  // TODO: handle empty lines
   var bigString = document.getElementById('partitionTextField').value;
   var lines = bigString.split('\n');
   var possiblePartition = lines.map(line => line.replace(/ /g, '').split(','));
@@ -225,4 +229,12 @@ function perfectButton() {
     result += "No, node '" + node + "' would rather be in coalition [" + otherCoalition + "].";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
+}
+
+function movePlayers(coalition) {
+  // TODO: actually implement this. Just a sketch right now.
+  // 1. change global partition
+  // 2. color the graph
+  // 3. change the text inside the partition textfield
+  return 0;
 }
