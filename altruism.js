@@ -2,6 +2,12 @@
 // Algorithms for altruistic hedonic games
 // public domain dedication
 
+// todo eventually: The score functions, instead of adding the node to the
+// coalition, should check if the node is already there and raise an error if
+// its not.
+
+// todo eventually: everything should be implemented with sets instead of arrays.
+
 // ** Score Functions **
 
 function FOScore(graph, node, coalition) {
