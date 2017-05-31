@@ -1,9 +1,7 @@
-// Luke Miles, April 2017
-// Code for all the buttons and things on lukexmiles.com/hedonic-games
+// Luke Miles, June 2017
+// Code for all the buttons and things on the front webpage
 
-// TODO: rename global letiables to all-caps things
-
-// ** necessary globals for setting up a user session **
+// ** Necessary globals for setting up a user session **
 
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(SIGMA, SIGMA.renderers[0]); // enable click and drag
@@ -242,10 +240,8 @@ function perfectButton() {
 }
 
 function movePlayers(coalition) {
-  // TODO: actually implement this. Just a sketch right now.
-  // 1. change global partition
-  // 2. color the graph
-  // 3. change the text inside the partition textfield
-  PARTITION = adjustPlayers(partition, coalition);
-  return 0;
+  PARTITION = adjustPartition(PARTITION, coalition);
+  document.getElementById("partitionTextField").innerHTML = partitionToString(PARTITION);
+  PARTITION.forEach(coalition => colorSubgraph(coalition, randomColor()));
+  SIGMA.refresh();
 }

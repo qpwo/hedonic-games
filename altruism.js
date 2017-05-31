@@ -1,5 +1,5 @@
-// Luke Miles, April 2017
-// Algorithms for altruistic hedonic games
+// Luke Miles, June 2017
+// algorithms for altruistic hedonic games
 // public domain dedication
 
 // TODO eventually: The score functions, instead of adding the node to the
