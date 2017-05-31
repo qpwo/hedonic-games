@@ -1,6 +1,6 @@
 // Luke Miles, June 2017
-// algorithms for altruistic hedonic games
-// public domain dedication
+// Algorithms for altruistic hedonic games
+// Public domain dedication
 
 // TODO eventually: The score functions, instead of adding the node to the
 // coalition, should check if the node is already there and raise an error if

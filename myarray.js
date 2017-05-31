@@ -1,6 +1,6 @@
-// Luke Miles, April 2017
+// Luke Miles, June 2017
 // Useful algorithms for arrays
-// public domain dedication
+// Public domain dedication
 
 Array.prototype.setEquals = function(arr) {
   // Would the arrays be equal as sets?
@@ -40,10 +40,10 @@ Array.prototype.powerset = function() {
 
 Array.prototype.max = function(key=(x=>x)) {
   // the maximum element of an array according to the key
-  var best = this[0];
-  var bestScore = key(best);
+  let best = this[0];
+  let bestScore = key(best);
   for (i = 1; i < this.length; i++) {
-    var score = key(this[i]);
+    let score = key(this[i]);
     if (score > bestScore)
       [best, bestScore] = [this[i], score];
   }
@@ -54,18 +54,18 @@ Array.prototype.partitionSet = function() {
   // The set of all partitions of a set.
   // Implemented from Knuth's TOACP volume 4a.
   // More items than 2^n but fewer than n!.
-  var n = this.length;
-  var partitions = [];
-  var a = Array(n).fill().map(_ => 0);
-  var b = Array(n).fill().map(_ => 1);
-  var m = 1;
+  let n = this.length;
+  let partitions = [];
+  let a = Array(n).fill().map(_ => 0);
+  let b = Array(n).fill().map(_ => 1);
+  let m = 1;
   while (true) {
     partitions.push(restrictedGrowthStringToPartition(a, this));
     while (a[n-1] != m) {
       a[n-1]++;
       partitions.push(restrictedGrowthStringToPartition(a, this));
     }
-    var j = n - 2;
+    let j = n - 2;
     while (a[j] == b[j])
       j--;
     if (j==0)
@@ -85,9 +85,8 @@ Array.prototype.partitionSet = function() {
 
 function restrictedGrowthStringToPartition(string, arr) {
   // Converts a restricted growth string and an array into a partition of that array.
-  // Helper for Array.prototype.partitionSet.
-  var numBlocks = Math.max.apply(null, string);
-  var partition = Array(numBlocks+1).fill().map(_ => []);
+  let numBlocks = Math.max.apply(null, string);
+  let partition = Array(numBlocks+1).fill().map(_ => []);
   string.forEach((blockNum, index) => partition[blockNum].push(arr[index]));
   return partition;
 }

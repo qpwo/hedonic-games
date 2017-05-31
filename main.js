@@ -41,7 +41,7 @@ function addEdge(source, target) {
 
 function collectGraph() {
   // Make a simple adjacency list object from the complex nodejs graph.
-  // Also, it sorts everything alphabetically.
+  // Also, sort everything alphabetically.
   let graph = {};
   let nodes = SIGMA.graph.nodes().map(node=>node.id).sort();
   for (const node of nodes)
@@ -57,17 +57,11 @@ function collectGraph() {
 
 function drawGraphFromTextButton() {
   // Replace the current graph with the one described in the big text box on the webpage.
-  // TODO: handle empty lines
   SIGMA.graph.clear();
-  let bigString = document.getElementById('graphTextField').value;
-  let lines = bigString.split('\n');
-  for (const line of lines) {
-    let colonSplit = line.replace(/ /g, '').split(':');
-    let source = colonSplit[0];
-    let targets = colonSplit[1].split(',');
+  let graph = stringToGraph(document.getElementById('graphTextField').value);
+  for (const source of Object.keys(graph)) {
     addNode(source);
-    for (let target of targets) {
-      if (!target) continue; // empty target list
+    for (const target of graph[source]) {
       addNode(target);
       addEdge(source, target);
       addEdge(target, source);
@@ -77,20 +71,23 @@ function drawGraphFromTextButton() {
   SIGMA.refresh(); // update the displayed picture
 }
 
-function stringToPartition(string) {
-  let partition = [];
+function stringToGraph(string) {
+  let graph = {};
   for (let line of string.split('\n')) {
     line = line.replace(/ /g, ''); // remove spaces
     if (line == "") continue;
-    partition.push(line.split(','));
+    let [source, targets] = line.split(':');
+    if (targets == "")
+      graph[source] = [];
+    graph[source] = targets.split(',');
   }
-  return partition;
+  return graph;
 }
     
 
 function makePartitionFromTextButton() {
   // Set the partition to the one described by the user and color the coalitions.
-  // Also, it sorts everything alphabetically.
+  // Also, sorts everything alphabetically.
   let partition = stringToPartition(document.getElementById('partitionTextField').value);
   let nodes = SIGMA.graph.nodes().map(nodeO => nodeO.id);
   if (!isPartition(nodes, partition)) {
@@ -112,6 +109,16 @@ function partitionToString(partition) {
     result += '\n';
   }
   return result;
+}
+
+function stringToPartition(string) {
+  let partition = [];
+  for (let line of string.split('\n')) {
+    line = line.replace(/ /g, ''); // remove spaces
+    if (line == "") continue;
+    partition.push(line.split(','));
+  }
+  return partition;
 }
 
 function updatePartitionTextField() {
