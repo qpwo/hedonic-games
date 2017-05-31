@@ -22,6 +22,10 @@ Array.prototype.union = function(arr) {
   return this.concat(arr.filter(x => !this.includes(x)));
 }
 
+Array.prototype.setMinus = function(arr) {
+  return this.filter(x => !arr.includes(x))
+}
+
 Array.prototype.sum = function() {
   // the sum of the elements of an array
   return this.reduce((sum, x) => sum + x, 0);

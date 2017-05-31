@@ -180,5 +180,9 @@ function isPerfect(graph, partition, scoreFunc) {
 function adjustPartition(partition, coalition) {
   // moves everyone in coalition out of their current coalitions and into a new
   // one together
-  return partition.map(C => C.filter(n => !coalition.includes(n))).filter(C => C.length > 0).concat([coalition]);
+  return sortPartition(partition.map(C => C.setMinus(coalition)).filter(C => C.length > 0).concat([coalition]));
+}
+
+function sortPartition(partition) {
+  return partition.map(C => C.sort()).sort( (C1,C2) => JSON.stringify(C1).localeCompare(JSON.stringify(C2)));
 }

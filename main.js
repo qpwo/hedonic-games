@@ -236,12 +236,13 @@ function coreStableButton() {
 
 function perfectButton() {
   // check if the partition is perfect and display result
-  let [isP, node, otherCoalition] = isPerfect(GRAPH, PARTITION, SCOREFUNC);
+  let [isP, node, coalition] = isPerfect(GRAPH, PARTITION, SCOREFUNC);
   let result = "";
   if (isP)
     result += "Yes, this is the perfect partition.";
   else {
-    result += "No, node '" + node + "' would rather be in coalition [" + otherCoalition + "].";
+    result += "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
+    result += "<button type=\"button\" onclick=movePlayers(" + JSON.stringify(coalition.concat(node)) + ")> Move! </button>";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
 }
