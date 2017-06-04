@@ -1,7 +1,21 @@
-body {
+
+.centerColumn {
   width: 500px;
   margin: auto;
 }
+
+#columns {
+  width: 810px;
+  margin: auto;
+}
+
+#column {
+  float: left;
+  display: inline;
+  width: 405px;
+}
+
+
 
 table, th, td {
    border: 1px solid black;
