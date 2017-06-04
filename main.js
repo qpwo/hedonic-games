@@ -102,13 +102,7 @@ function makePartitionFromTextButton() {
 }
 
 function partitionToString(partition) {
-  let result = "";
-  for (const coalition of partition) {
-    for (const node of coalition)
-      result += node + ' ';
-    result += '\n';
-  }
-  return result;
+  return partition.map(coalition => coalition.join(", ")).join("\n");
 }
 
 function stringToPartition(string) {
@@ -176,8 +170,10 @@ function individuallyRationalButton() {
   let result = "";
   if (isIR)
     result += "Yes this partition is individually rational!";
-  else
+  else {
     result += "No. Node '" + node + "' would rather be alone.";
+    result += makeMoveButton([node]);
+  }
   document.getElementById("individuallyRationalParagraph").innerHTML = result;
 }
 
@@ -186,8 +182,10 @@ function nashStableButton() {
   let result = "";
   if (isNS)
     result += "Yes, this partition is Nash stable.";
-  else
+  else {
     result += "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
+    result += makeMoveButton(coalition.concat(node));
+  }
   document.getElementById("nashStableParagraph").innerHTML = result;
 }
 
@@ -196,9 +194,11 @@ function individuallyStableButton() {
   let result = ""
   if (isIS)
     result += "Yes, this partition is individually stable";
-  else
+  else {
     result = "No, node '" + node + "' would rather be in coalition [" + coalition +
       "] and everyone in that coalition is okay with adding that node.";
+    result += makeMoveButton(coalition.concat(node));
+  }
   document.getElementById("individuallyStableParagraph").innerHTML = result;
 }
 
@@ -207,10 +207,12 @@ function contractuallyIndividuallyStableButton() {
   let result = ""
   if (isCIS)
     result += "Yes, this partition is contractually individually stable";
-  else
+  else {
     result = "No, node '" + node + "' would rather be in coalition [" + coalition +
       "] and everyone in that coalition is okay with adding that node" +
       " and everyone in that node's home coalition is okay with it leaving.";
+    result += makeMoveButton(coalition.concat(node));
+  }
   document.getElementById("contractuallyIndividuallyStableParagraph").innerHTML = result;
 }
 
@@ -219,8 +221,10 @@ function strictlyPopularButton() {
   let result = "";
   if (isSP)
     result += "Yes, this partition is Strictly Popular.";
-  else
+  else {
     result += "No, partition " + JSON.stringify(betterPartition) + " is preferred overall by " + (-winCount) + " votes.";
+    // TODO: add a button here
+  }
   document.getElementById("strictlyPopularParagraph").innerHTML = result;
 }
 
@@ -229,8 +233,10 @@ function coreStableButton() {
   let result = "";
   if (isCS)
     result += "Yes, this partition is core stable";
-  else
+  else {
     result += "No, the coalition [" + coalition + "] wants to elope.";
+    result += makeMoveButton(coalition.concat(node));
+  }
   document.getElementById("coreStableParagraph").innerHTML = result;
 }
 
@@ -241,8 +247,8 @@ function perfectButton() {
   if (isP)
     result += "Yes, this is the perfect partition.";
   else {
-    result += "No, node '" + node + "' would rather be in coalition [" + coalition + "].";
-    result += "<button type=\"button\" onclick=movePlayers(" + JSON.stringify(coalition.concat(node)) + ")> Move! </button>";
+    result += "No, node '" + node + "' would rather be in coalition [" + coalition + "].<br/>";
+    result += makeMoveButton(coalition.concat(node));
   }
   document.getElementById("perfectParagraph").innerHTML = result;
 }
@@ -252,4 +258,8 @@ function movePlayers(coalition) {
   document.getElementById("partitionTextField").innerHTML = partitionToString(PARTITION);
   PARTITION.forEach(coalition => colorSubgraph(coalition, randomColor()));
   SIGMA.refresh();
+}
+
+function makeMoveButton(coalition) {
+  return "<button type=\"button\" onclick=movePlayers(" + JSON.stringify(coalition) + ")> Move! </button>";
 }
