@@ -2,16 +2,15 @@
 // Algorithms for altruistic hedonic games
 // Public domain dedication
 
-// TODO eventually: The score functions, instead of adding the node to the
-// coalition, should check if the node is already there and raise an error if
-// its not.
-
 // TODO eventually: everything should be implemented with sets instead of arrays.
+
+// TODO: change order of functions
 
 // ** Score Functions **
 
 function FOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
+  if (!coalition.includes(node)) throw "coalition doesn't contain node";
   var n = Object.keys(graph).length;
   var friends = graph[node];
   return coalition.map(node2 =>
@@ -31,6 +30,7 @@ function friendAverage(graph, node, coalition) {
 
 function FOSFScore(graph, node, coalition) {
   // node's selfish-first score of coalition
+  if (!coalition.includes(node)) throw "coalition doesn't contain node";
   coalition = coalition.union([node]);
   var n = Object.keys(graph).length;
   var myScore = FOScore(graph, node, coalition);
@@ -40,7 +40,7 @@ function FOSFScore(graph, node, coalition) {
 
 function FOALScore(graph, node, coalition) {
   // node's altruistic treatment score of coalition
-  coalition = coalition.union([node]);
+  if (!coalition.includes(node)) throw "coalition doesn't contain node";
   var n = Object.keys(graph).length;
   var myScore = FOScore(graph, node, coalition);
   var friendsScore = friendAverage(graph, node, coalition);
@@ -49,7 +49,7 @@ function FOALScore(graph, node, coalition) {
 
 function FOEQScore(graph, node, coalition) {
   // node's equal treatment score of coalition
-  coalition = coalition.union([node]);
+  if (!coalition.includes(node)) throw "coalition doesn't contain node";
   var n = Object.keys(graph).length;
   var total = FOScore(graph, node, coalition);
   var count = 1;
@@ -86,11 +86,14 @@ function isAcceptable(graph, node, coalition) {
     // Is it actually a different coalition?
     var test0 = (G, P, n, C1, C2, SF) => !C1.equals(C2);
     // Do I (the node) want to leave my home?
-    var test1 = (G, P, n, C1, C2, SF) => SF(G, n, C2) > SF(G, n, C1);
+    var test1 = (G, P, n, C1, C2, SF) => SF(G, n, C2.concat(n)) > SF(G, n, C1);
     // Is the new coalition okay with having me?
     var test2 = (G, P, n, C1, C2, SF) => C2.every(n2 => SF(G, n2, C2.concat([n])) >= SF(G, n2, C2));
     // Is my home okay with me leaving?
-    var test3 = (G, P, n, C1, C2, SF) => (C1wn => C1wn.every(n1 => SF(G,n1,C1wn) >= SF(G,n1,C1)))(C1.filter(n1=>n1!=n));
+    var test3 = function(G, P, n, C1, C2, SF) {
+      let C1wn = C1.filter(n1 => n1 != n);
+      return C1wn.every(n1 => SF(G,n1,C1wn) >= SF(G,n1,C1));
+    }
 
     // check if any possible vertex with a home coalition and a new coalition passes every test
     var makeCheckFunc = tests =>
@@ -169,8 +172,8 @@ function isPerfect(graph, partition, scoreFunc) {
     for (const node of coalition) {
       var homeScore = scoreFunc(graph, node, coalition);
       for (const otherCoalition of nodes.filter(n=>n!=node).powerset())
-        if (scoreFunc(graph, node, otherCoalition) > homeScore)
-          return [false, node, otherCoalition];
+        if (scoreFunc(graph, node, otherCoalition.concat(node)) > homeScore)
+          return [false, node, otherCoalition.concat(node)];
     }
   return [true, null, null];
 }

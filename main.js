@@ -1,6 +1,8 @@
 // Luke Miles, June 2017
 // Code for all the buttons and things on the front webpage
 
+// TODO: change order of functions
+
 // ** Necessary globals for setting up a user session **
 
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
@@ -149,7 +151,7 @@ function displayScoresButton() {
   for (const node of Object.keys(GRAPH)) {
     result += "<tr> <th>" + node + "</th>"; // start a new row
     for (const coalition of PARTITION) {
-      let score = SCOREFUNC(GRAPH, node, coalition); 
+      let score = SCOREFUNC(GRAPH, node, coalition.union([node])); 
       result += "<td>" + ((score%1==0)? score : score.toFixed(2)) + "</td>"; // add a score
     }
     result += "</tr>";
@@ -234,8 +236,8 @@ function coreStableButton() {
   if (isCS)
     result += "Yes, this partition is core stable";
   else {
-    result += "No, the coalition [" + coalition + "] wants to elope." +
-      makeMoveButton(coalition.concat(node));
+    result += "No, the coalition [" + coalition + "] is weakly blocking (all members weakly prefer it and one member strongly prefers it.)." +
+      makeMoveButton(coalition);
   }
   document.getElementById("coreStableParagraph").innerHTML = result;
 }
@@ -248,7 +250,7 @@ function perfectButton() {
     result += "Yes, this is the perfect partition.";
   else {
     result += "No, node '" + node + "' would rather be in coalition [" + coalition + "].<br/>" +
-      makeMoveButton(coalition.concat(node));
+      makeMoveButton(coalition);
   }
   document.getElementById("perfectParagraph").innerHTML = result;
 }
