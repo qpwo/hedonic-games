@@ -93,7 +93,7 @@ function isAcceptable(graph, node, coalition) {
     var test3 = function(G, P, n, C1, C2, SF) {
       let C1wn = C1.filter(n1 => n1 != n);
       return C1wn.every(n1 => SF(G,n1,C1wn) >= SF(G,n1,C1));
-    }
+    };
 
     // check if any possible vertex with a home coalition and a new coalition passes every test
     var makeCheckFunc = tests =>
