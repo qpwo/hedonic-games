@@ -8,14 +8,26 @@
 
 // ** Score Functions **
 
+// possible TODO: shorten code for similar score functions with scoping
+
 function FOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
-  if (!coalition.includes(node)) throw "coalition doesn't contain node";
+  if (!coalition.has(node)) throw "coalition doesn't contain node";
   var n = Object.keys(graph).length;
-  var friends = graph[node];
-  return coalition.map(node2 =>
-    (node2 == node ? 0 : (friends.includes(node2) ? n : -1))).sum();
+  var numFriends = coalition.intersect(graph[node]).size;
+  var numEnemies = coalition.size - numFriends - 1;
+  return n * numFriends - numEnemies;
 }
+
+function EOScore(graph, node, coalition) {
+  // node's friend oriented score of coalition
+  if (!coalition.has(node)) throw "coalition doesn't contain node";
+  var n = Object.keys(graph).length;
+  var numFriends = coalition.intersect(graph[node]).size;
+  var numEnemies = coalition.size - numFriends - 1;
+  return numFriends - n * numEnemies;
+}
+
 
 function friendAverage(graph, node, coalition) {
   // the average happiness of a node's friends in a given coalition
@@ -25,13 +37,12 @@ function friendAverage(graph, node, coalition) {
     total += FOScore(graph, friend, coalition);
     count++;
   }
-  return (count > 0 ? total / count : 0);
+  return (count>0 ? total/count : 0);
 }
 
 function FOSFScore(graph, node, coalition) {
   // node's selfish-first score of coalition
-  if (!coalition.includes(node)) throw "coalition doesn't contain node";
-  coalition = coalition.union([node]);
+  if (!coalition.has(node)) throw "coalition doesn't contain node";
   var n = Object.keys(graph).length;
   var myScore = FOScore(graph, node, coalition);
   var friendsScore = friendAverage(graph, node, coalition);
@@ -40,7 +51,7 @@ function FOSFScore(graph, node, coalition) {
 
 function FOALScore(graph, node, coalition) {
   // node's altruistic treatment score of coalition
-  if (!coalition.includes(node)) throw "coalition doesn't contain node";
+  if (!coalition.has(node)) throw "coalition doesn't contain node";
   var n = Object.keys(graph).length;
   var myScore = FOScore(graph, node, coalition);
   var friendsScore = friendAverage(graph, node, coalition);
@@ -49,7 +60,7 @@ function FOALScore(graph, node, coalition) {
 
 function FOEQScore(graph, node, coalition) {
   // node's equal treatment score of coalition
-  if (!coalition.includes(node)) throw "coalition doesn't contain node";
+  if (!coalition.has(node)) throw "coalition doesn't contain node";
   var n = Object.keys(graph).length;
   var total = FOScore(graph, node, coalition);
   var count = 1;
@@ -75,58 +86,64 @@ function isIndividuallyRational(graph, partition) {
 
 function isAcceptable(graph, node, coalition) {
   // Is this coalition acceptable to node?
-  return coalition.equals([node]) || graph[node].intersect(coalition).length > 0;
+  return coalition.equals(new Set([node])) || graph[node].intersect(coalition).size > 0; 
 }
 
 // The next three stability concepts repeatedly use the same tests, so it is better to define them all at once
-[isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable] =
-  (function(){
-    // four different tests used in stability:
-    // G=graph, P=partition, n=node, C1=homeCoalition, C2=otherCoalition, SF=scoreFunc
-    // Is it actually a different coalition?
-    var test0 = (G, P, n, C1, C2, SF) => !C1.equals(C2);
-    // Do I (the node) want to leave my home?
-    var test1 = (G, P, n, C1, C2, SF) => SF(G, n, C2.concat(n)) > SF(G, n, C1);
-    // Is the new coalition okay with having me?
-    var test2 = (G, P, n, C1, C2, SF) => C2.every(n2 => SF(G, n2, C2.concat([n])) >= SF(G, n2, C2));
-    // Is my home okay with me leaving?
-    var test3 = function(G, P, n, C1, C2, SF) {
-      let C1wn = C1.filter(n1 => n1 != n);
-      return C1wn.every(n1 => SF(G,n1,C1wn) >= SF(G,n1,C1));
-    };
+{
+  // four different tests used in stability:
 
-    // check if any possible vertex with a home coalition and a new coalition passes every test
-    var makeCheckFunc = tests =>
-      function(G, P, SF) {
-        for (const C1 of P) for (const n of C1) for (const C2 of P.concat([[]]))
-          if (tests.every(test => test(G, P, n, C1, C2, SF))) // if this situation passes every test
-            return [false, n, C2];
-        return [true, null, null];
-      }
+  // Is it actually a different coalition?
+  let test0 = (graph, partition, node, homeCoalition, newCoalition, scoreFunc) =>
+    !homeCoalition.equals(newCoalition);
 
-    return [
-      makeCheckFunc([test0, test1]),
-      makeCheckFunc([test0, test1, test2]),
-      makeCheckFunc([test0, test1, test2, test3])
-    ];
-  })();
+  // Do I (the node) want to leave my home?
+  let test1 = (graph, partition, node, homeCoalition, newCoalition, scoreFunc) =>
+    scoreFunc(graph, node, newCoalition.plus(node)) > scoreFunc(graph, node, homeCoalition);
+
+  // Is the new coalition okay with having me?
+  let test2 = (graph, partition, node, homeCoalition, newCoalition, scoreFunc) =>
+    newCoalition.every(nodeB => scoreFunc(graph, nodeB, newCoalition.plus(node)) >= scoreFunc(graph, nodeB, newCoalition));
+
+  // Is my home okay with me leaving?
+  let test3 = function(graph, partition, node, homeCoalition, newCoalition, scoreFunc) {
+    let homeWithoutMe = homeCoalition.minus(node);
+    return homeWithoutMe.every(nodeB => scoreFunc(graph,nodeB,homeWithoutMe) >= scoreFunc(graph,nodeB,homeCoalition));
+  };
+
+  // check if any possible vertex with a home coalition and a new coalition passes every test
+  var makeCheckFunc = tests =>
+    function(graph, partition, scoreFunc) {
+      for (const homeCoalition of partition)
+        for (const node of homeCoalition)
+          for (const newCoalition of partition.plus(new Set([])))
+            if (tests.every(test => test(graph, partition, node, homeCoalition, newCoalition, scoreFunc))) // if this situation passes every test
+              return [false, node, newCoalition];
+      return [true, null, null];
+    }
+
+  var isNashStable = makeCheckFunc([test0, test1]);
+  var isIndividuallyStable = makeCheckFunc([test0, test1, test2]);
+  var isContractuallyIndividuallyStable = makeCheckFunc([test0, test1, test2, test3]);
+}
 
 function isCoreStable(graph, partition, scoreFunc) {
   // Is this partition core-stable?
   // If not, give a counter-example.
-  var scores = {};
+  // TODO: also write weakly core stable version
+  var homeScores = {};
   for (const coalition of partition)
     for (const node of coalition)
-      scores[node] = scoreFunc(graph, node, coalition);
+      homeScores[node] = scoreFunc(graph, node, coalition);
   var nodes = Object.keys(graph);
-  for (const coalition of nodes.powerset()) {
-    if (coalition.length==0)
-      continue;
+  var powerset = nodes.powerset().map(arr => new Set(arr));
+  for (const coalition of powerset) {
+    if (coalition.size==0) continue;
     var newScores = {}
     for (const node of coalition)
       newScores[node] = scoreFunc(graph, node, coalition)
-    if (coalition.every(node => newScores[node] >= scores[node]) &&
-      coalition.some(node => newScores[node] > scores[node]))
+    if (coalition.every(node => newScores[node] >= homeScores[node]) &&
+      coalition.some(node => newScores[node] > homeScores[node]))
       return [false, coalition];
   }
   return [true, null];
