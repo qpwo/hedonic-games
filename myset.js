@@ -16,6 +16,14 @@ Set.prototype.intersect = function(set) {
   return intersection;
 }
 
+Set.prototype.setMinus = function(set) {
+  let difference = new Set(this);
+  for (const x of set) {
+    difference.delete(x);
+  }
+  return difference;
+}
+
 Set.prototype.sum = function() {
   let total = 0;
   for (const x of this)
@@ -37,8 +45,20 @@ Set.prototype.every = function(f) {
   return true;
 }
 
+Set.prototype.filter = function(f) {
+  let set = new Set();
+  for (const x of this)
+    if (f(x))
+      set.add(x)
+  return set;
+}
+
 Set.prototype.equals = function(set) {
   return this.every(x => set.has(x)) && set.every(x => this.has(x));
+}
+
+Set.prototype.deepEquals = function(setSet) {
+  return this.every(set => setSet.some(setB => setB.equals(set)));
 }
 
 Set.prototype.plus = function(x) {
@@ -53,3 +73,11 @@ Set.prototype.minus = function(x) {
   return set;
 }
 
+Set.prototype.partitionSet = function() {
+  return Array.from(this).partitionSet().map(partition =>
+    new Set(partition.map(coalition => new Set(coalition))));
+}
+
+Set.prototype.powerset = function() {
+  return Array.from(this).powerSet().map(arr => new Set(arr));
+}

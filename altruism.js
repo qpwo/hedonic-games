@@ -3,8 +3,10 @@
 // Public domain dedication
 
 // TODO eventually: everything should be implemented with sets instead of arrays.
-
 // TODO: change order of functions
+// possible TODO: rename coalitions to groups
+
+
 
 // ** Score Functions **
 
@@ -13,26 +15,26 @@
 function FOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
-  var n = Object.keys(graph).length;
-  var numFriends = coalition.intersect(graph[node]).size;
-  var numEnemies = coalition.size - numFriends - 1;
+  let n = Object.keys(graph).length;
+  let numFriends = coalition.intersect(graph[node]).size;
+  let numEnemies = coalition.size - numFriends - 1;
   return n * numFriends - numEnemies;
 }
 
 function EOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
-  var n = Object.keys(graph).length;
-  var numFriends = coalition.intersect(graph[node]).size;
-  var numEnemies = coalition.size - numFriends - 1;
+  let n = Object.keys(graph).length;
+  let numFriends = coalition.intersect(graph[node]).size;
+  let numEnemies = coalition.size - numFriends - 1;
   return numFriends - n * numEnemies;
 }
 
 
 function friendAverage(graph, node, coalition) {
   // the average happiness of a node's friends in a given coalition
-  var total = 0;
-  var count = 0;
+  let total = 0;
+  let count = 0;
   for (const friend of coalition.intersect(graph[node])) {
     total += FOScore(graph, friend, coalition);
     count++;
@@ -43,27 +45,27 @@ function friendAverage(graph, node, coalition) {
 function FOSFScore(graph, node, coalition) {
   // node's selfish-first score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
-  var n = Object.keys(graph).length;
-  var myScore = FOScore(graph, node, coalition);
-  var friendsScore = friendAverage(graph, node, coalition);
+  let n = Object.keys(graph).length;
+  let myScore = FOScore(graph, node, coalition);
+  let friendsScore = friendAverage(graph, node, coalition);
   return Math.pow(n, 5) * myScore + friendsScore;
 }
 
 function FOALScore(graph, node, coalition) {
   // node's altruistic treatment score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
-  var n = Object.keys(graph).length;
-  var myScore = FOScore(graph, node, coalition);
-  var friendsScore = friendAverage(graph, node, coalition);
+  let n = Object.keys(graph).length;
+  let myScore = FOScore(graph, node, coalition);
+  let friendsScore = friendAverage(graph, node, coalition);
   return myScore + Math.pow(n, 5) * friendsScore;
 }
 
 function FOEQScore(graph, node, coalition) {
   // node's equal treatment score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
-  var n = Object.keys(graph).length;
-  var total = FOScore(graph, node, coalition);
-  var count = 1;
+  let n = Object.keys(graph).length;
+  let total = FOScore(graph, node, coalition);
+  let count = 1;
   for (const friend of coalition.intersect(graph[node])) {
     total += FOScore(graph, friend, coalition)
     count++;
@@ -74,9 +76,9 @@ function FOEQScore(graph, node, coalition) {
 // ** Stability Concepts **
 
 function isIndividuallyRational(graph, partition) {
-  // Is every node in every coalition in partition happier in its current coalition than it would be alone?
+  // Is every node in every coalition in partition happier in its home coalition than it would be alone?
   // If not, return a counter-example.
-  var nodes = Object.keys(graph);
+  let nodes = Object.keys(graph);
   for (const coalition of partition)
     for (const node of coalition)
       if (!isAcceptable(graph, node, coalition))
@@ -112,7 +114,7 @@ function isAcceptable(graph, node, coalition) {
   };
 
   // check if any possible vertex with a home coalition and a new coalition passes every test
-  var makeCheckFunc = tests =>
+  let makeCheckFunc = tests =>
     function(graph, partition, scoreFunc) {
       for (const homeCoalition of partition)
         for (const node of homeCoalition)
@@ -131,15 +133,15 @@ function isCoreStable(graph, partition, scoreFunc) {
   // Is this partition core-stable?
   // If not, give a counter-example.
   // TODO: also write weakly core stable version
-  var homeScores = {};
+  let homeScores = {};
   for (const coalition of partition)
     for (const node of coalition)
       homeScores[node] = scoreFunc(graph, node, coalition);
-  var nodes = Object.keys(graph);
-  var powerset = nodes.powerset().map(arr => new Set(arr));
+  let nodes = Object.keys(graph);
+  let powerset = nodes.powerset().map(arr => new Set(arr));
   for (const coalition of powerset) {
     if (coalition.size==0) continue;
-    var newScores = {}
+    let newScores = {}
     for (const node of coalition)
       newScores[node] = scoreFunc(graph, node, coalition)
     if (coalition.every(node => newScores[node] >= homeScores[node]) &&
@@ -152,31 +154,29 @@ function isCoreStable(graph, partition, scoreFunc) {
 function isStrictlyPopular(graph, partition, scoreFunc) {
   // Is this partition stictly popular?
   // If not, give a counter-example.
-  var currentScores = {}
+  // TODO: make a non-strict version
+  // TODO: seperate the winCount into separate for and against vots
+  let homeScores = {}
   for (const coalition of partition)
     for (const node of coalition)
-      currentScores[node] = scoreFunc(graph, node, coalition);
-  var nodes = Object.keys(graph)
-  var n = nodes.length;
-  var otherScores = {}; // will map nodes to node-coalition-value maps
-  for (const node of nodes)
-    otherScores[node] = {}; // This map is useful because the same subset occurs in many partitions.
-  for (const otherPartition of nodes.partitionSet()) {
-    if (partition.equals(otherPartition)) continue;
-    var winCount = 0;
-    for (const coalition of otherPartition) {
-      var coalitionString = JSON.stringify(coalition);
+      homeScores[node] = scoreFunc(graph, node, coalition);
+  let nodes = Object.keys(graph)
+  let n = nodes.length;
+  for (const newPartition of (new Set(nodes)).partitionSet()) {
+    if (newPartition.deepEquals(partition))
+      continue;
+    let winCount = 0;
+    for (const coalition of newPartition) {
+      let newScore = scoreFunc(graph, node, coalition);
       for (const node of coalition) {
-        if (!otherScores[node][coalitionString])
-          otherScores[node][coalitionString] = scoreFunc(graph, node, coalition);
-        if (currentScores[node] > otherScores[node][coalitionString])
+        if (homeScores[node] > newScore)
           winCount++;
-        if (currentScores[node] < otherScores[node][coalitionString])
+        if (homeScores[node] < newScore)
           winCount--;
       }
     }
     if (winCount <= 0)
-      return [false, otherPartition, winCount];
+      return [false, newPartition, winCount];
   }
   return [true, null, null]
 }
@@ -184,13 +184,16 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
 function isPerfect(graph, partition, scoreFunc) {
   // Is this partition perfect?
   // If not, give a counter-example.
-  var nodes = Object.keys(graph);
+  let nodes = Object.keys(graph);
   for (const coalition of partition)
     for (const node of coalition) {
-      var homeScore = scoreFunc(graph, node, coalition);
-      for (const otherCoalition of nodes.filter(n=>n!=node).powerset())
-        if (scoreFunc(graph, node, otherCoalition.concat(node)) > homeScore)
-          return [false, node, otherCoalition.concat(node)];
+      let homeScore = scoreFunc(graph, node, coalition);
+      let newCoalitions = (new Set(nodes)).minus(node).powerset().filter(coalitionB => !coalition.equals(coalitionB));
+      for (const newCoalition of newCoalitions) {
+        let newScore = scoreFunc(graph, node, newCoalition.plus(node));
+        if (newScore > homeScore)
+          return [false, node, newCoalition.plus(node)];
+      }
     }
   return [true, null, null];
 }
@@ -198,11 +201,6 @@ function isPerfect(graph, partition, scoreFunc) {
 // ** Other Tools **
 
 function adjustPartition(partition, coalition) {
-  // moves everyone in coalition out of their current coalitions and into a new
-  // one together
-  return sortPartition(partition.map(C => C.setMinus(coalition)).filter(C => C.length > 0).concat([coalition]));
-}
-
-function sortPartition(partition) {
-  return partition.map(C => C.sort()).sort( (C1,C2) => JSON.stringify(C1).localeCompare(JSON.stringify(C2)));
+  // moves everyone in coalition out of their home coalitions and into a new one together
+  return partition.map(coalitionB => coalitionB.setMinus(coalition)).filter(coalitionB => coalitionB.size > 0).plus(coalition);
 }
