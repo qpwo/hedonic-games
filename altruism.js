@@ -155,7 +155,7 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
   // Is this partition stictly popular?
   // If not, give a counter-example.
   // TODO: make a non-strict version
-  // TODO: seperate the winCount into separate for and against vots
+  // TODO: seperate the winCount into separate for and against votes
   let homeScores = {}
   for (const coalition of partition)
     for (const node of coalition)
@@ -166,15 +166,14 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
     if (newPartition.deepEquals(partition))
       continue;
     let winCount = 0;
-    for (const coalition of newPartition) {
-      let newScore = scoreFunc(graph, node, coalition);
+    for (const coalition of newPartition)
       for (const node of coalition) {
+        let newScore = scoreFunc(graph, node, coalition);
         if (homeScores[node] > newScore)
           winCount++;
         if (homeScores[node] < newScore)
           winCount--;
       }
-    }
     if (winCount <= 0)
       return [false, newPartition, winCount];
   }

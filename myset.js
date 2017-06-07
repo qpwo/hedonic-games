@@ -79,5 +79,5 @@ Set.prototype.partitionSet = function() {
 }
 
 Set.prototype.powerset = function() {
-  return Array.from(this).powerSet().map(arr => new Set(arr));
+  return Array.from(this).powerset().map(arr => new Set(arr));
 }
