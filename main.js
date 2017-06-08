@@ -181,7 +181,7 @@ function individuallyRationalButton() {
     result += "No. Node '" + node + "' would rather be alone.";
   }
   document.getElementById("individuallyRationalParagraph").innerHTML = result;
-  document.getElementById("individuallyRationalParagraph").appendChild(makeMoveButton(new Set([node])));
+  //document.getElementById("individuallyRationalParagraph").appendChild(makeMoveButton(new Set([node])));
 }
 
 function nashStableButton() {
@@ -194,7 +194,7 @@ function nashStableButton() {
       coalition.stringify() + ".";
   }
   document.getElementById("nashStableParagraph").innerHTML = result;
-  document.getElementById("nashStableParagraph").appendChild(makeMoveButton(coalition));
+  //document.getElementById("nashStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function individuallyStableButton() {
@@ -207,7 +207,7 @@ function individuallyStableButton() {
       " and everyone in that coalition is okay with adding that node.";
   }
   document.getElementById("individuallyStableParagraph").innerHTML = result;
-  document.getElementById("individuallyStableParagraph").appendChild(makeMoveButton(coalition));
+  //document.getElementById("individuallyStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function contractuallyIndividuallyStableButton() {
@@ -221,7 +221,7 @@ function contractuallyIndividuallyStableButton() {
       " and everyone in that node's home coalition is okay with it leaving.";
   }
   document.getElementById("contractuallyIndividuallyStableParagraph").innerHTML = result;
-  document.getElementById("contractuallyIndividuallyStableParagraph").appendChild(makeMoveButton(coalition));
+  //document.getElementById("contractuallyIndividuallyStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function strictlyPopularButton() {
@@ -245,7 +245,7 @@ function coreStableButton() {
     result += "No, the coalition " + coalition.stringify() + " is weakly blocking (all members weakly prefer it and one member strongly prefers it.).";
   }
   document.getElementById("coreStableParagraph").innerHTML = result;
-  document.getElementById("coreStableParagraph").appendChild(makeMoveButton(coalition));
+  //document.getElementById("coreStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function perfectButton() {
@@ -255,10 +255,10 @@ function perfectButton() {
   if (isP)
     result += "Yes, this is the perfect partition.";
   else {
-    result += "No, node '" + node + "' would rather be in coalition " + coalition + ".<br/>";
+    result += "No, node '" + node + "' would rather be in coalition " + coalition.stringify() + ".<br/>";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
-  document.getElementById("perfectParagraph").appendChild(makeMoveButton(coalition));
+  //document.getElementById("perfectParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function movePlayers(coalition) {
@@ -269,15 +269,11 @@ function movePlayers(coalition) {
 }
 
 function makeMoveButton(coalition) {
+  // Broken!! TODO.
   let button = document.createElement("button");
   button.type = "button";
   console.log("Making a button for coalition " + coalition.stringify() + ".");
-  if (coalition) {
-    button.onclick = function() {movePlayers(coalition);};
-    button.innerText = "Move!";
-  }
-  else {
-    button.innerText = "Do nothing.";
-  }
+  button.onclick = function() {movePlayers(coalition);};
+  button.innerText = "Move!";
   return button;
 }
