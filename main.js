@@ -2,21 +2,21 @@
 // Code for all the buttons and things on the front webpage
 
 // TODO: change order of functions
+// TODO: make line length more consistent
 
 // ** Necessary globals for setting up a user session **
 
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(SIGMA, SIGMA.renderers[0]); // enable click and drag
 SIGMA.settings('zoomingRatio', 1); // scroll doesn't zoom
-let PARTITION = []; // current partition of the vertices
+let PARTITION = new Set(); // current partition of the vertices
 let GRAPH = {}; // a map from nodes to arrays of nodes
 let SCOREFUNC = FOScore; // function to use for player type
 
 // ** Functions for Reading and Changing the Graph **
 
-function addNode(name, x=Math.random(), y=Math.random()) {
+function addNode(name=Sigma.graph.nodes().length, x=Math.random(), y=Math.random()) {
   // add a node to the sigma graph
-  name = (name ? name : 'n' + SIGMA.graph.nodes().length.toString());
   if (SIGMA.graph.nodes(name)) return; // don't add the node if there's already one with the same name
   SIGMA.graph.addNode({
     id: name,
@@ -42,23 +42,21 @@ function addEdge(source, target) {
 }
 
 function collectGraph() {
-  // Make a simple adjacency list object from the complex sigma graph.
-  // Also, sort everything alphabetically.
+  // Make a simple adjacency list object from the complex sigma graph
+  // Also, sort everything alphabetically
   let graph = {};
   let nodes = SIGMA.graph.nodes().map(node=>node.id).sort();
   for (const node of nodes)
-    graph[node] = [];
+    graph[node] = new Set();
   for (const edge of SIGMA.graph.edges())
-    graph[edge.source].push(edge.target);
-  for (const node of nodes)
-    graph[node] = graph[node].sort();
+    graph[edge.source].add(edge.target);
   return graph;
 }
 
 // ** Functions for Taking User Input **
 
 function drawGraphFromTextButton() {
-  // Replace the current graph with the one described in the big text box on the webpage.
+  // Replace the current graph with the one described in the big text box on the webpage
   SIGMA.graph.clear();
   let graph = stringToGraph(document.getElementById('graphTextField').value);
   for (const source of Object.keys(graph)) {
@@ -80,16 +78,16 @@ function stringToGraph(string) {
     if (line == "") continue;
     let [source, targets] = line.split(':');
     if (targets == "")
-      graph[source] = [];
-    graph[source] = targets.split(',');
+      graph[source] = new Set();
+    graph[source] = new Set(targets.split(','));
   }
   return graph;
 }
     
 
 function makePartitionFromTextButton() {
-  // Set the partition to the one described by the user and color the coalitions.
-  // Also, sorts everything alphabetically.
+  // Set the partition to the one described by the user and color the coalitions
+  // Also, sorts everything alphabetically
   let partition = stringToPartition(document.getElementById('partitionTextField').value);
   let nodes = SIGMA.graph.nodes().map(nodeO => nodeO.id);
   if (!isPartition(nodes, partition)) {
@@ -97,22 +95,21 @@ function makePartitionFromTextButton() {
       "exactly one line. (Commas seperate nodes.)");
     return;
   }
-  PARTITION = partition.map(arr => arr.sort()).sort(
-    (arr1, arr2) => JSON.stringify(arr1).localeCompare(JSON.stringify(arr2)));
-  PARTITION.forEach(coalition => colorSubgraph(coalition, randomColor()));
+  PARTITION = partition;
+  partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
   SIGMA.refresh(); // update the displayed picture
 }
 
 function partitionToString(partition) {
-  return partition.map(coalition => coalition.join(", ")).join("\n");
+  return Array.from(partition).map(coalition => Array.from(coalition).join(", ")).join("\n");
 }
 
 function stringToPartition(string) {
-  let partition = [];
+  let partition = new Set();
   for (let line of string.split('\n')) {
     line = line.replace(/ /g, ''); // remove spaces
     if (line == "") continue;
-    partition.push(line.split(','));
+    partition.add(new Set(line.split(',')));
   }
   return partition;
 }
@@ -122,15 +119,21 @@ function updatePartitionTextField() {
 }
 
 
-function isPartition(arr, arrArr) {
-  // checks if the arrArr is a partition of the arr
-  let concatified = [].concat.apply([],arrArr);
-  return (concatified.length == arr.length) && arr.every(x => concatified.includes(x));
+function isPartition(set, partition) {
+  // checks if partition is actually a partition of the set
+  let setCopy = new Set(set);
+  for (const subSet of partition)
+    for (const x of subSet)
+      if (!setCopy.delete(x)) // an element occurs twice
+        return false;
+  if (setCopy.size > 0) // an element is missing
+    return false;
+  return true;
 }
 
 function colorSubgraph(nodes, color) {
   // color a subgraph induced by a set of nodes
-  for (let nodeObject of SIGMA.graph.nodes(nodes))
+  for (let nodeObject of SIGMA.graph.nodes(Array.from(nodes)))
     nodeObject.color = color;
 }
 
@@ -142,16 +145,18 @@ function randomColor() {
 // ** Buttons for Displaying Calculations **
 
 function displayScoresButton() {
-  // Displays every node's score of every coalition in the partition.
+  // Displays every node's score of every coalition in the partition
+  // TODO: do we want all nodes to evaluate all coalitions?
+  // TODO: possibly switch to document.createElement
   let result = "<table>";
   result += "<tr><th></th>";
   for (const coalition of PARTITION)
-    result += "<th>" + coalition.toString() + "</th>";
+    result += "<th>" + coalition.stringify() + "</th>";
   result += "</tr>";
   for (const node of Object.keys(GRAPH)) {
     result += "<tr> <th>" + node + "</th>"; // start a new row
     for (const coalition of PARTITION) {
-      let score = SCOREFUNC(GRAPH, node, coalition.union([node])); 
+      let score = SCOREFUNC(GRAPH, node, coalition.plus(node));
       result += "<td>" + ((score%1==0)? score : score.toFixed(2)) + "</td>"; // add a score
     }
     result += "</tr>";
@@ -161,7 +166,7 @@ function displayScoresButton() {
 }
 
 function setPlayerTypeButton() {
-  // Set the global player type.
+  // Set the global player type
   let nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
   let selection = document.getElementById("playerTypePicker").value;
   SCOREFUNC = nameToFunc[selection];
@@ -173,10 +178,10 @@ function individuallyRationalButton() {
   if (isIR)
     result += "Yes this partition is individually rational!";
   else {
-    result += "No. Node '" + node + "' would rather be alone."
-      + makeMoveButton([node]);
+    result += "No. Node '" + node + "' would rather be alone.";
   }
   document.getElementById("individuallyRationalParagraph").innerHTML = result;
+  document.getElementById("individuallyRationalParagraph").appendChild(makeMoveButton(new Set([node])));
 }
 
 function nashStableButton() {
@@ -185,10 +190,11 @@ function nashStableButton() {
   if (isNS)
     result += "Yes, this partition is Nash stable.";
   else {
-    result += "No, node '" + node + "' would rather be in coalition [" + coalition + "]." +
-      makeMoveButton(coalition.concat(node));
+    result += "No, node '" + node + "' would rather be in coalition " +
+      coalition.stringify() + ".";
   }
   document.getElementById("nashStableParagraph").innerHTML = result;
+  document.getElementById("nashStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function individuallyStableButton() {
@@ -197,11 +203,11 @@ function individuallyStableButton() {
   if (isIS)
     result += "Yes, this partition is individually stable";
   else {
-    result = "No, node '" + node + "' would rather be in coalition [" + coalition +
-      "] and everyone in that coalition is okay with adding that node." +
-      makeMoveButton(coalition.concat(node));
+    result = "No, node '" + node + "' would rather be in coalition " + coalition.stringify() +
+      " and everyone in that coalition is okay with adding that node.";
   }
   document.getElementById("individuallyStableParagraph").innerHTML = result;
+  document.getElementById("individuallyStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function contractuallyIndividuallyStableButton() {
@@ -210,21 +216,21 @@ function contractuallyIndividuallyStableButton() {
   if (isCIS)
     result += "Yes, this partition is contractually individually stable";
   else {
-    result = "No, node '" + node + "' would rather be in coalition [" + coalition +
-      "] and everyone in that coalition is okay with adding that node" +
-      " and everyone in that node's home coalition is okay with it leaving." +
-      makeMoveButton(coalition.concat(node));
+    result = "No, node '" + node + "' would rather be in coalition " + coalition.stringify() +
+      " and everyone in that coalition is okay with adding that node" +
+      " and everyone in that node's home coalition is okay with it leaving.";
   }
   document.getElementById("contractuallyIndividuallyStableParagraph").innerHTML = result;
+  document.getElementById("contractuallyIndividuallyStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function strictlyPopularButton() {
-  let [isSP, betterPartition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
+  let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
   let result = "";
   if (isSP)
     result += "Yes, this partition is Strictly Popular.";
   else {
-    result += "No, partition " + JSON.stringify(betterPartition) + " is preferred overall by " + (-winCount) + " votes.";
+    result += "No, partition {" + Array.from(partition).map(coalition=>coalition.stringify()).join(',') + "} is preferred overall by " + (-winCount) + " votes.";
     // TODO: add a button here
   }
   document.getElementById("strictlyPopularParagraph").innerHTML = result;
@@ -236,10 +242,10 @@ function coreStableButton() {
   if (isCS)
     result += "Yes, this partition is core stable";
   else {
-    result += "No, the coalition [" + coalition + "] is weakly blocking (all members weakly prefer it and one member strongly prefers it.)." +
-      makeMoveButton(coalition);
+    result += "No, the coalition " + coalition.stringify() + " is weakly blocking (all members weakly prefer it and one member strongly prefers it.).";
   }
   document.getElementById("coreStableParagraph").innerHTML = result;
+  document.getElementById("coreStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function perfectButton() {
@@ -249,10 +255,10 @@ function perfectButton() {
   if (isP)
     result += "Yes, this is the perfect partition.";
   else {
-    result += "No, node '" + node + "' would rather be in coalition [" + coalition + "].<br/>" +
-      makeMoveButton(coalition);
+    result += "No, node '" + node + "' would rather be in coalition " + coalition + ".<br/>";
   }
   document.getElementById("perfectParagraph").innerHTML = result;
+  document.getElementById("perfectParagraph").appendChild(makeMoveButton(coalition));
 }
 
 function movePlayers(coalition) {
@@ -263,5 +269,15 @@ function movePlayers(coalition) {
 }
 
 function makeMoveButton(coalition) {
-  return "<button type=\"button\" onclick=movePlayers(" + JSON.stringify(coalition) + ")> Move! </button>";
+  let button = document.createElement("button");
+  button.type = "button";
+  console.log("Making a button for coalition " + coalition.stringify() + ".");
+  if (coalition) {
+    button.onclick = function() {movePlayers(coalition);};
+    button.innerText = "Move!";
+  }
+  else {
+    button.innerText = "Do nothing.";
+  }
+  return button;
 }
