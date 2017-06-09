@@ -11,114 +11,77 @@
 
   <div class="centerColumn">
     <h3> Altruistic Hedonic Game Simulator </h3>
+    <!-- Introduction -->
     <p>
-      Welcome to the altruistic hedonic game simulator! This software is based off the 2016 AAMAS
-      <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">paper</a>
-      <i>Altruistic Hedonic Games</i> by Nguyen, Rey, Rey, Rothe, and Schend.
+    Welcome to the altruistic hedonic game simulator! This software is based off the 2016 AAMAS
+    <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">paper</a>
+    <i>Altruistic Hedonic Games</i> by Nguyen, Rey, Rey, Rothe, and Schend.
     </p>
     <p> This software doesn't work at all on smartphones. Desktop with chrome or firefox recommended. </p>
     <p> If you modify the graph or partition or you change the  player type, then make sure you recalculate the scores and stability checks. </p>
     <hr>
-  </div>
 
-  <div id="columns">
-
-    <div id="column">
-      <!-- Display the graph -->
-      <div id="outergraphbox">
-        <div id="innergraphbox"></div>
-      </div>
-      <script src="sigma/sigma.min.js"></script> <!-- main graph library -->
-      <script src="sigma/sigma.plugins.dragNodes.js"></script> <!-- plugin for clicking and dragging nodes -->
-      <script src="myarray.js"></script> <!-- algorithms for arrays -->
-      <script src="myset.js"></script> <!-- algorithms for arrays -->
-      <script src="altruism.js"></script> <!-- algorithms for altruistic hedonic games -->
-      <script src="main.js"></script> <!-- code for the buttons etc -->
+    <!-- The box that holds the interactive graph -->
+    <div id="outergraphbox">
+      <div id="innergraphbox"></div>
     </div>
 
-    <div id="column">
-      <!-- All the buttons and interface -->
-      <ul>
-        <li> Enter adjacency list: <br>
-          <textarea id="graphTextField" cols="40" rows="5">a: b, c, d
-c: d, e</textarea>
-          <button type="button" onclick="drawGraphFromTextButton()">Draw!</button>
-        </li>
-        <li> Enter partition: <br>
-          <textarea id="partitionTextField" cols="40" rows="5">a,b
-c,d
-e</textarea>
-          <button type="button" onclick="makePartitionFromTextButton()">Color!</button>
-        </li>
-        <li>
-          Select player type: <br>
-          <select id="playerTypePicker">
-            <option value="simple">simple friend-oriented</option>
-            <option value="AL">truly altruistic</option>
-            <option value="SF">selfish first</option>
-            <option value="EQ">equal treatment</option>
-          </select>
-          <button type="button" onclick="setPlayerTypeButton()"> Change mindset! </button>
-        </li>
-        <li>
-          Compute scores of this partition:
-          <button type="button" onclick="displayScoresButton()">Compute!</button>
-          <p id="scoreParagraph"> </p>
-        </li>
-        <li>
-          Check stability of this partition:
-          <ul>
-            <li>
-              individually rational? (fast)
-              <button type="button" onclick="individuallyRationalButton()">Check!</button>
-              <p id="individuallyRationalParagraph"> </p>
-            </li>
-            <li>
-              Nash-stable? (fast)
-              <button type="button" onclick="nashStableButton()">Check!</button>
-              <p id="nashStableParagraph"> </p>
-            </li>
-            <li>
-              individually stable? (fast)
-              <button type="button" onclick="individuallyStableButton()">Check!</button>
-              <p id="individuallyStableParagraph"> </p>
-            </li>
-            <li>
-              contractually individually stable? (fast)
-              <button type="button" onclick="contractuallyIndividuallyStableButton()">Check!</button>
-              <p id="contractuallyIndividuallyStableParagraph"> </p>
-            </li>
-            <li>
-              strictly popular? (very slow)
-              <button type="button" onclick="strictlyPopularButton()">Check!</button>
-              <p id="strictlyPopularParagraph"> </p>
-            </li>
-            <li>
-              core-stable? (slow)
-              <button type="button" onclick="coreStableButton()">Check!</button>
-              <p id="coreStableParagraph"> </p>
-            </li>
-            <li>
-              perfect? (slow)
-              <button type="button" onclick="perfectButton()">Check!</button>
-              <p id="perfectParagraph"> </p>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </div>
+    <!-- All the buttons and interface -->
+    <ul>
+      <li> Enter adjacency list: <br>
+        <textarea id="graphTextField" cols="40" rows="5"> </textarea>
+        <button type="button" id="drawGraphFromTextButton">Draw!</button>
+      </li>
+      <li> Enter partition: <br>
+        <textarea id="partitionTextField" cols="40" rows="5"> </textarea>
+        <button type="button" id="makePartitionFromTextButton">Color!</button>
+      </li>
+      <li>
+        <b>Player type:</b> The players should be
+        <select id="playerTypePicker">
+          <option value="simple">simple friend-oriented</option>
+          <option value="AL">truly altruistic</option>
+          <option value="SF">selfish first</option>
+          <option value="EQ">equal treatment</option>
+        </select>.
+      </li>
+      <li>
+        Compute every node's score of every other partition:
+        <button type="button" onclick="displayScoresButton()">Compute!</button>
+        <p id="scoreParagraph"> </p>
+      </li>
+      <li>
+        <b>Stability check:</b> Check if this partition is
+        <select id="stabilityPicker">
+          <option value="individuallyRational">individually rational</option>
+          <option value="nashStable">Nash-stable</option>
+          <option value="individuallyStable">individually stable</option>
+          <option value="contractuallyIndividuallyStable">contractually individually stable</option>
+          <option value="strictlyPopular">strictly popular</option>
+          <option value="coreStable">core-stable</option>
+          <option value="perfect">perfect</option>
+        </select>:
+        <button type="button" id="checkStabilityButton"> Check it! </button>
+        <p id="stabilityParagraph"> </p> <br>
+      </li>
+    </ul>
 
 
-  <div class="centerColumn">
     <hr>
+    <!-- footer -->
     <p> Public domain dedication. No rights reserved. Look at the source!</p>
     <p> Hosted on
-      <a href="https://github.com/qpwo/altruistic-hedonic-games">Github</a>.
-      Using graph library
-      <a href="http://sigmajs.org/">sigmajs</a>.
+    <a href="https://github.com/qpwo/altruistic-hedonic-games">Github</a>.
+    Using graph library
+    <a href="http://sigmajs.org/">sigmajs</a>.
     </p>
   </div>
 
+  <script src="sigma/sigma.min.js"></script> <!-- main graph library -->
+  <script src="sigma/sigma.plugins.dragNodes.js"></script> <!-- plugin for clicking and dragging nodes -->
+  <script src="myarray.js"></script> <!-- algorithms for arrays -->
+  <script src="myset.js"></script> <!-- algorithms for sets -->
+  <script src="altruism.js"></script> <!-- algorithms for altruistic hedonic games -->
+  <script src="main.js"></script> <!-- code for the buttons etc -->
 </body>
 </html>

@@ -55,7 +55,8 @@ function collectGraph() {
 
 // ** Functions for Taking User Input **
 
-function drawGraphFromTextButton() {
+document.getElementById("graphTextField").innerHTML = "a: b, c, d\nc: d, e"; // default value
+document.getElementById("drawGraphFromTextButton").onclick = function() {
   // Replace the current graph with the one described in the big text box on the webpage
   SIGMA.graph.clear();
   let graph = stringToGraph(document.getElementById('graphTextField').value);
@@ -83,9 +84,9 @@ function stringToGraph(string) {
   }
   return graph;
 }
-    
 
-function makePartitionFromTextButton() {
+document.getElementById("partitionTextField").innerHTML = "a, b\nc, d\ne"; // default value
+document.getElementById("makePartitionFromTextButton").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
   // Also, sorts everything alphabetically
   let partition = stringToPartition(document.getElementById('partitionTextField').value);
@@ -139,10 +140,35 @@ function colorSubgraph(nodes, color) {
 
 function randomColor() {
   // generates a random hex color code
+  // TODO: make colors more different from each other
   return '#'+Math.random().toString(16).substr(-6);
 }
 
 // ** Buttons for Displaying Calculations **
+
+document.getElementById("playerTypePicker").onchange = function() {
+  // Set the global player type
+  let nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
+  let selection = document.getElementById("playerTypePicker").value;
+  SCOREFUNC = nameToFunc[selection];
+}
+
+
+document.getElementById("checkStabilityButton").onclick = individuallyRationalButton; // default value
+document.getElementById("stabilityPicker").onchange = function() {
+  // Set the global player type
+  let nameToFunc = {
+    "individuallyRational": individuallyRationalButton,
+    "nashStable": nashStableButton,
+    "individuallyStable": individuallyStableButton,
+    "contractuallyIndividuallyStable": contractuallyIndividuallyStableButton,
+    "strictlyPopular": strictlyPopularButton,
+    "coreStable": coreStableButton,
+    "perfect": perfectButton,
+  }
+  let selection = nameToFunc[document.getElementById("stabilityPicker").value];
+  document.getElementById("checkStabilityButton").onclick = selection;
+}
 
 function displayScoresButton() {
   // Displays every node's score of every coalition in the partition
@@ -165,13 +191,6 @@ function displayScoresButton() {
   document.getElementById("scoreParagraph").innerHTML = result;
 }
 
-function setPlayerTypeButton() {
-  // Set the global player type
-  let nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
-  let selection = document.getElementById("playerTypePicker").value;
-  SCOREFUNC = nameToFunc[selection];
-}
-
 function individuallyRationalButton() {
   let [isIR, node] = isIndividuallyRational(GRAPH, PARTITION);
   let result = "";
@@ -180,7 +199,7 @@ function individuallyRationalButton() {
   else {
     result += "No. Node '" + node + "' would rather be alone.";
   }
-  document.getElementById("individuallyRationalParagraph").innerHTML = result;
+  document.getElementById("stabilityParagraph").innerHTML = result;
   //document.getElementById("individuallyRationalParagraph").appendChild(makeMoveButton(new Set([node])));
 }
 
@@ -193,7 +212,7 @@ function nashStableButton() {
     result += "No, node '" + node + "' would rather be in coalition " +
       coalition.stringify() + ".";
   }
-  document.getElementById("nashStableParagraph").innerHTML = result;
+  document.getElementById("stabilityParagraph").innerHTML = result;
   //document.getElementById("nashStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
@@ -206,7 +225,7 @@ function individuallyStableButton() {
     result = "No, node '" + node + "' would rather be in coalition " + coalition.stringify() +
       " and everyone in that coalition is okay with adding that node.";
   }
-  document.getElementById("individuallyStableParagraph").innerHTML = result;
+  document.getElementById("stabilityParagraph").innerHTML = result;
   //document.getElementById("individuallyStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
@@ -220,7 +239,7 @@ function contractuallyIndividuallyStableButton() {
       " and everyone in that coalition is okay with adding that node" +
       " and everyone in that node's home coalition is okay with it leaving.";
   }
-  document.getElementById("contractuallyIndividuallyStableParagraph").innerHTML = result;
+  document.getElementById("stabilityParagraph").innerHTML = result;
   //document.getElementById("contractuallyIndividuallyStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
@@ -233,7 +252,7 @@ function strictlyPopularButton() {
     result += "No, partition {" + Array.from(partition).map(coalition=>coalition.stringify()).join(',') + "} is preferred overall by " + (-winCount) + " votes.";
     // TODO: add a button here
   }
-  document.getElementById("strictlyPopularParagraph").innerHTML = result;
+  document.getElementById("stabilityParagraph").innerHTML = result;
 }
 
 function coreStableButton() {
@@ -244,7 +263,7 @@ function coreStableButton() {
   else {
     result += "No, the coalition " + coalition.stringify() + " is weakly blocking (all members weakly prefer it and one member strongly prefers it.).";
   }
-  document.getElementById("coreStableParagraph").innerHTML = result;
+  document.getElementById("stabilityParagraph").innerHTML = result;
   //document.getElementById("coreStableParagraph").appendChild(makeMoveButton(coalition));
 }
 
@@ -257,7 +276,7 @@ function perfectButton() {
   else {
     result += "No, node '" + node + "' would rather be in coalition " + coalition.stringify() + ".<br/>";
   }
-  document.getElementById("perfectParagraph").innerHTML = result;
+  document.getElementById("stabilityParagraph").innerHTML = result;
   //document.getElementById("perfectParagraph").appendChild(makeMoveButton(coalition));
 }
 
@@ -268,12 +287,12 @@ function movePlayers(coalition) {
   SIGMA.refresh();
 }
 
-function makeMoveButton(coalition) {
-  // Broken!! TODO.
-  let button = document.createElement("button");
-  button.type = "button";
-  console.log("Making a button for coalition " + coalition.stringify() + ".");
-  button.onclick = function() {movePlayers(coalition);};
-  button.innerText = "Move!";
-  return button;
-}
+// function makeMoveButton(coalition) {
+//   // Broken!! TODO.
+//   let button = document.createElement("button");
+//   button.type = "button";
+//   console.log("Making a button for coalition " + coalition.stringify() + ".");
+//   button.onclick = function() {movePlayers(coalition);};
+//   button.innerText = "Move!";
+//   return button;
+// }
