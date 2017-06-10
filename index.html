@@ -29,25 +29,27 @@
     <!-- All the buttons and interface -->
     <ul>
       <li> Enter adjacency list: <br>
-        <textarea id="graphTextField" cols="40" rows="5"> </textarea>
-        <button type="button" id="drawGraphFromTextButton">Draw!</button>
+        <textarea id="graphText" cols="40" rows="5"> </textarea>
+        <button type="button" id="drawGraph">Draw!</button>
       </li>
       <li> Enter partition: <br>
-        <textarea id="partitionTextField" cols="40" rows="5"> </textarea>
-        <button type="button" id="makePartitionFromTextButton">Color!</button>
+        <textarea id="partitionText" cols="40" rows="5"> </textarea>
+        <button type="button" id="colorPartition">Color!</button>
       </li>
       <li>
-        <b>Player type:</b> The players should be
-        <select id="playerTypePicker">
+        The players should be
+        <select id="playerType">
           <option value="simple">simple friend-oriented</option>
           <option value="AL">truly altruistic</option>
           <option value="SF">selfish first</option>
           <option value="EQ">equal treatment</option>
-        </select>.
+        </select>. <br>
+        <p id="playerExplanation"> simple friend-oriented games are dj skdfdsf </p>
       </li>
       <li>
-        <b>Stability check:</b> Check if this partition is
-        <select id="stabilityPicker">
+        <p>
+        <b>Stability check:</b> Is this partition
+        <select id="stabilityType">
           <option value="individuallyRational">individually rational</option>
           <option value="nashStable">Nash-stable</option>
           <option value="individuallyStable">individually stable</option>
@@ -55,14 +57,16 @@
           <option value="strictlyPopular">strictly popular</option>
           <option value="coreStable">core-stable</option>
           <option value="perfect">perfect</option>
-        </select>:
-        <button type="button" id="checkStabilityButton"> Check it! </button>
-        <p id="stabilityParagraph"> </p> <br>
+        </select>?
+        <button type="button" id="checkStability"> Check it! </button>
+        </p>
+        <p id="stabilityResults"> </p>
+        <p id="stabilityExplanation"> </p>
       </li>
       <li>
         Compute every node's score of every other partition:
-        <button type="button" onclick="displayScoresButton()">Compute!</button>
-        <p id="scoreParagraph"> </p>
+        <button type="button" id="computeScores">Compute!</button>
+        <p id="scores"> </p>
       </li>
     </ul>
 

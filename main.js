@@ -55,11 +55,11 @@ function collectGraph() {
 
 // ** Functions for Taking User Input **
 
-document.getElementById("graphTextField").innerHTML = "a: b, c, d\nc: d, e"; // default value
-document.getElementById("drawGraphFromTextButton").onclick = function() {
+document.getElementById("graphText").innerHTML = "a: b, c, d\nc: d, e"; // default value
+document.getElementById("drawGraph").onclick = function() {
   // Replace the current graph with the one described in the big text box on the webpage
   SIGMA.graph.clear();
-  let graph = stringToGraph(document.getElementById('graphTextField').value);
+  let graph = stringToGraph(document.getElementById('graphText').value);
   for (const source of Object.keys(graph)) {
     addNode(source);
     for (const target of graph[source]) {
@@ -85,11 +85,11 @@ function stringToGraph(string) {
   return graph;
 }
 
-document.getElementById("partitionTextField").innerHTML = "a, b\nc, d\ne"; // default value
-document.getElementById("makePartitionFromTextButton").onclick = function() {
+document.getElementById("partitionText").innerHTML = "a, b\nc, d\ne"; // default value
+document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
   // Also, sorts everything alphabetically
-  let partition = stringToPartition(document.getElementById('partitionTextField').value);
+  let partition = stringToPartition(document.getElementById('partitionText').value);
   let nodes = SIGMA.graph.nodes().map(nodeO => nodeO.id);
   if (!isPartition(nodes, partition)) {
     window.alert("This is not a valid partition. Every node must occur on " +
@@ -146,18 +146,33 @@ function randomColor() {
 
 // ** Buttons for Displaying Calculations **
 
-document.getElementById("playerTypePicker").onchange = function() {
-  // Set the global player type
-  let nameToFunc = {"EQ": FOEQScore, "AL":FOALScore, "SF":FOSFScore, "simple":FOScore};
-  let selection = document.getElementById("playerTypePicker").value;
-  SCOREFUNC = nameToFunc[selection];
+{
+  let choiceToFunc = { // TODO: add enemy-oriented. TODO eventually: add fractional and others.
+    "EQ": FOEQScore,
+    "AL":FOALScore,
+    "SF":FOSFScore,
+    "simple":FOScore
+  };
+  let choiceToExplanation = {
+    "EQ": "Equal treatment means I evaluate everyone in my coalition with equal importance.",
+    "AL": "Altruistic treatment means I want my friends happy first and only then will I make myself happy.",
+    "SF": "Selfish first treatment means I only consult my friends if I can't decide.",
+    "simple": "Friend-oriented scores mean I try to maximize friends and, in the case of a tie, minimize enemies.",
+  };
+  let changePlayerType = function() {
+    // TODO: delete or grey-out the old scores etc when player type is changed
+    let choice = document.getElementById("playerType").value;
+    SCOREFUNC = choiceToFunc[choice];
+    let explanation = choiceToExplanation[choice];
+    document.getElementById("playerExplanation").innerHTML = explanation;
+  }
+  document.getElementById("playerType").onchange = changePlayerType
+  changePlayerType()
 }
 
 
-document.getElementById("checkStabilityButton").onclick = individuallyRationalButton; // default value
-document.getElementById("stabilityPicker").onchange = function() {
-  // Set the global player type
-  let nameToFunc = {
+{
+  let choiceToFunc = { // TODO: rename all these functions from *Button to check*
     "individuallyRational": individuallyRationalButton,
     "nashStable": nashStableButton,
     "individuallyStable": individuallyStableButton,
@@ -166,11 +181,31 @@ document.getElementById("stabilityPicker").onchange = function() {
     "coreStable": coreStableButton,
     "perfect": perfectButton,
   }
-  let selection = nameToFunc[document.getElementById("stabilityPicker").value];
-  document.getElementById("checkStabilityButton").onclick = selection;
+  let choiceToExplanation = {
+    "individuallyRational": "individual rationality means...",
+    "nashStable": "nash stability means...",
+    "individuallyStable":  "individual stability means...",
+    "contractuallyIndividuallyStable": "contractual individual stability means...",
+    "strictlyPopular": "strict popularity is a blessing.",
+    "coreStable": "core stability is a rarity.",
+    "perfect": "we all want the perfect partition.",
+  }
+  let changeStabilityType = function() {
+    // TODO: check stability on change, not just on button click
+    // Set the global player type
+    let choice = document.getElementById("stabilityType").value;
+    let stabilityFunc = choiceToFunc[choice];
+    let explanation = choiceToExplanation[choice];
+    document.getElementById("checkStability").onclick = function () {
+      document.getElementById("stabilityResults").innerHTML = stabilityFunc();
+    }
+    document.getElementById("stabilityExplanation").innerHTML = explanation;
+  }
+  document.getElementById("stabilityType").onchange = changeStabilityType;
+  changeStabilityType();
 }
 
-function displayScoresButton() {
+document.getElementById("computeScores").onclick = function() {
   // Displays every node's score of every coalition in the partition
   // TODO: do we want all nodes to evaluate all coalitions?
   // TODO: possibly switch to document.createElement
@@ -188,96 +223,60 @@ function displayScoresButton() {
     result += "</tr>";
   }
   result += "</table>";
-  document.getElementById("scoreParagraph").innerHTML = result;
+  document.getElementById("scores").innerHTML = result;
 }
 
 function individuallyRationalButton() {
   let [isIR, node] = isIndividuallyRational(GRAPH, PARTITION);
-  let result = "";
   if (isIR)
-    result += "Yes this partition is individually rational!";
-  else {
-    result += "No. Node '" + node + "' would rather be alone.";
-  }
-  document.getElementById("stabilityParagraph").innerHTML = result;
-  //document.getElementById("individuallyRationalParagraph").appendChild(makeMoveButton(new Set([node])));
+    return "Yes.";
+  return "No. Counterexample: node " + node;
 }
 
 function nashStableButton() {
   let [isNS, node, coalition] = isNashStable(GRAPH, PARTITION, SCOREFUNC);
-  let result = "";
   if (isNS)
-    result += "Yes, this partition is Nash stable.";
-  else {
-    result += "No, node '" + node + "' would rather be in coalition " +
-      coalition.stringify() + ".";
-  }
-  document.getElementById("stabilityParagraph").innerHTML = result;
-  //document.getElementById("nashStableParagraph").appendChild(makeMoveButton(coalition));
+    return "Yes."
+  return "No. Counterexample: node " + node + " and coalition " + coalition.stringify();
 }
 
 function individuallyStableButton() {
   let [isIS, node, coalition] = isIndividuallyStable(GRAPH, PARTITION, SCOREFUNC);
-  let result = ""
   if (isIS)
-    result += "Yes, this partition is individually stable";
-  else {
-    result = "No, node '" + node + "' would rather be in coalition " + coalition.stringify() +
-      " and everyone in that coalition is okay with adding that node.";
-  }
-  document.getElementById("stabilityParagraph").innerHTML = result;
-  //document.getElementById("individuallyStableParagraph").appendChild(makeMoveButton(coalition));
+    return "Yes."
+  return "No. Counterexample: node " + node + " and coalition " + coalition.stringify();
 }
 
 function contractuallyIndividuallyStableButton() {
   let [isCIS, node, coalition] = isContractuallyIndividuallyStable(GRAPH, PARTITION, SCOREFUNC);
-  let result = ""
   if (isCIS)
-    result += "Yes, this partition is contractually individually stable";
-  else {
-    result = "No, node '" + node + "' would rather be in coalition " + coalition.stringify() +
-      " and everyone in that coalition is okay with adding that node" +
-      " and everyone in that node's home coalition is okay with it leaving.";
-  }
-  document.getElementById("stabilityParagraph").innerHTML = result;
-  //document.getElementById("contractuallyIndividuallyStableParagraph").appendChild(makeMoveButton(coalition));
+    return "Yes."
+  return "No. Counterexample: node " + node + " and coalition " + coalition.stringify();
 }
 
 function strictlyPopularButton() {
+  // TODO: seperate into for, against, and tie votes.
   let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
-  let result = "";
   if (isSP)
-    result += "Yes, this partition is Strictly Popular.";
-  else {
-    result += "No, partition {" + Array.from(partition).map(coalition=>coalition.stringify()).join(',') + "} is preferred overall by " + (-winCount) + " votes.";
-    // TODO: add a button here
-  }
-  document.getElementById("stabilityParagraph").innerHTML = result;
+    return "Yes."
+  partitionString = '{' + Array.from(partition).map(coalition=>coalition.stringify()).join(',') + '}';
+  return "No. Counterexample: partition " + partitionString + " with " + winCount + " more votes.";
+  // TODO: special button
 }
 
 function coreStableButton() {
   let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC);
-  let result = "";
   if (isCS)
-    result += "Yes, this partition is core stable";
-  else {
-    result += "No, the coalition " + coalition.stringify() + " is weakly blocking (all members weakly prefer it and one member strongly prefers it.).";
-  }
-  document.getElementById("stabilityParagraph").innerHTML = result;
-  //document.getElementById("coreStableParagraph").appendChild(makeMoveButton(coalition));
+    return "Yes."
+  return "No. Counterexample: coalition " + coalition.stringify();
 }
 
 function perfectButton() {
   // check if the partition is perfect and display result
   let [isP, node, coalition] = isPerfect(GRAPH, PARTITION, SCOREFUNC);
-  let result = "";
   if (isP)
-    result += "Yes, this is the perfect partition.";
-  else {
-    result += "No, node '" + node + "' would rather be in coalition " + coalition.stringify() + ".<br/>";
-  }
-  document.getElementById("stabilityParagraph").innerHTML = result;
-  //document.getElementById("perfectParagraph").appendChild(makeMoveButton(coalition));
+    return "Yes."
+  return "No. Counterexample: node " + node + " and coalition " + coalition.stringify();
 }
 
 function movePlayers(coalition) {
