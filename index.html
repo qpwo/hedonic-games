@@ -37,31 +37,69 @@
         <button type="button" id="colorPartition">Color!</button>
       </li>
       <li>
+        <p>
         The players should be
         <select id="playerType">
-          <option value="simple">simple friend-oriented</option>
-          <option value="AL">truly altruistic</option>
-          <option value="SF">selfish first</option>
-          <option value="EQ">equal treatment</option>
-        </select>. <br>
-        <p id="playerExplanation"> simple friend-oriented games are dj skdfdsf </p>
+          <option value="friendOriented">simple friend-oriented</option>
+          <option value="selfishFirst">selfish first</option>
+          <option value="equalTreatment">equal treatment</option>
+          <option value="altruisticTreatment">altruistic treatment</option>
+        </select>.
+        </p>
+
+        <!-- explanations of player types -->
+        <p id="friendOriented">
+        A player is friend-oriented if she tries to maximize friends and, in the case of a tie, minimize enemies.
+        </p>
+        <p id="selfishFirst">
+        A player is selfish-first if she uses her own preferences first and only uses her friends' preferences to break ties.
+        </p>
+        <p id="equalTreatment">
+        A player is equal-treatment if she puts equal weight on her own opinion and each friend's opinion.
+        </p>
+        <p id="altruisticTreatment">
+        A player is altruistic treatment if she uses her friends' preferences first and only uses her own preferences to break ties.
+        </p>
       </li>
       <li>
         <p>
         <b>Stability check:</b> Is this partition
         <select id="stabilityType">
-          <option value="individuallyRational">individually rational</option>
-          <option value="nashStable">Nash-stable</option>
-          <option value="individuallyStable">individually stable</option>
-          <option value="contractuallyIndividuallyStable">contractually individually stable</option>
-          <option value="strictlyPopular">strictly popular</option>
-          <option value="coreStable">core-stable</option>
-          <option value="perfect">perfect</option>
+          <option>individually rational</option>
+          <option>Nash-stable</option>
+          <option>individually stable</option>
+          <option>contractually individually stable</option>
+          <option>strictly popular</option>
+          <option>core-stable</option>
+          <option>perfect</option>
         </select>?
         <button type="button" id="checkStability"> Check it! </button>
         </p>
         <p id="stabilityResults"> </p>
-        <p id="stabilityExplanation"> </p>
+
+        <!-- explanations of stability concepts -->
+        <p id="individuallyRational">
+        A partition is individually rational if every player is happier in her home coalition than she would be alone. In other words,
+        \( \forall i \in N: \Gamma(i) \geq_i \{i\} \).
+        </p>
+        <p id="nashStable">
+        TODO NS why not
+        </p>
+        <p id="individuallyStable">
+        TODO IS is is \(2+2 = 4\).
+        </p>
+        <p id="contractuallyIndividuallyStable">
+        TODO CIS even better
+        </p>
+        <p id="strictlyPopular">
+        TODO SP I love it
+        </p>
+        <p id="coreStable">
+        TODO CS brilliant
+        </p>
+        <p id="perfect">
+        TODO just perfect
+        </p>
       </li>
       <li>
         Compute every node's score of every other partition:
@@ -88,5 +126,6 @@
   <script type="text/javascript" src="altruism.js"></script> <!-- algorithms for altruistic hedonic games -->
   <script type="text/javascript" src="main.js"></script> <!-- code for the buttons etc -->
   <script type="text/javascript" src="mathjax/MathJax.js?config=default"></script> <!-- makes pretty math rendering -->
+
 </body>
 </html>

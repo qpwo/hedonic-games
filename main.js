@@ -147,24 +147,16 @@ function randomColor() {
 // ** Buttons for Displaying Calculations **
 
 {
-  let choiceToFunc = { // TODO: add enemy-oriented. TODO eventually: add fractional and others.
-    "EQ": FOEQScore,
-    "AL":FOALScore,
-    "SF":FOSFScore,
-    "simple":FOScore
-  };
-  let choiceToExplanation = {
-    "EQ": "Equal treatment means I evaluate everyone in my coalition with equal importance.",
-    "AL": "Altruistic treatment means I want my friends happy first and only then will I make myself happy.",
-    "SF": "Selfish first treatment means I only consult my friends if I can't decide.",
-    "simple": "Friend-oriented scores mean I try to maximize friends and, in the case of a tie, minimize enemies.",
-  };
+  // TODO: add enemy-oriented games soon and add fractional games eventually
+  let functions = [FOScore, FOSFScore, FOEQScore, FOALScore];
+  let paragraphIds = ["friendOriented", "selfishFirst", "equalTreatment", "altruisticTreatment"];
   let changePlayerType = function() {
     // TODO: delete or grey-out the old scores etc when player type is changed
-    let choice = document.getElementById("playerType").value;
-    SCOREFUNC = choiceToFunc[choice];
-    let explanation = choiceToExplanation[choice];
-    document.getElementById("playerExplanation").innerHTML = explanation;
+    let choice = document.getElementById("playerType").selectedIndex;
+    SCOREFUNC = functions[choice];
+    for (let i=0; i<paragraphIds.length; i++)
+      document.getElementById(paragraphIds[i]).style.display = "none";
+    document.getElementById(paragraphIds[choice]).style.display = "initial";
   }
   document.getElementById("playerType").onchange = changePlayerType
   changePlayerType()
@@ -172,34 +164,28 @@ function randomColor() {
 
 
 {
-  let choiceToFunc = { // TODO: rename all these functions from *Button to check*
-    "individuallyRational": individuallyRationalButton,
-    "nashStable": nashStableButton,
-    "individuallyStable": individuallyStableButton,
-    "contractuallyIndividuallyStable": contractuallyIndividuallyStableButton,
-    "strictlyPopular": strictlyPopularButton,
-    "coreStable": coreStableButton,
-    "perfect": perfectButton,
-  }
-  let choiceToExplanation = {
-    "individuallyRational": "individual rationality means...",
-    "nashStable": "nash stability means...",
-    "individuallyStable":  "individual stability means...",
-    "contractuallyIndividuallyStable": "contractual individual stability means...",
-    "strictlyPopular": "strict popularity is a blessing.",
-    "coreStable": "core stability is a rarity.",
-    "perfect": "we all want the perfect partition.",
-  }
+  // TODO: rename all these functions from somethingButton to checkSomething
+  let functions = [individuallyRationalButton, nashStableButton,
+    individuallyStableButton, contractuallyIndividuallyStableButton,
+    strictlyPopularButton, coreStableButton, perfectButton,]
+  let paragraphIds = ["individuallyRational", "nashStable",
+    "individuallyStable", "contractuallyIndividuallyStable", "strictlyPopular",
+    "coreStable", "perfect",]
   let changeStabilityType = function() {
-    // TODO: check stability on change, not just on button click
-    // Set the global player type
-    let choice = document.getElementById("stabilityType").value;
-    let stabilityFunc = choiceToFunc[choice];
-    let explanation = choiceToExplanation[choice];
-    document.getElementById("checkStability").onclick = function () {
+    // Executes when user picks a different stability type
+    let choice = document.getElementById("stabilityType").selectedIndex;
+    // set up the stability button
+    let stabilityFunc = functions[choice];
+    let buttonAction = function() {
       document.getElementById("stabilityResults").innerHTML = stabilityFunc();
     }
-    document.getElementById("stabilityExplanation").innerHTML = explanation;
+    document.getElementById("checkStability").onclick = buttonAction;
+    buttonAction();
+
+    // update the stability explanation
+    for (let i=0; i<paragraphIds.length; i++) // first hide all the paragraphs
+      document.getElementById(paragraphIds[i]).style.display = "none";
+    document.getElementById(paragraphIds[choice]).style.display = "initial"; // then display the one we want
   }
   document.getElementById("stabilityType").onchange = changeStabilityType;
   changeStabilityType();
