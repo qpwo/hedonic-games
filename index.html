@@ -17,7 +17,7 @@
     <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">paper</a>
     <i>Altruistic Hedonic Games</i> by Nguyen, Rey, Rey, Rothe, and Schend.
     </p>
-    <p> This software doesn't work at all on smartphones. Desktop with chrome or firefox recommended. </p>
+    <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. </p>
     <p> If you modify the graph or partition or you change the  player type, then make sure you recalculate the scores and stability checks. </p>
     <hr>
 
@@ -38,32 +38,46 @@
       </li>
       <li>
         <p>
-        The players should be
+        <b>Player type:</b>
+        Set all players to be
         <select id="playerType">
-          <option value="friendOriented">simple friend-oriented</option>
-          <option value="selfishFirst">selfish first</option>
-          <option value="equalTreatment">equal treatment</option>
-          <option value="altruisticTreatment">altruistic treatment</option>
+          <option>friend-oriented (FO)</option>
+          <option>selfish-first (SF)</option>
+          <option>equal-treatment (EQ)</option>
+          <option>altruistic-treatment (AL)</option>
         </select>.
         </p>
 
         <!-- explanations of player types -->
         <p id="friendOriented">
+        Explanation:
         A player is friend-oriented if she tries to maximize friends and, in the case of a tie, minimize enemies.
+        This preference relation is defined by the score function
+        \[score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i | .\]
         </p>
         <p id="selfishFirst">
+        Explanation:
         A player is selfish-first if she uses her own preferences first and only uses her friends' preferences to break ties.
+        This preference relation is defined by the score function
+        \[ score_i^{SF}(A) = n^5 score_i^{FO}(A) + \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
         </p>
         <p id="equalTreatment">
+        Explanation:
         A player is equal-treatment if she puts equal weight on her own opinion and each friend's opinion.
+        This preference relation is defined by the score function
+        \[ score_i^{EQ}(A) = \sum_{a \in A \cap F_i \cup \{i\}} \frac{score_a^{FO}(A)}{|A \cap F_i \cup \{i\}|} .\]
         </p>
         <p id="altruisticTreatment">
-        A player is altruistic treatment if she uses her friends' preferences first and only uses her own preferences to break ties.
+        Explanation:
+        A player is altruistic-treatment if she uses her friends' preferences first and only uses her own preferences to break ties.
+        This preference relation is defined by the score function
+        \[ score_i^{AL}(A) = score_i^{FO}(A) + n^5 \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
         </p>
       </li>
       <li>
         <p>
-        <b>Stability check:</b> Is this partition
+        <b>Stability check:</b>
+        Is this partition
         <select id="stabilityType">
           <option>individually rational</option>
           <option>Nash-stable</option>
@@ -79,30 +93,51 @@
 
         <!-- explanations of stability concepts -->
         <p id="individuallyRational">
-        A partition is individually rational if every player is happier in her home coalition than she would be alone. In other words,
-        \( \forall i \in N: \Gamma(i) \geq_i \{i\} \).
+        Explanation:
+        A partition is individually rational if every player is happier in her home coalition than she would be alone.
+        In other words, \(\Gamma\) is individually rational iff
+        \[ \forall i \in N: \Gamma(i) \geq_i \{i\} .\]
         </p>
         <p id="nashStable">
-        TODO NS why not
+        Explanation:
+        A partition is Nash-stable if every player is happier in her home coalition than she would be in any other coalition.
+        In other words, \(\Gamma\) is Nash-stable iff
+        \[ \forall i \in N: \forall C \in \Gamma: \Gamma(i) \geq_i C \cup \{i\} .\]
         </p>
         <p id="individuallyStable">
-        TODO IS is is \(2+2 = 4\).
+        Explanation:
+        A partition is individually stable if every player who wants to transfer to a new coalition is unwanted by someone in that coalition.
+        In other words, \(\Gamma\) is individually stable iff
+        \[ \forall i \in N: \forall C \in \Gamma: (\Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C >_j C \cup \{i\} ))  .\]
         </p>
         <p id="contractuallyIndividuallyStable">
-        TODO CIS even better
+        Explanation:
+        A partition is contractually individually stable if every player who wants to transfer to a new coalition is either unwanted by someone in that coalition or is not permitted to leave by someone in her home coalition.
+        In other words, \(\Gamma\) is contractually individually stable iff
+        \[ \forall i \in N: \forall C \in \Gamma: \]
+        \[ \Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C >_j C \cup \{i\} ) \lor (\exists k \in \Gamma(i) \setminus \{i\}: \Gamma(i) >_k \Gamma(i) \setminus \{i\}) .\]
         </p>
         <p id="strictlyPopular">
-        TODO SP I love it
+        Explanation:
+        A partition is strictly popular if the majority of players prefer it to any other partition.
+        In other words, \(\Gamma\) is strictly popular iff
+        \[ \forall \Gamma': |\{ i \in N: \Gamma(i) >_i \Gamma'(i) \}| > |\{ i \in N: \Gamma'(i) >_i \Gamma(i) \}| .\]
         </p>
-        <p id="coreStable">
-        TODO CS brilliant
+        <p id="coreStable"> <!-- TODO: add weakly core stable -->
+        Explanation:
+        A partition is strictly core-stable if there is no possible weakly blocking coalition. (A coalition weakly blocks if everyone is at least as happy in the new one and someone is even happier.)
+        In other words, \(\Gamma\) is strictly core-stable iff
+        \[ \not\exists C \in N^n: (\forall i \in C: C \geq_i \Gamma(i)) \land (\exists j \in C: C >_j \Gamma(i)) .\]
         </p>
         <p id="perfect">
-        TODO just perfect
+        Explanation:
+        A partition is perfect if every player is in one of their favorite possible coalitions.
+        In other words, \(\Gamma\) is perfect iff
+        \[ \forall i \in N: \not\exists C \in N^n: C >_i \Gamma(i) .\]
         </p>
       </li>
       <li>
-        Compute every node's score of every other partition:
+        Compute every node's score of every other coalition in the partition:
         <button type="button" id="computeScores">Compute!</button>
         <p id="scores"> </p>
       </li>

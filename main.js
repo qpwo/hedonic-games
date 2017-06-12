@@ -71,6 +71,7 @@ document.getElementById("drawGraph").onclick = function() {
   GRAPH = collectGraph(); // update the global graph object
   SIGMA.refresh(); // update the displayed picture
 }
+document.getElementById("drawGraph").click()
 
 function stringToGraph(string) {
   let graph = {};
@@ -100,6 +101,7 @@ document.getElementById("colorPartition").onclick = function() {
   partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
   SIGMA.refresh(); // update the displayed picture
 }
+document.getElementById("colorPartition").click()
 
 function partitionToString(partition) {
   return Array.from(partition).map(coalition => Array.from(coalition).join(", ")).join("\n");
