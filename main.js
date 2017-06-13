@@ -150,8 +150,8 @@ function randomColor() {
 
 {
   // TODO: add enemy-oriented games soon and add fractional games eventually
-  let functions = [FOScore, FOSFScore, FOEQScore, FOALScore];
-  let paragraphIds = ["friendOriented", "selfishFirst", "equalTreatment", "altruisticTreatment"];
+  let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore];
+  let paragraphIds = ["friendOriented", "enemyOriented", "selfishFirst", "equalTreatment", "altruisticTreatment"];
   let changePlayerType = function() {
     // TODO: delete or grey-out the old scores etc when player type is changed
     let choice = document.getElementById("playerType").selectedIndex;

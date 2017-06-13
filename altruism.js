@@ -22,7 +22,7 @@ function FOScore(graph, node, coalition) {
 }
 
 function EOScore(graph, node, coalition) {
-  // node's friend oriented score of coalition
+  // node's enemy oriented score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
   let n = Object.keys(graph).length;
   let numFriends = coalition.intersect(graph[node]).size;

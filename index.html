@@ -42,6 +42,7 @@
         Set all players to be
         <select id="playerType">
           <option>friend-oriented (FO)</option>
+          <option>enemy-oriented (EO)</option>
           <option>selfish-first (SF)</option>
           <option>equal-treatment (EQ)</option>
           <option>altruistic-treatment (AL)</option>
@@ -54,6 +55,12 @@
         A player is friend-oriented if she tries to maximize friends and, in the case of a tie, minimize enemies.
         This preference relation is defined by the score function
         \[score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i | .\]
+        </p>
+        <p id="enemyOriented">
+        Explanation:
+        A player is enemy-oriented if she tries to minimize enemies and, in the case of a tie, maximize friends.
+        This preference relation is defined by the score function
+        \[score_i^{EO}(A) = | A \cap F_i | - n | A \cap E_i | .\]
         </p>
         <p id="selfishFirst">
         Explanation:
