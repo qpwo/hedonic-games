@@ -3,16 +3,6 @@
   margin: auto;
 }
 
-table, th, td {
-   border: 1px solid black;
-}
-
-ul li {
-  /*list-style: none;*/
-  margin-top: 20px;
-  margin-bottom: 5px;
-}
-
 #outergraphbox {
   width: 400px;
   height: 400px;
@@ -23,4 +13,19 @@ ul li {
 #innergraphbox {
   width: 400px;
   height: 400px;
+}
+
+
+table, th, td {
+   border: 1px solid black;
+}
+
+#interface li {
+  /*list-style: none;*/
+  margin-top: 25px;
+}
+
+#references li {
+  list-style: none;
+  margin-top: 15px;
 }

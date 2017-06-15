@@ -2,7 +2,8 @@
 <html>
 
 <head>
-  <title>altruistic hedonic game simulator</title>
+  <title>Hedonic Game Simulator</title>
+  <meta charset="UTF-8">
   <link rel="stylesheet" type="text/css" href="style.css">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
@@ -10,15 +11,11 @@
 <body>
 
   <div class="centerColumn">
-    <h3> Altruistic Hedonic Game Simulator </h3>
+    <h2> Hedonic Game Simulator </h2>
     <!-- Introduction -->
-    <p>
-    Welcome to the altruistic hedonic game simulator! This software is based off the 2016 AAMAS
-    <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">paper</a>
-    <i>Altruistic Hedonic Games</i> by Nguyen, Rey, Rey, Rothe, and Schend.
-    </p>
+    <p> Welcome to the hedonic game simulator! </p>
     <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. </p>
-    <p> If you modify the graph or partition or you change the  player type, then make sure you recalculate the scores and stability checks. </p>
+    <p> If you change the graph or partition or player type, then recalculate the scores and stability checks. They do not currently auto-update.</p>
     <hr>
 
     <!-- The box that holds the interactive graph -->
@@ -27,7 +24,7 @@
     </div>
 
     <!-- All the buttons and interface -->
-    <ul>
+    <ul id="interface">
       <li> Enter adjacency list: <br>
         <textarea id="graphText" cols="40" rows="5"> </textarea>
         <button type="button" id="drawGraph">Draw!</button>
@@ -55,30 +52,35 @@
         A player is friend-oriented if she tries to maximize friends and, in the case of a tie, minimize enemies.
         This preference relation is defined by the score function
         \[score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i | .\]
+        Introduced in [DBHS2006].
         </p>
         <p id="enemyOriented">
         Explanation:
         A player is enemy-oriented if she tries to minimize enemies and, in the case of a tie, maximize friends.
         This preference relation is defined by the score function
         \[score_i^{EO}(A) = | A \cap F_i | - n | A \cap E_i | .\]
+        Introduced in [DBHS2006].
         </p>
         <p id="selfishFirst">
         Explanation:
         A player is selfish-first if she uses her own preferences first and only uses her friends' preferences to break ties.
         This preference relation is defined by the score function
         \[ score_i^{SF}(A) = n^5 score_i^{FO}(A) + \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
+        Introduced in [NRRRS2016].
         </p>
         <p id="equalTreatment">
         Explanation:
         A player is equal-treatment if she puts equal weight on her own opinion and each friend's opinion.
         This preference relation is defined by the score function
         \[ score_i^{EQ}(A) = \sum_{a \in A \cap F_i \cup \{i\}} \frac{score_a^{FO}(A)}{|A \cap F_i \cup \{i\}|} .\]
+        Introduced in [NRRRS2016].
         </p>
         <p id="altruisticTreatment">
         Explanation:
         A player is altruistic-treatment if she uses her friends' preferences first and only uses her own preferences to break ties.
         This preference relation is defined by the score function
         \[ score_i^{AL}(A) = score_i^{FO}(A) + n^5 \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
+        Introduced in [NRRRS2016].
         </p>
       </li>
       <li>
@@ -147,6 +149,80 @@
         Compute every node's score of every other coalition in the partition:
         <button type="button" id="computeScores">Compute!</button>
         <p id="scores"> </p>
+      </li>
+    </ul>
+
+    <h3> What is a hedonic game? </h3>
+    <h4> Basic idea </h4>
+
+    <p>
+    You have a set of people which for some reason needs to split into groups.
+    The people are called <i>players</i> and the groups are called <i>coalitions</i>.
+    Maybe the set of people is your kindergarten class and they need to split up so each group can build a lego tower. 
+    A player might really want to be in some coalitions, but not in others.
+    These are the player's <i>preferences</i>.
+    Once the whole set of players is split into coalitions, it's called a <i>partition</i> or a <i>coalition formation</i>.
+    <b>Hedonic games are the study of how people cooperate and form groups together and when partitions are stable and when partitions fall apart. </b>
+    </p>
+
+    <p> More at <a href="https://en.wikipedia.org/wiki/Hedonic_game">Wikipedia</a>.</p>
+
+    <p> Hedonic games were independently introduced in [BKS2001] and [BJ2002]. </p>
+
+    <h4> Notation </h4>
+
+    <p>
+    \(N\) is the set of players, \(n = |N|\) is the number of players, and \(\Gamma\) is a partition of \(N\).
+    Usually, \(A \subseteq N\) is a coalition and \(a\) is a player in \(A\). 
+    And \(i\) is a player from anywhere in \(N\).
+    </p>
+
+    <p>
+    If some player \(i\) would rather be in coalition \(A\) than coalition \(B\), then we say \(A >_i B\).
+    In principle, \(i\)'s preferences are defined by listing all the subsets of \(N\) which contain \(i\) in order of decreasing desirability.
+    But that would take tons of computer memory or paper and ink, so we mainly focus on hedonic games which are <i>compactly representable</i>.
+    This means that there is some concise way of describing each player's preferences over the possible coalitions.
+    Sometimes that means you have a <i>score function</i> which takes a player and a coalition as input and outputs a real number; the larger the number the more that player likes that coalition.
+    Once you know the score functions, you can concisely say that \(A >_i B\) if and only if \(score_i(A) > score_i(B)\).
+    </p>
+
+    <p> Most of the notation here is from [NRRRS2016]. Other stuff I added to make it more programmer-friendly.</p>
+
+
+    <h3> References </h3>
+
+    In no particular order...
+
+    <ul id="references">
+      <li>
+        [NRRRS2016]:
+        Nhan-Tam Nguyen, Anja Rey, Lisa Rey, Jörg Rothe, and Lena Schend.
+        "Altruistic Hedonic Games."
+        The International Conference on Autonomous Agents and Multi-Agent Systems.
+        2016.
+        <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">PDF</a>.
+      </li>
+      <li>
+        [DBHS2006]:
+        Dinko Dimitrov, Peter Borm, Ruud Hendrickx, and Shao Chin Sung.
+        "Simple priorities and core stability in hedonic games."
+        Social Choice and Welfare.
+        2006.
+        <a href="http://fmwww.bc.edu/repec/esNASM04/up.9919.1074605860.pdf">PDF</a>.
+      </li>
+      <li>
+        [BKS2001]:
+        Suryapratim Banerjee, Hideo Konishi, and Tayfun Sönmez.
+        "Core in a simple coalition formation game."
+        Social Choice and Welfare.
+        2001.
+      </li>
+      <li>
+        [BJ2002]:
+        Anna Bogomolnaia and Matthew O Jackson.
+        "The Stability of Hedonic Coalition Structures."
+        Games and Economic Behavior.
+        2002.
       </li>
     </ul>
 
