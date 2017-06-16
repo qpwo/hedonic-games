@@ -74,20 +74,15 @@ function FOEQScore(graph, node, coalition) {
 
 // ** Stability Concepts **
 
-function isIndividuallyRational(graph, partition) {
+function isIndividuallyRational(graph, partition, scoreFunc) {
   // Is every node in every coalition in partition happier in its home coalition than it would be alone?
   // If not, return a counter-example.
   let nodes = Object.keys(graph);
   for (const coalition of partition)
     for (const node of coalition)
-      if (!isAcceptable(graph, node, coalition))
+      if (scoreFunc(graph, node, coalition) < scoreFunc(graph, node, new Set([node])))
         return [false, node];
   return [true, null];
-}
-
-function isAcceptable(graph, node, coalition) {
-  // Is this coalition acceptable to node?
-  return coalition.equals(new Set([node])) || graph[node].intersect(coalition).size > 0; 
 }
 
 // The next three stability concepts repeatedly use the same tests, so it is better to define them all at once

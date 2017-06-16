@@ -70,6 +70,9 @@ document.getElementById("drawGraph").onclick = function() {
   }
   GRAPH = collectGraph(); // update the global graph object
   SIGMA.refresh(); // update the displayed picture
+  document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
+  document.getElementById("scores").style.backgroundColor = "lightgrey";
+  PARTITION = null;
 }
 document.getElementById("drawGraph").click()
 
@@ -100,6 +103,8 @@ document.getElementById("colorPartition").onclick = function() {
   PARTITION = partition;
   partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
   SIGMA.refresh(); // update the displayed picture
+  document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
+  document.getElementById("scores").style.backgroundColor = "lightgrey";
 }
 document.getElementById("colorPartition").click()
 
@@ -151,16 +156,17 @@ function changePartition(partition) {
 // ** Buttons for Displaying Calculations **
 
 {
-  // TODO: add enemy-oriented games soon and add fractional games eventually
+  // TODO eventually: add fractional games
   let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore];
   let paragraphIds = ["friendOriented", "enemyOriented", "selfishFirst", "equalTreatment", "altruisticTreatment"];
   let changePlayerType = function() {
-    // TODO: delete or grey-out the old scores etc when player type is changed
     let choice = document.getElementById("playerType").selectedIndex;
     SCOREFUNC = functions[choice];
     for (let i=0; i<paragraphIds.length; i++)
       document.getElementById(paragraphIds[i]).style.display = "none";
     document.getElementById(paragraphIds[choice]).style.display = "initial";
+    document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
+    document.getElementById("scores").style.backgroundColor = "lightgrey";
   }
   document.getElementById("playerType").onchange = changePlayerType
   changePlayerType()
@@ -168,7 +174,6 @@ function changePartition(partition) {
 
 
 {
-  // TODO: rename all these functions from somethingButton to checkSomething
   let functions = [checkIndividuallyRational, checkNashStable,
     checkIndividuallyStable, checkContractuallyIndividuallyStable,
     checkStrictlyPopular, checkCoreStable, checkPerfect]
@@ -182,12 +187,21 @@ function changePartition(partition) {
     // set up the stability button
     let stabilityFunc = functions[choice];
     let buttonAction = function() {
+      if (PARTITION == null) {
+        window.alert("You must set a partition before you can check its stability.")
+        return;
+      }
       let [string, partition] = stabilityFunc()
-      document.getElementById("stabilityResults").innerHTML = string;
+      let results = document.getElementById("stabilityResults");
+      results.innerHTML = string;
+      results.style.backgroundColor = null;
       let button = document.getElementById("updatePartition");
       if (partition) {
         button.style.display = "initial";
-        button.onclick = function() { changePartition(partition); };
+        button.onclick = function() {
+          changePartition(partition);
+          document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
+        };
       }
       else {
         button.style.display = "none";
@@ -209,27 +223,34 @@ document.getElementById("computeScores").onclick = function() {
   // Displays every node's score of every coalition in the partition
   // TODO: do we want all nodes to evaluate all coalitions?
   // TODO: possibly switch to document.createElement
+  if (PARTITION == null) {
+    window.alert("You must set a partition before you can compute the scores.")
+    return;
+  }
   let result = "<table>";
   result += "<tr><th></th>";
-  for (const coalition of PARTITION)
+  let coalitions = PARTITION.plus(new Set());
+  for (const coalition of coalitions)
     result += "<th>" + coalition.stringify() + "</th>";
   result += "</tr>";
   for (const node of Object.keys(GRAPH)) {
     result += "<tr> <th>" + node + "</th>"; // start a new row
-    for (const coalition of PARTITION) {
+    for (const coalition of coalitions) {
       let score = SCOREFUNC(GRAPH, node, coalition.plus(node));
       result += "<td>" + ((score%1==0)? score : score.toFixed(2)) + "</td>"; // add a score
     }
     result += "</tr>";
   }
   result += "</table>";
-  document.getElementById("scores").innerHTML = result;
+  let scores = document.getElementById("scores");
+  scores.innerHTML = result;
+  scores.style.backgroundColor = null;
 }
 
 // ** Stability Checks **
 
 function checkIndividuallyRational() {
-  let [isIR, node] = isIndividuallyRational(GRAPH, PARTITION);
+  let [isIR, node] = isIndividuallyRational(GRAPH, PARTITION, SCOREFUNC);
   if (isIR)
     return ["Yes.", null];
   return ["No. Counterexample: node " + node, groupElope(PARTITION, new Set([node]))];
@@ -260,12 +281,17 @@ function checkContractuallyIndividuallyStable() {
 }
 
 function checkStrictlyPopular() {
-  // TODO: seperate into for, against, and tie votes.
+  // TODO: separate into for, against, and tie votes.
   let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
   if (isSP)
     return ["Yes.", null]
-  partitionString = '{' + Array.from(partition).map(coalition=>coalition.stringify()).join(',') + '}';
-  return ["No. Counterexample: partition " + partitionString + " with " + winCount + " more votes.", partition];
+  let partitionString = '{' + Array.from(partition).map(coalition=>coalition.stringify()).join(',') + '}';
+  let string = "";
+  if (winCount == 0)
+    string = "No. Counterexample: partition " + partitionString + " is equally preferred to the current partition.";
+  else
+    string ="No. Counterexample: partition " + partitionString + " is preferred overall by " + (-winCount) + " votes." 
+  return [string, partition];
 }
 
 function checkCoreStable() {
