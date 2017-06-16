@@ -2,7 +2,6 @@
 // Algorithms for altruistic hedonic games
 // Public domain dedication
 
-// TODO eventually: everything should be implemented with sets instead of arrays.
 // TODO: change order of functions
 // possible TODO: rename coalitions to groups
 
@@ -199,7 +198,7 @@ function isPerfect(graph, partition, scoreFunc) {
 
 // ** Other Tools **
 
-function adjustPartition(partition, coalition) {
+function groupElope(partition, coalition) {
   // moves everyone in coalition out of their home coalitions and into a new one together
   return partition.map(coalitionB => coalitionB.setMinus(coalition)).filter(coalitionB => coalitionB.size > 0).plus(coalition);
 }
