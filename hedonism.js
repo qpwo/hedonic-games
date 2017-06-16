@@ -123,7 +123,7 @@ function isIndividuallyRational(graph, partition, scoreFunc) {
   var isContractuallyIndividuallyStable = makeCheckFunc([test0, test1, test2, test3]);
 }
 
-function isCoreStable(graph, partition, scoreFunc) {
+function isCoreStable(graph, partition, scoreFunc, isStrict=false) {
   // Is this partition core-stable?
   // If not, give a counter-example.
   // TODO: also write weakly core stable version
@@ -138,9 +138,13 @@ function isCoreStable(graph, partition, scoreFunc) {
     let newScores = {}
     for (const node of coalition)
       newScores[node] = scoreFunc(graph, node, coalition)
-    if (coalition.every(node => newScores[node] >= homeScores[node]) &&
-      coalition.some(node => newScores[node] > homeScores[node]))
-      return [false, coalition];
+    if (isStrict)
+      if (coalition.every(node => newScores[node] >= homeScores[node]) &&
+        coalition.some(node => newScores[node] > homeScores[node]))
+        return [false, coalition];
+    else
+      if (coalition.every(node => newScores[node] > homeScores[node]))
+        return [false, coalition];
   }
   return [true, null];
 }

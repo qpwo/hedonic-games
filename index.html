@@ -92,6 +92,7 @@
           <option>contractually individually stable</option>
           <option>strictly popular</option>
           <option>core-stable</option>
+          <option>strictly core-stable</option>
           <option>perfect</option>
         </select>?
         <button type="button" id="checkStability"> Check it! </button>
@@ -131,7 +132,13 @@
         In other words, \(\Gamma\) is strictly popular iff
         \[ \forall \Gamma': |\{ i \in N: \Gamma(i) >_i \Gamma'(i) \}| > |\{ i \in N: \Gamma'(i) >_i \Gamma(i) \}| .\]
         </p>
-        <p id="coreStable"> <!-- TODO: add weakly core stable -->
+        <p id="coreStable"> 
+        Explanation:
+        A partition is core-stable if there is no possible strictly blocking coalition. (A coalition strictly blocks if everyone prefers it to their current homes.)
+        In other words, \(\Gamma\) is core-stable iff
+        \[ \not\exists C \in 2^N: \forall i \in C: C >_i \Gamma(i) .\]
+        </p>
+        <p id="strictlyCoreStable"> 
         Explanation:
         A partition is strictly core-stable if there is no possible weakly blocking coalition. (A coalition weakly blocks if everyone is at least as happy in the new one and someone is even happier.)
         In other words, \(\Gamma\) is strictly core-stable iff

@@ -176,10 +176,10 @@ function changePartition(partition) {
 {
   let functions = [checkIndividuallyRational, checkNashStable,
     checkIndividuallyStable, checkContractuallyIndividuallyStable,
-    checkStrictlyPopular, checkCoreStable, checkPerfect]
+    checkStrictlyPopular, checkCoreStable, checkStrictlyCoreStable, checkPerfect]
   let paragraphIds = ["individuallyRational", "nashStable",
     "individuallyStable", "contractuallyIndividuallyStable", "strictlyPopular",
-    "coreStable", "perfect",]
+    "coreStable", "strictlyCoreStable", "perfect",]
   let changeStabilityType = function() {
     // Executes when user picks a different stability type
     let choice = document.getElementById("stabilityType").selectedIndex;
@@ -295,7 +295,15 @@ function checkStrictlyPopular() {
 }
 
 function checkCoreStable() {
-  let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC);
+  let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC, false);
+  if (isCS)
+    return ["Yes.", null]
+  return ["No. Counterexample: coalition " + coalition.stringify(),
+    groupElope(PARTITION, coalition)];
+}
+
+function checkStrictlyCoreStable() {
+  let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC, true);
   if (isCS)
     return ["Yes.", null]
   return ["No. Counterexample: coalition " + coalition.stringify(),
