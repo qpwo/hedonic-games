@@ -101,14 +101,8 @@ document.getElementById("colorPartition").onclick = function() {
     return;
   }
   PARTITION = partition;
-  let length = partition.size;
-  let i = 0;
-  for (const coalition of partition) {
-    colorSubgraph(coalition, rainbow(length, i));
-    i++;
-  }
-  //partition.forEach((coalition,i) => colorSubgraph(coalition, rainbow(5, i)));
-  SIGMA.refresh(); // update the displayed picture
+  colorGraph();
+  SIGMA.refresh();
   document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
   document.getElementById("scores").style.backgroundColor = "lightgrey";
 }
@@ -140,16 +134,11 @@ function isPartition(set, partition) {
   return true;
 }
 
-function colorSubgraph(nodes, color) {
-  // color a subgraph induced by a set of nodes
-  for (let nodeObject of SIGMA.graph.nodes(Array.from(nodes)))
-    nodeObject.color = color;
-}
 
 function changePartition(partition) {
   document.getElementById("partitionText").innerHTML = partitionToString(partition);
-  partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
   PARTITION = partition;
+  colorGraph();
   SIGMA.refresh();
 }
 
@@ -321,10 +310,24 @@ function checkPerfect() {
 
 // ** Other tools **
 
+function colorGraph() {
+  let length = PARTITION.size;
+  let i = 0;
+  for (const coalition of PARTITION) {
+    colorSubgraph(coalition, rainbow(length, i));
+    i++;
+  }
+}
+
+function colorSubgraph(nodes, color) {
+  // color a subgraph induced by a set of nodes
+  for (let nodeObject of SIGMA.graph.nodes(Array.from(nodes)))
+    nodeObject.color = color;
+}
 
 function rainbow(numOfSteps, step) {
   // This function generates vibrant, "evenly spaced" colours
-  // from https://stackoverflow.com/a/7419630
+  // From https://stackoverflow.com/a/7419630
   let r, g, b;
   let h = step / numOfSteps;
   let i = ~~(h * 6);
