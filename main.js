@@ -101,7 +101,13 @@ document.getElementById("colorPartition").onclick = function() {
     return;
   }
   PARTITION = partition;
-  partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
+  let length = partition.size;
+  let i = 0;
+  for (const coalition of partition) {
+    colorSubgraph(coalition, rainbow(length, i));
+    i++;
+  }
+  //partition.forEach((coalition,i) => colorSubgraph(coalition, rainbow(5, i)));
   SIGMA.refresh(); // update the displayed picture
   document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
   document.getElementById("scores").style.backgroundColor = "lightgrey";
@@ -138,12 +144,6 @@ function colorSubgraph(nodes, color) {
   // color a subgraph induced by a set of nodes
   for (let nodeObject of SIGMA.graph.nodes(Array.from(nodes)))
     nodeObject.color = color;
-}
-
-function randomColor() {
-  // generates a random hex color code
-  // TODO: make colors more different from each other
-  return '#'+Math.random().toString(16).substr(-6);
 }
 
 function changePartition(partition) {
@@ -318,3 +318,27 @@ function checkPerfect() {
   return ["No. Counterexample: node " + node + " and coalition " + coalition.stringify(),
     groupElope(PARTITION, coalition.plus(node))];
 }
+
+// ** Other tools **
+
+
+function rainbow(numOfSteps, step) {
+  // This function generates vibrant, "evenly spaced" colours
+  // from https://stackoverflow.com/a/7419630
+  let r, g, b;
+  let h = step / numOfSteps;
+  let i = ~~(h * 6);
+  let f = h * 6 - i;
+  let q = 1 - f;
+  switch(i % 6){
+    case 0: r = 1; g = f; b = 0; break;
+    case 1: r = q; g = 1; b = 0; break;
+    case 2: r = 0; g = 1; b = f; break;
+    case 3: r = 0; g = q; b = 1; break;
+    case 4: r = f; g = 0; b = 1; break;
+    case 5: r = 1; g = 0; b = q; break;
+  }
+  let c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+  return (c);
+}
+
