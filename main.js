@@ -141,6 +141,13 @@ function randomColor() {
   return '#'+Math.random().toString(16).substr(-6);
 }
 
+function changePartition(partition) {
+  document.getElementById("partitionText").innerHTML = partitionToString(partition);
+  partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
+  PARTITION = partition;
+  SIGMA.refresh();
+}
+
 // ** Buttons for Displaying Calculations **
 
 {
@@ -162,9 +169,9 @@ function randomColor() {
 
 {
   // TODO: rename all these functions from somethingButton to checkSomething
-  let functions = [individuallyRationalButton, nashStableButton,
-    individuallyStableButton, contractuallyIndividuallyStableButton,
-    strictlyPopularButton, coreStableButton, perfectButton,]
+  let functions = [checkIndividuallyRational, checkNashStable,
+    checkIndividuallyStable, checkContractuallyIndividuallyStable,
+    checkStrictlyPopular, checkCoreStable, checkPerfect]
   let paragraphIds = ["individuallyRational", "nashStable",
     "individuallyStable", "contractuallyIndividuallyStable", "strictlyPopular",
     "coreStable", "perfect",]
@@ -219,14 +226,16 @@ document.getElementById("computeScores").onclick = function() {
   document.getElementById("scores").innerHTML = result;
 }
 
-function individuallyRationalButton() {
+// ** Stability Checks **
+
+function checkIndividuallyRational() {
   let [isIR, node] = isIndividuallyRational(GRAPH, PARTITION);
   if (isIR)
     return ["Yes.", null];
   return ["No. Counterexample: node " + node, groupElope(PARTITION, new Set([node]))];
 }
 
-function nashStableButton() {
+function checkNashStable() {
   let [isNS, node, coalition] = isNashStable(GRAPH, PARTITION, SCOREFUNC);
   if (isNS)
     return ["Yes.", null];
@@ -234,7 +243,7 @@ function nashStableButton() {
     groupElope(PARTITION, coalition.plus(node))];
 }
 
-function individuallyStableButton() {
+function checkIndividuallyStable() {
   let [isIS, node, coalition] = isIndividuallyStable(GRAPH, PARTITION, SCOREFUNC);
   if (isIS)
     return ["Yes.", null];
@@ -242,7 +251,7 @@ function individuallyStableButton() {
     groupElope(PARTITION, coalition.plus(node))];
 }
 
-function contractuallyIndividuallyStableButton() {
+function checkContractuallyIndividuallyStable() {
   let [isCIS, node, coalition] = isContractuallyIndividuallyStable(GRAPH, PARTITION, SCOREFUNC);
   if (isCIS)
     return ["Yes.", null];
@@ -250,7 +259,7 @@ function contractuallyIndividuallyStableButton() {
     groupElope(PARTITION, coalition.plus(node))];
 }
 
-function strictlyPopularButton() {
+function checkStrictlyPopular() {
   // TODO: seperate into for, against, and tie votes.
   let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
   if (isSP)
@@ -259,7 +268,7 @@ function strictlyPopularButton() {
   return ["No. Counterexample: partition " + partitionString + " with " + winCount + " more votes.", partition];
 }
 
-function coreStableButton() {
+function checkCoreStable() {
   let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC);
   if (isCS)
     return ["Yes.", null]
@@ -267,18 +276,11 @@ function coreStableButton() {
     groupElope(PARTITION, coalition)];
 }
 
-function perfectButton() {
+function checkPerfect() {
   // check if the partition is perfect and display result
   let [isP, node, coalition] = isPerfect(GRAPH, PARTITION, SCOREFUNC);
   if (isP)
     return ["Yes.", null];
   return ["No. Counterexample: node " + node + " and coalition " + coalition.stringify(),
     groupElope(PARTITION, coalition.plus(node))];
-}
-
-function changePartition(partition) {
-  document.getElementById("partitionText").innerHTML = partitionToString(partition);
-  partition.forEach(coalition => colorSubgraph(coalition, randomColor()));
-  PARTITION = partition;
-  SIGMA.refresh();
 }
