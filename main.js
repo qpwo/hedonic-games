@@ -8,7 +8,9 @@
 
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(SIGMA, SIGMA.renderers[0]); // enable click and drag
-SIGMA.settings('zoomingRatio', 1); // scroll doesn't zoom
+SIGMA.settings({"zoomingRatio": 1, // scroll doesn't zoom
+  "edgeColor": "#000#"}); // edges are all black
+
 let PARTITION = new Set(); // current partition of the vertices
 let GRAPH = {}; // a map from nodes to arrays of nodes
 let SCOREFUNC = FOScore; // function to use for player type
@@ -24,7 +26,7 @@ function addNode(name=Sigma.graph.nodes().length, x=Math.random(), y=Math.random
     x: x,
     y: y,
     size: 1,
-    color: '#000'
+    color: "#000"
   });
   SIGMA.refresh();
 }
@@ -59,7 +61,7 @@ document.getElementById("graphText").innerHTML = "a: b, c, d\nc: d, e"; // defau
 document.getElementById("drawGraph").onclick = function() {
   // Replace the current graph with the one described in the big text box on the webpage
   SIGMA.graph.clear();
-  let graph = stringToGraph(document.getElementById('graphText').value);
+  let graph = stringToGraph(document.getElementById("graphText").value);
   for (const source of Object.keys(graph)) {
     addNode(source);
     for (const target of graph[source]) {
@@ -93,7 +95,7 @@ document.getElementById("partitionText").innerHTML = "a, b\nc, d\ne"; // default
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
   // Also, sorts everything alphabetically
-  let partition = stringToPartition(document.getElementById('partitionText').value);
+  let partition = stringToPartition(document.getElementById("partitionText").value);
   let nodes = SIGMA.graph.nodes().map(nodeO => nodeO.id);
   if (!isPartition(nodes, partition)) {
     window.alert("This is not a valid partition. Every node must occur on " +
