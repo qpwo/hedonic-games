@@ -41,6 +41,7 @@
           <option>selfish-first (SF)</option>
           <option>equal-treatment (EQ)</option>
           <option>altruistic-treatment (AL)</option>
+          <option>fractional (FR)</option>
         </select>.
         </p>
 
@@ -79,6 +80,13 @@
         This preference relation is defined by the score function
         \[ score_i^{AL}(A) = score_i^{FO}(A) + n^5 \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
         Introduced in [NRRRS2016].
+        </p>
+        <p id="fractional">
+        Explanation:
+        In fractional hedonic games, a player's score of a coalition is the average of her scores of the players in it.
+        Scores could be anything, but this simulator only allows scores that are simple and symmetric.
+        \[ score_i^{FR}(A) = |A \cap F_i| / |A| .\]
+        Introduced in [ABH2014].
         </p>
       </li>
       <li>
@@ -152,7 +160,8 @@
         </p>
       </li>
       <li>
-        Compute every node's score of every other coalition in the partition:
+        Compute every node's score of every other coalition in the partition below.
+        A node's score of a coalition is what would be if that node joined that coalition.
         <button type="button" id="computeScores">Compute!</button>
         <p id="scores"> </p>
       </li>
@@ -229,6 +238,14 @@
         "The Stability of Hedonic Coalition Structures."
         Games and Economic Behavior.
         2002.
+      </li>
+      <li>
+        [ABH2014]:
+        Haris Aziz, Feliz Brandt, and Paul Harrenstein.
+        "Fractional Hedonic Games."
+        The International Conference on Autonomous Agents and Multi-Agent Systems.
+        2014.
+        <a href="http://www.ifaamas.org/Proceedings/aamas2014/aamas/p5.pdf">PDF</a>.
       </li>
     </ul>
 

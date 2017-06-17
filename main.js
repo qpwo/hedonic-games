@@ -146,8 +146,8 @@ function changePartition(partition) {
 
 {
   // TODO eventually: add fractional games
-  let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore];
-  let paragraphIds = ["friendOriented", "enemyOriented", "selfishFirst", "equalTreatment", "altruisticTreatment"];
+  let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore, fractionalScore];
+  let paragraphIds = ["friendOriented", "enemyOriented", "selfishFirst", "equalTreatment", "altruisticTreatment", "fractional"];
   let changePlayerType = function() {
     let choice = document.getElementById("playerType").selectedIndex;
     SCOREFUNC = functions[choice];

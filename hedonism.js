@@ -72,6 +72,12 @@ function FOEQScore(graph, node, coalition) {
   return total/count;
 }
 
+function fractionalScore(graph, node, coalition) {
+  // node's fractional hedonic game score of coalition
+  if (!coalition.has(node)) throw "coalition doesn't contain node";
+  return coalition.intersect(graph[node]).size / coalition.size;
+}
+
 // ** Stability Concepts **
 
 function isIndividuallyRational(graph, partition, scoreFunc) {
