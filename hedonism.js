@@ -144,13 +144,14 @@ function isCoreStable(graph, partition, scoreFunc, isStrict=false) {
     let newScores = {}
     for (const node of coalition)
       newScores[node] = scoreFunc(graph, node, coalition)
-    if (isStrict)
+    if (isStrict) {
       if (coalition.every(node => newScores[node] >= homeScores[node]) &&
         coalition.some(node => newScores[node] > homeScores[node]))
         return [false, coalition];
-    else
+    } else {
       if (coalition.every(node => newScores[node] > homeScores[node]))
         return [false, coalition];
+    }
   }
   return [true, null];
 }
