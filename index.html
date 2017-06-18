@@ -14,7 +14,7 @@
     <h2> Hedonic Game Simulator </h2>
     <!-- Introduction -->
     <p> Welcome to the hedonic game simulator! </p>
-    <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. </p>
+    <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. You can click and drag nodes in the box. </p>
 
     <!-- The box that holds the interactive graph -->
     <div id="outergraphbox">
@@ -34,7 +34,7 @@
       <li>
         <p>
         <b>Player type:</b>
-        Set all players to be
+        Set all players to have
         <select id="playerType">
           <option>friend-oriented (FO)</option>
           <option>enemy-oriented (EO)</option>
@@ -42,7 +42,8 @@
           <option>equal-treatment (EQ)</option>
           <option>altruistic-treatment (AL)</option>
           <option>fractional (FR)</option>
-        </select>.
+          <option>additively-seperable (AS)</option>
+        </select> preferences.
         </p>
 
         <!-- explanations of player types -->
@@ -87,6 +88,13 @@
         Scores could be anything, but this simulator only allows scores that are simple and symmetric.
         \[ score_i^{FR}(A) = |A \cap F_i| / |A| .\]
         Introduced in [ABH2014].
+        </p>
+        <p id="additive">
+        Explanation:
+        In additively seperable hedonic games, a node's score of a coalition is the sum of her scores of the players in it.
+        In unweighted, undirected graphs, this is simple the degree of the node in the coalition.
+        \[ score_i^{AS}(A) = |A \cap F_i| .\]
+        I don't know when/where additively seperable hedonic games were introduced. If you know, then please email me!
         </p>
       </li>
       <li>

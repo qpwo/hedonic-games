@@ -1,9 +1,6 @@
 // Luke Miles, June 2017
 // Code for all the buttons and things on the front webpage
 
-// TODO: change order of functions
-// TODO: make line length more consistent
-
 // ** Necessary globals for setting up a user session **
 
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
@@ -153,9 +150,8 @@ function changePartition(partition) {
 // ** Buttons for Displaying Calculations **
 
 {
-  // TODO eventually: add fractional games
-  let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore, fractionalScore];
-  let paragraphIds = ["friendOriented", "enemyOriented", "selfishFirst", "equalTreatment", "altruisticTreatment", "fractional"];
+  let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore, fractionalScore, additiveScore];
+  let paragraphIds = ["friendOriented", "enemyOriented", "selfishFirst", "equalTreatment", "altruisticTreatment", "fractional", "additive"];
   let changePlayerType = function() {
     let choice = document.getElementById("playerType").selectedIndex;
     SCOREFUNC = functions[choice];
@@ -218,8 +214,7 @@ function changePartition(partition) {
 
 document.getElementById("computeScores").onclick = function() {
   // Displays every node's score of every coalition in the partition
-  // TODO: do we want all nodes to evaluate all coalitions?
-  // TODO: possibly switch to document.createElement
+  // possible TODO: switch to document.createElement
   if (PARTITION == null) {
     window.alert("You must set a partition before you can compute the scores.")
     return;

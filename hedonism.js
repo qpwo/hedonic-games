@@ -4,12 +4,16 @@
 
 // TODO: change order of functions
 // possible TODO: rename coalitions to groups
+// TODO eventually: add existence checks
+// possible TODO eventually: allow different players to be of different type
+// possible TODO eventually: allow directed graphs and weighted graphs
 
 
 
 // ** Score Functions **
 
 // possible TODO: shorten code for similar score functions with scoping
+// TODO: add maxmin score thing
 
 function FOScore(graph, node, coalition) {
   // node's friend oriented score of coalition
@@ -76,6 +80,12 @@ function fractionalScore(graph, node, coalition) {
   // node's fractional hedonic game score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
   return coalition.intersect(graph[node]).size / coalition.size;
+}
+
+function additiveScore(graph, node, coalition) {
+  // node's additively seperable hedonic game score of coalition
+  if (!coalition.has(node)) throw "coalition doesn't contain node";
+  return coalition.intersect(graph[node]).size;
 }
 
 // ** Stability Concepts **
