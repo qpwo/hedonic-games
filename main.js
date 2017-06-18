@@ -91,7 +91,7 @@ function stringToGraph(string) {
   return graph;
 }
 
-document.getElementById("partitionText").innerHTML = "a, b\nc, d\ne"; // default value
+document.getElementById("partitionText").value = "a, b\nc, d\ne"; // default value
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
   // Also, sorts everything alphabetically
@@ -138,7 +138,7 @@ function isPartition(set, partition) {
 
 
 function changePartition(partition) {
-  document.getElementById("partitionText").innerHTML = partitionToString(partition);
+  document.getElementById("partitionText").value = partitionToString(partition);
   PARTITION = partition;
   colorGraph();
   SIGMA.refresh();
