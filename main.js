@@ -83,9 +83,15 @@ function stringToGraph(string) {
   for (let line of string.split('\n')) {
     line = line.replace(/ /g, ''); // remove spaces
     if (line == "") continue;
+    if (line.indexOf(':') == -1) {
+      graph[line] = new Set();
+      continue;
+    }
     let [source, targets] = line.split(':');
-    if (targets == "")
+    if (targets == "") {
       graph[source] = new Set();
+      continue;
+    }
     graph[source] = new Set(targets.split(','));
   }
   return graph;
