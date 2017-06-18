@@ -1,4 +1,4 @@
-### Altruistic Hedonic Games
+### Hedonic Game Simulator
 
 Go to
 [lukemiles.org/hedonic-games/](http://lukemiles.org/hedonic-games/)
