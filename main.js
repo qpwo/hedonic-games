@@ -3,6 +3,8 @@
 
 // ** Necessary globals for setting up a user session **
 
+// TODO: change PARTITION from a set of sets to an array of sets
+
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(SIGMA, SIGMA.renderers[0]); // enable click and drag
 SIGMA.settings({"zoomingRatio": 1, // scroll doesn't zoom
@@ -15,8 +17,8 @@ let SCOREFUNC = FOScore; // function to use for player type
 // ** Functions for Reading and Changing the Graph **
 
 function addNode(name=Sigma.graph.nodes().length, x=Math.random(), y=Math.random()) {
-  // add a node to the sigma graph
-  if (SIGMA.graph.nodes(name)) return; // don't add the node if there's already one with the same name
+  // Add a node to the sigma graph
+  if (SIGMA.graph.nodes(name)) return;
   SIGMA.graph.addNode({
     id: name,
     label: name,
@@ -29,10 +31,10 @@ function addNode(name=Sigma.graph.nodes().length, x=Math.random(), y=Math.random
 }
 
 function addEdge(source, target) {
-  // add an edge to the sigma graph
-  if (source == target) return; // don't add edge loops
+  // Add an edge to the sigma graph
+  if (source == target) return;
   let name = source + '-' + target;
-  if (SIGMA.graph.edges(name)) return; // don't add already existing edges
+  if (SIGMA.graph.edges(name)) return;
   SIGMA.graph.addEdge({
     id: name,
     source: source,
@@ -42,7 +44,6 @@ function addEdge(source, target) {
 
 function collectGraph() {
   // Make a simple adjacency list object from the complex sigma graph
-  // Also, sort everything alphabetically
   let graph = {};
   let nodes = SIGMA.graph.nodes().map(node=>node.id).sort();
   for (const node of nodes)
@@ -67,8 +68,8 @@ document.getElementById("drawGraph").onclick = function() {
       addEdge(target, source);
     }
   }
-  GRAPH = collectGraph(); // update the global graph object
-  SIGMA.refresh(); // update the displayed picture
+  GRAPH = collectGraph();
+  SIGMA.refresh();
   document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
   document.getElementById("scores").style.backgroundColor = "lightgrey";
   PARTITION = null;
@@ -78,7 +79,7 @@ document.getElementById("drawGraph").click()
 function stringToGraph(string) {
   let graph = {};
   for (let line of string.split('\n')) {
-    line = line.replace(/ /g, ''); // remove spaces
+    line = line.replace(/ /g, '');
     if (line == "") continue;
     if (line.indexOf(':') == -1) {
       graph[line] = new Set();
@@ -94,10 +95,9 @@ function stringToGraph(string) {
   return graph;
 }
 
-document.getElementById("partitionText").value = "a, b\nc, d\ne"; // default value
+document.getElementById("partitionText").value = "a, b\nc, d\ne";
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
-  // Also, sorts everything alphabetically
   let partition = stringToPartition(document.getElementById("partitionText").value);
   let nodes = SIGMA.graph.nodes().map(nodeO => nodeO.id);
   if (!isPartition(nodes, partition)) {
@@ -120,7 +120,7 @@ function partitionToString(partition) {
 function stringToPartition(string) {
   let partition = new Set();
   for (let line of string.split('\n')) {
-    line = line.replace(/ /g, ''); // remove spaces
+    line = line.replace(/ /g, '');
     if (line == "") continue;
     partition.add(new Set(line.split(',')));
   }
@@ -128,7 +128,8 @@ function stringToPartition(string) {
 }
 
 function isPartition(set, partition) {
-  // checks if partition is actually a partition of the set
+  // TODO: move to myset.js
+  // Check if partition is actually a partition of the set
   let setCopy = new Set(set);
   for (const subSet of partition)
     for (const x of subSet)
@@ -174,10 +175,8 @@ function changePartition(partition) {
     "individuallyStable", "contractuallyIndividuallyStable", "strictlyPopular",
     "coreStable", "strictlyCoreStable", "perfect",]
   let changeStabilityType = function() {
-    // Executes when user picks a different stability type
     let choice = document.getElementById("stabilityType").selectedIndex;
 
-    // set up the stability button
     let stabilityFunc = functions[choice];
     let buttonAction = function() {
       if (PARTITION == null) {
@@ -203,17 +202,16 @@ function changePartition(partition) {
     document.getElementById("checkStability").onclick = buttonAction;
     buttonAction();
 
-    // update the stability explanation
-    for (let i=0; i<paragraphIds.length; i++) // first hide all the paragraphs
+    for (let i=0; i<paragraphIds.length; i++)
       document.getElementById(paragraphIds[i]).style.display = "none";
-    document.getElementById(paragraphIds[choice]).style.display = "initial"; // then display the one we want
+    document.getElementById(paragraphIds[choice]).style.display = "initial";
   }
   document.getElementById("stabilityType").onchange = changeStabilityType;
   changeStabilityType();
 }
 
 document.getElementById("computeScores").onclick = function() {
-  // Displays every node's score of every coalition in the partition
+  // Display every node's score of every coalition in the partition
   // possible TODO: switch to document.createElement
   if (PARTITION == null) {
     window.alert("You must set a partition before you can compute the scores.")
@@ -226,10 +224,10 @@ document.getElementById("computeScores").onclick = function() {
     result += "<th>" + coalition.stringify() + "</th>";
   result += "</tr>";
   for (const node of Object.keys(GRAPH)) {
-    result += "<tr> <th>" + node + "</th>"; // start a new row
+    result += "<tr> <th>" + node + "</th>";
     for (const coalition of coalitions) {
       let score = SCOREFUNC(GRAPH, node, coalition.plus(node));
-      result += "<td>" + ((score%1==0)? score : score.toFixed(2)) + "</td>"; // add a score
+      result += "<td>" + ((score%1==0)? score : score.toFixed(2)) + "</td>";
     }
     result += "</tr>";
   }
@@ -303,7 +301,6 @@ function checkStrictlyCoreStable() {
 }
 
 function checkPerfect() {
-  // check if the partition is perfect and display result
   let [isP, node, coalition] = isPerfect(GRAPH, PARTITION, SCOREFUNC);
   if (isP)
     return ["Yes.", null];
@@ -323,7 +320,7 @@ function colorGraph() {
 }
 
 function colorSubgraph(nodes, color) {
-  // color a subgraph induced by a set of nodes
+  // Color a subgraph induced by a set of nodes
   for (let nodeObject of SIGMA.graph.nodes(Array.from(nodes)))
     nodeObject.color = color;
 }

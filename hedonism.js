@@ -215,6 +215,6 @@ function isPerfect(graph, partition, scoreFunc) {
 // ** Other Tools **
 
 function groupElope(partition, coalition) {
-  // moves everyone in coalition out of their home coalitions and into a new one together
+  // Moves everyone in coalition out of their home coalitions and into a new one together
   return partition.map(coalitionB => coalitionB.setMinus(coalition)).filter(coalitionB => coalitionB.size > 0).plus(coalition);
 }
