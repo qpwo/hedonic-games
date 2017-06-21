@@ -58,16 +58,16 @@ function printStablePartitions(graph, scoreFunc, stability) {
   var partitions = Object.keys(graph).partitionSet().map(p => p.map(c => new Set(c)));
   for (const partition of partitions)
     if (stability(graph, partition, scoreFunc)[0])
-      console.log(p2s(p));
+      console.log(p2s(partition));
 }
 
 function checkExistenceStablePartitions(graph, scoreFunc, stability) {
   // Checks if any partitions meet stability under scoreFunc
   var partitions = Object.keys(graph).partitionSet().map(p => p.map(c => new Set(c)));
   for (const partition of partitions)
-    if (isCoreStable(graph, partition, equalTreatmentScore)[0])
-      return [false, p];
-  return [true, null];
+    if (stability(graph, partition, scoreFunc)[0])
+      return [true, partition];
+  return [false, null];
 }
 
 function graphToString(graph) {
@@ -75,4 +75,18 @@ function graphToString(graph) {
   for (const node of Object.keys(graph))
     s += node + ": " + Array.from(graph[node]).join(', ') + '\n';
   return s;
+}
+
+function walkTowardsCore(graph, scoreFunc) {
+  var partition = new Set([ new Set( Object.keys(graph) ) ]);
+  var count = 0;
+  while (true) {
+    [coreStable, blockingCoalition] = isCoreStable(graph, partition, scoreFunc);
+    if (coreStable)
+      return [partition, count];
+    if (count >= 100)
+      return [null, count];
+    partition = groupElope(partition, blockingCoalition);
+    count++;
+  }
 }
