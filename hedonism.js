@@ -8,8 +8,6 @@
 // possible TODO eventually: allow different players to be of different type
 // possible TODO eventually: allow directed graphs and weighted graphs
 
-
-
 // ** Score Functions **
 
 // possible TODO: shorten code for similar score functions with scoping
@@ -33,16 +31,17 @@ function EOScore(graph, node, coalition) {
   return numFriends - n * numEnemies;
 }
 
-
 function friendAverage(graph, node, coalition) {
   // the average happiness of a node's friends in a given coalition
+  let n = Object.keys(graph).length;
+  let friends = coalition.intersect(graph[node]);
+  if (friends.size == 0)
+    return 0;
   let total = 0;
-  let count = 0;
-  for (const friend of coalition.intersect(graph[node])) {
-    total += FOScore(graph, friend, coalition);
-    count++;
-  }
-  return (count>0 ? total/count : 0);
+  let k = coalition.size
+  for (const friend of friends)
+    total += (n+1) * coalition.intersect(graph[friend]).size + 1 - k
+  return total / friends.size;
 }
 
 function FOSFScore(graph, node, coalition) {
@@ -55,7 +54,7 @@ function FOSFScore(graph, node, coalition) {
 }
 
 function FOALScore(graph, node, coalition) {
-  // node's altruistic treatment score of coalition
+  // node's altruistic-treatment score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
   let n = Object.keys(graph).length;
   let myScore = FOScore(graph, node, coalition);
@@ -64,17 +63,17 @@ function FOALScore(graph, node, coalition) {
 }
 
 function FOEQScore(graph, node, coalition) {
-  // node's equal treatment score of coalition
+  // node's equal-treatment score of coalition
   if (!coalition.has(node)) throw "coalition doesn't contain node";
   let n = Object.keys(graph).length;
-  let total = FOScore(graph, node, coalition);
-  let count = 1;
-  for (const friend of coalition.intersect(graph[node])) {
-    total += FOScore(graph, friend, coalition)
-    count++;
-  }
-  return total/count;
+  let k = coalition.size;
+  let S = graph[node].intersect(coalition).plus(node);
+  let total = 0;
+  for (const nodeB of S)
+    total += (n+1) * coalition.intersect(graph[nodeB]).size + 1 - k;
+  return total / S.size;
 }
+
 
 function fractionalScore(graph, node, coalition) {
   // node's fractional hedonic game score of coalition
@@ -142,7 +141,6 @@ function isIndividuallyRational(graph, partition, scoreFunc) {
 function isCoreStable(graph, partition, scoreFunc, isStrict=false) {
   // Is this partition core-stable?
   // If not, give a counter-example.
-  // TODO: also write weakly core stable version
   let homeScores = {};
   for (const coalition of partition)
     for (const node of coalition)

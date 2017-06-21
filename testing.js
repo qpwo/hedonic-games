@@ -1,12 +1,6 @@
-function equalTreatmentScore(graph, node, coalition) {
-  let n = Object.keys(graph).length;
-  let k = coalition.size;
-  let S = graph[node].intersect(coalition).plus(node);
-  let total = 0;
-  for (let nodeB of S)
-    total += (n + 1) * graph[nodeB].intersect(coalition).size + 1 - k;
-  return total / S.size;
-}
+// Luke Miles
+// June 2017
+// Experimental stuff to maybe eventually add to the hedonic game simulator
 
 function cycleGraph(n) {
   // n is the number of nodes in the cycle
@@ -30,6 +24,8 @@ function starGraph(n) {
 }
 
 function randomGraph(n, p) {
+  // n is the number of nodes in the graph
+  // p is the probability of an edge between any two given nodes
   let G = {};
   for (let i = 0; i <= n-1; i++)
     G[i] = new Set();
@@ -44,6 +40,8 @@ function randomGraph(n, p) {
 
 
 function stringy(graph) {
+  // Return a new graph with numbers turned into strings.
+  // Necessary because Object.keys(graph) returns strings even if graph was created with numbers
   let G = {}
   for (const key of Object.keys(graph))
     G[key] = graph[key].map(n => n.toString());
@@ -51,20 +49,23 @@ function stringy(graph) {
 }
 
 function p2s(p) {
+  // simplified partition to string
   return p.map(set => Array.from(set).join('')).join('  ');
 }
 
-function printWholeCore(graph, scoreFunc) {
+function printStablePartitions(graph, scoreFunc, stability) {
+  // Prints all partitions that meet stability under scoreFunc
   var partitions = Object.keys(graph).partitionSet().map(p => p.map(c => new Set(c)));
-  for (const p of partitions)
-    if (isCoreStable(graph, p, scoreFunc)[0])
+  for (const partition of partitions)
+    if (stability(graph, partition, scoreFunc)[0])
       console.log(p2s(p));
 }
 
-function checkEmptyCore(graph) {
+function checkExistenceStablePartitions(graph, scoreFunc, stability) {
+  // Checks if any partitions meet stability under scoreFunc
   var partitions = Object.keys(graph).partitionSet().map(p => p.map(c => new Set(c)));
-  for (const p of partitions)
-    if (isCoreStable(graph, p, equalTreatmentScore)[0])
+  for (const partition of partitions)
+    if (isCoreStable(graph, partition, equalTreatmentScore)[0])
       return [false, p];
   return [true, null];
 }
@@ -74,33 +75,4 @@ function graphToString(graph) {
   for (const node of Object.keys(graph))
     s += node + ": " + Array.from(graph[node]).join(', ') + '\n';
   return s;
-}
-
-function connectedComponents(graph) {
-  let nodes = Object.keys(graph);
-  let todo = [nodes[0]];
-  let done = [];
-  let nodeIndices = {}
-  let counter = 0;
-  while (!done.setEquals(nodes)) {
-    while (todo.length > 0) {
-      let node = todo.pop();
-      nodeIndices[node] = counter;
-      for (const child of graph[node])
-        if (!done.includes(child))
-          todo.push(child);
-      done.push(node);
-    }
-    for (const node of nodes)
-      if (!done.includes(node)) {
-        todo.push(node);
-        counter++;
-        break;
-      }
-  }
-  return nodeIndices;
-  let components = new Array(counter + 1).fill().map(_ => []);
-  for (const node of nodes)
-    components[nodeIndices[node]].push(node);
-  return components;
 }
