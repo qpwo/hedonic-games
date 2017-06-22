@@ -3,16 +3,14 @@
 
 // ** Necessary globals for setting up a user session **
 
-// TODO: change PARTITION from a set of sets to an array of sets
-
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
 sigma.plugins.dragNodes(SIGMA, SIGMA.renderers[0]); // enable click and drag
 SIGMA.settings({"zoomingRatio": 1, // scroll doesn't zoom
   "edgeColor": "#000#"}); // edges are all black
 
-let PARTITION = new Set(); // current partition of the vertices
-let GRAPH = {}; // a map from nodes to arrays of nodes
-let SCOREFUNC = FOScore; // function to use for player type
+let PARTITION; // current partition of the vertices, an array of sets
+let GRAPH; // a map from nodes to arrays of nodes
+let SCOREFUNC; // function to use for player type
 
 // ** Functions for Reading and Changing the Graph **
 
@@ -114,21 +112,20 @@ document.getElementById("colorPartition").onclick = function() {
 document.getElementById("colorPartition").click()
 
 function partitionToString(partition) {
-  return Array.from(partition).map(coalition => Array.from(coalition).join(", ")).join("\n");
+  return partition.map(coalition => Array.from(coalition).join(", ")).join("\n");
 }
 
 function stringToPartition(string) {
-  let partition = new Set();
+  let partition = [];
   for (let line of string.split('\n')) {
     line = line.replace(/ /g, '');
     if (line == "") continue;
-    partition.add(new Set(line.split(',')));
+    partition.push(new Set(line.split(',')));
   }
   return partition;
 }
 
 function isPartition(set, partition) {
-  // TODO: move to myset.js
   // Check if partition is actually a partition of the set
   let setCopy = new Set(set);
   for (const subSet of partition)
@@ -219,7 +216,7 @@ document.getElementById("computeScores").onclick = function() {
   }
   let result = "<table>";
   result += "<tr><th></th>";
-  let coalitions = PARTITION.plus(new Set());
+  let coalitions = PARTITION.concat(new Set());
   for (const coalition of coalitions)
     result += "<th>" + coalition.stringify() + "</th>";
   result += "</tr>";
@@ -275,7 +272,7 @@ function checkStrictlyPopular() {
   let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
   if (isSP)
     return ["Yes.", null]
-  let partitionString = '{' + Array.from(partition).map(coalition=>coalition.stringify()).join(',') + '}';
+  let partitionString = '{' + partition.map(coalition=>coalition.stringify()).join(',') + '}';
   let string = "";
   if (winCount == 0)
     string = "No. Counterexample: partition " + partitionString + " is equally preferred to the current partition.";
@@ -311,22 +308,18 @@ function checkPerfect() {
 // ** Other tools **
 
 function colorGraph() {
-  let length = PARTITION.size;
-  let i = 0;
-  for (const coalition of PARTITION) {
-    colorSubgraph(coalition, rainbow(length, i));
-    i++;
-  }
+  let length = PARTITION.length;
+  PARTITION.forEach((coalition, index) => colorSubgraph(coalition, rainbow(length, index)));
 }
 
-function colorSubgraph(nodes, color) {
-  // Color a subgraph induced by a set of nodes
-  for (let nodeObject of SIGMA.graph.nodes(Array.from(nodes)))
+function colorSubgraph(coalition, color) {
+  // Color all the nodes in the coalition
+  for (let nodeObject of SIGMA.graph.nodes(Array.from(coalition)))
     nodeObject.color = color;
 }
 
 function rainbow(numOfSteps, step) {
-  // This function generates vibrant, "evenly spaced" colours
+  // Generates vibrant, "evenly spaced" colours
   // From https://stackoverflow.com/a/7419630
   let r, g, b;
   let h = step / numOfSteps;

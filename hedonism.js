@@ -127,7 +127,7 @@ function isIndividuallyRational(graph, partition, scoreFunc) {
     function(graph, partition, scoreFunc) {
       for (const homeCoalition of partition)
         for (const node of homeCoalition)
-          for (const newCoalition of partition.plus(new Set([])))
+          for (const newCoalition of partition.concat(new Set()))
             if (tests.every(test => test(graph, partition, node, homeCoalition, newCoalition, scoreFunc))) // if this situation passes every test
               return [false, node, newCoalition];
       return [true, null, null];
@@ -214,5 +214,5 @@ function isPerfect(graph, partition, scoreFunc) {
 
 function groupElope(partition, coalition) {
   // Moves everyone in coalition out of their home coalitions and into a new one together
-  return partition.map(coalitionB => coalitionB.setMinus(coalition)).filter(coalitionB => coalitionB.size > 0).plus(coalition);
+  return partition.map(coalitionB => coalitionB.setMinus(coalition)).filter(coalitionB => coalitionB.size > 0).concat([coalition]);
 }
