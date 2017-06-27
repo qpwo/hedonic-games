@@ -174,17 +174,13 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
   // Is this partition stictly popular? If not, give a counter-example.
   // TODO: make a non-strict version
   // TODO: seperate the winCount into separate for and against votes
-  let homeScores = {}
-  for (const coalition of partition)
-    for (const node of coalition)
+  let homeScores = {};
+  for (const coalition of partition) for (const node of coalition)
       homeScores[node] = scoreFunc(graph, node, coalition);
-  let nodes = Object.keys(graph)
-  let n = nodes.length;
-  for (const newPartition of (new Set(nodes)).partitionSet()) {
-    if (newPartition.deepEquals(partition))
-      continue;
+  let partitions = new Set(Object.keys(graph)).partitionSet();
+  for (const partitionB of partitions) {
     let winCount = 0;
-    for (const coalition of newPartition)
+    for (const coalition of partitionB)
       for (const node of coalition) {
         let newScore = scoreFunc(graph, node, coalition);
         if (homeScores[node] > newScore)
@@ -192,8 +188,8 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
         if (homeScores[node] < newScore)
           winCount--;
       }
-    if (winCount <= 0)
-      return [false, newPartition, winCount];
+    if (winCount <= 0 && !partitionEquals(partitionB,partition))
+      return [false, partitionB, winCount];
   }
   return [true, null, null]
 }
@@ -219,4 +215,8 @@ function isPerfect(graph, partition, scoreFunc) {
 function groupElope(partition, coalition) {
   // Moves everyone in coalition out of their home coalitions and into a new one together
   return partition.map(coalitionB => coalitionB.setMinus(coalition)).filter(coalitionB => coalitionB.size > 0).concat([coalition]);
+}
+
+function partitionEquals(partitionA, partitionB) {
+  return partitionA.every(coalitionA => partitionB.some(coalitionB => coalitionA.equals(coalitionB)));
 }

@@ -306,7 +306,7 @@ function checkPerfect() {
     groupElope(PARTITION, coalition.plus(node))];
 }
 
-// ** Other tools **
+// ** Coloring tools **
 
 function colorGraph() {
   let length = PARTITION.length;
@@ -337,5 +337,29 @@ function rainbow(numOfSteps, step) {
   }
   let c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
   return (c);
+}
+
+// ** Other Stuff **
+
+{
+  let hideShow = function() {
+    let div = document.getElementById("playerExplanation");
+    if (div.style.display == "none")
+      div.style.display = "initial";
+    else
+      div.style.display = "none";
+  }
+  document.getElementById("hideShowPlayerExplanation").onclick = hideShow;
+}
+
+{
+  let hideShow = function() {
+    let div = document.getElementById("stabilityExplanation");
+    if (div.style.display == "none")
+      div.style.display = "initial";
+    else
+      div.style.display = "none";
+  }
+  document.getElementById("hideShowStabilityExplanation").onclick = hideShow;
 }
 

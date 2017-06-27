@@ -57,10 +57,6 @@ Set.prototype.equals = function(set) {
   return this.every(x => set.has(x)) && set.every(x => this.has(x));
 }
 
-Set.prototype.deepEquals = function(setSet) {
-  return this.every(set => setSet.some(setB => setB.equals(set)));
-}
-
 Set.prototype.plus = function(x) {
   let set = new Set(this);
   set.add(x);
@@ -74,8 +70,7 @@ Set.prototype.minus = function(x) {
 }
 
 Set.prototype.partitionSet = function() {
-  return Array.from(this).partitionSet().map(partition =>
-    new Set(partition.map(coalition => new Set(coalition))));
+  return Array.from(this).partitionSet().map(partition => partition.map(coalition => new Set(coalition)));
 }
 
 Set.prototype.powerset = function() {
