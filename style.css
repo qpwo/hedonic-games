@@ -29,3 +29,8 @@ table, th, td {
   list-style: none;
   margin-top: 15px;
 }
+
+#hideShowPlayerExplanation, #hideShowStabilityExplanation {
+  color: blue;
+  cursor: pointer;
+}

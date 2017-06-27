@@ -342,24 +342,18 @@ function rainbow(numOfSteps, step) {
 // ** Other Stuff **
 
 {
-  let hideShow = function() {
-    let div = document.getElementById("playerExplanation");
-    if (div.style.display == "none")
-      div.style.display = "initial";
-    else
-      div.style.display = "none";
+  let hideShow = function(buttonId, paragraphId) {
+    let par = document.getElementById(paragraphId);
+    let button = document.getElementById(buttonId);
+    if (par.style.display == "none") {
+      par.style.display = "initial";
+      button.innerHTML = "[hide explanation]";
+    } else {
+      par.style.display = "none";
+      button.innerHTML = "[show explanation]";
+    }
   }
-  document.getElementById("hideShowPlayerExplanation").onclick = hideShow;
-}
 
-{
-  let hideShow = function() {
-    let div = document.getElementById("stabilityExplanation");
-    if (div.style.display == "none")
-      div.style.display = "initial";
-    else
-      div.style.display = "none";
-  }
-  document.getElementById("hideShowStabilityExplanation").onclick = hideShow;
+  document.getElementById("hideShowPlayerExplanation").onclick = (() => hideShow("hideShowPlayerExplanation", "playerExplanation"));
+  document.getElementById("hideShowStabilityExplanation").onclick = (() => hideShow("hideShowStabilityExplanation", "stabilityExplanation"));
 }
-
