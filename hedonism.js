@@ -138,35 +138,40 @@ function isIndividuallyRational(graph, partition, scoreFunc) {
   var isContractuallyIndividuallyStable = makeCheckFunc([test0, test1, test2, test3]);
 }
 
-function isCoreStable(graph, partition, scoreFunc, isStrict=false) {
-  // Is this partition core-stable?
-  // If not, give a counter-example.
+function isCoreStable(graph, partition, scoreFunc) {
+  // Is this partition core-stable? If not, give a counter-example.
   let homeScores = {};
-  for (const coalition of partition)
-    for (const node of coalition)
-      homeScores[node] = scoreFunc(graph, node, coalition);
-  let nodes = Object.keys(graph);
-  let powerset = nodes.powerset().map(arr => new Set(arr));
+  for (const coalition of partition) for (const node of coalition)
+    homeScores[node] = scoreFunc(graph, node, coalition);
+  let powerset = Object.keys(graph).powerset().map(arr => new Set(arr));
+  for (const coalition of powerset) {
+    if (coalition.size==0) continue;
+    if (coalition.every(node => scoreFunc(graph, node, coalition) > homeScores[node]))
+      return [false, coalition];
+  }
+  return [true, null];
+}
+
+function isStrictlyCoreStable(graph, partition, scoreFunc) {
+  // Is this partition strictly core-stable? If not, give a counter-example.
+  let homeScores = {};
+  for (const coalition of partition) for (const node of coalition)
+    homeScores[node] = scoreFunc(graph, node, coalition);
+  let powerset = Object.keys(graph).powerset().map(arr => new Set(arr));
   for (const coalition of powerset) {
     if (coalition.size==0) continue;
     let newScores = {}
     for (const node of coalition)
       newScores[node] = scoreFunc(graph, node, coalition)
-    if (isStrict) {
-      if (coalition.every(node => newScores[node] >= homeScores[node]) &&
-        coalition.some(node => newScores[node] > homeScores[node]))
-        return [false, coalition];
-    } else {
-      if (coalition.every(node => newScores[node] > homeScores[node]))
-        return [false, coalition];
-    }
+    if (coalition.every(node => newScores[node] >= homeScores[node]) &&
+      coalition.some(node => newScores[node] > homeScores[node]))
+      return [false, coalition];
   }
   return [true, null];
 }
 
 function isStrictlyPopular(graph, partition, scoreFunc) {
-  // Is this partition stictly popular?
-  // If not, give a counter-example.
+  // Is this partition stictly popular? If not, give a counter-example.
   // TODO: make a non-strict version
   // TODO: seperate the winCount into separate for and against votes
   let homeScores = {}
@@ -194,8 +199,7 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
 }
 
 function isPerfect(graph, partition, scoreFunc) {
-  // Is this partition perfect?
-  // If not, give a counter-example.
+  // Is this partition perfect? If not, give a counter-example.
   let nodes = Object.keys(graph);
   for (const coalition of partition)
     for (const node of coalition) {

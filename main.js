@@ -53,9 +53,9 @@ function collectGraph() {
 
 // ** Functions for Taking User Input **
 
+// For drawing the graph:
 document.getElementById("graphText").innerHTML = "a: b, c, d\nc: d, e"; // default value
 document.getElementById("drawGraph").onclick = function() {
-  // Replace the current graph with the one described in the big text box on the webpage
   SIGMA.graph.clear();
   let graph = stringToGraph(document.getElementById("graphText").value);
   for (const source of Object.keys(graph)) {
@@ -93,6 +93,7 @@ function stringToGraph(string) {
   return graph;
 }
 
+// For making the partition:
 document.getElementById("partitionText").value = "a, b\nc, d\ne";
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
@@ -282,7 +283,7 @@ function checkStrictlyPopular() {
 }
 
 function checkCoreStable() {
-  let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC, false);
+  let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC);
   if (isCS)
     return ["Yes.", null]
   return ["No. Counterexample: coalition " + coalition.stringify(),
@@ -290,7 +291,7 @@ function checkCoreStable() {
 }
 
 function checkStrictlyCoreStable() {
-  let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC, true);
+  let [isCS, coalition] = isStrictlyCoreStable(GRAPH, PARTITION, SCOREFUNC);
   if (isCS)
     return ["Yes.", null]
   return ["No. Counterexample: coalition " + coalition.stringify(),
