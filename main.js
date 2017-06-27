@@ -278,7 +278,7 @@ function checkStrictlyPopular() {
   if (winCount == 0)
     string = "No. Counterexample: partition " + partitionString + " is equally preferred to the current partition.";
   else
-    string ="No. Counterexample: partition " + partitionString + " is preferred overall by " + (-winCount) + " votes." 
+    string = "No. Counterexample: partition " + partitionString + " is preferred overall by " + (-winCount) + " votes.";
   return [string, partition];
 }
 

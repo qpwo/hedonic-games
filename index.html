@@ -47,55 +47,58 @@
         </p>
 
         <!-- explanations of player types -->
-        <p id="friendOriented">
+        <p>
+        <div id="friendOriented">
         Explanation:
         A player is friend-oriented if she tries to maximize friends and, in the case of a tie, minimize enemies.
         This preference relation is defined by the score function
         \[score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i | .\]
         Introduced in [DBHS2006].
-        </p>
-        <p id="enemyOriented">
+        </div>
+        <div id="enemyOriented">
         Explanation:
         A player is enemy-oriented if she tries to minimize enemies and, in the case of a tie, maximize friends.
         This preference relation is defined by the score function
         \[score_i^{EO}(A) = | A \cap F_i | - n | A \cap E_i | .\]
         Introduced in [DBHS2006].
-        </p>
-        <p id="selfishFirst">
+        </div>
+        <div id="selfishFirst">
         Explanation:
         A player is selfish-first if she uses her own preferences first and only uses her friends' preferences to break ties.
         This preference relation is defined by the score function
         \[ score_i^{SF}(A) = n^5 score_i^{FO}(A) + \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
         Introduced in [NRRRS2016].
-        </p>
-        <p id="equalTreatment">
+        </div>
+        <div id="equalTreatment">
         Explanation:
         A player is equal-treatment if she puts equal weight on her own opinion and each friend's opinion.
         This preference relation is defined by the score function
         \[ score_i^{EQ}(A) = \sum_{a \in A \cap F_i \cup \{i\}} \frac{score_a^{FO}(A)}{|A \cap F_i \cup \{i\}|} .\]
         Introduced in [NRRRS2016].
-        </p>
-        <p id="altruisticTreatment">
+        </div>
+        <div id="altruisticTreatment">
         Explanation:
         A player is altruistic-treatment if she uses her friends' preferences first and only uses her own preferences to break ties.
         This preference relation is defined by the score function
         \[ score_i^{AL}(A) = score_i^{FO}(A) + n^5 \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
         Introduced in [NRRRS2016].
-        </p>
-        <p id="fractional">
+        </div>
+        <div id="fractional">
         Explanation:
         In fractional hedonic games, a player's score of a coalition is the average of her scores of the players in it.
         Scores could be anything, but this simulator only allows scores that are simple and symmetric.
         \[ score_i^{FR}(A) = |A \cap F_i| / |A| .\]
         Introduced in [ABH2014].
-        </p>
-        <p id="additive">
+        </div>
+        <div id="additive">
         Explanation:
         In additively seperable hedonic games, a node's score of a coalition is the sum of her scores of the players in it.
         In unweighted, undirected graphs, this is simple the degree of the node in the coalition.
         \[ score_i^{AS}(A) = |A \cap F_i| .\]
         I don't know when/where additively seperable hedonic games were introduced. If you know, then please email me!
+        </div>
         </p>
+
       </li>
       <li>
         <p>
@@ -117,54 +120,56 @@
         <p id="stabilityResults"> </p>
 
         <!-- explanations of stability concepts -->
-        <p id="individuallyRational">
+        <p>
+        <div id="individuallyRational">
         Explanation:
         A partition is individually rational if every player is happier in her home coalition than she would be alone.
         In other words, \(\Gamma\) is individually rational iff
         \[ \forall i \in N: \Gamma(i) \geq_i \{i\} .\]
-        </p>
-        <p id="nashStable">
+        </div>
+        <div id="nashStable">
         Explanation:
         A partition is Nash-stable if every player is happier in her home coalition than she would be in any other coalition.
         In other words, \(\Gamma\) is Nash-stable iff
         \[ \forall i \in N: \forall C \in \Gamma: \Gamma(i) \geq_i C \cup \{i\} .\]
-        </p>
-        <p id="individuallyStable">
+        </div>
+        <div id="individuallyStable">
         Explanation:
         A partition is individually stable if every player who wants to transfer to a new coalition is unwanted by someone in that coalition.
         In other words, \(\Gamma\) is individually stable iff
         \[ \forall i \in N: \forall C \in \Gamma: (\Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C >_j C \cup \{i\} ))  .\]
-        </p>
-        <p id="contractuallyIndividuallyStable">
+        </div>
+        <div id="contractuallyIndividuallyStable">
         Explanation:
         A partition is contractually individually stable if every player who wants to transfer to a new coalition is either unwanted by someone in that coalition or is not permitted to leave by someone in her home coalition.
         In other words, \(\Gamma\) is contractually individually stable iff
         \[ \forall i \in N: \forall C \in \Gamma: \]
         \[ \Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C >_j C \cup \{i\} ) \lor (\exists k \in \Gamma(i) \setminus \{i\}: \Gamma(i) >_k \Gamma(i) \setminus \{i\}) .\]
-        </p>
-        <p id="strictlyPopular">
+        </div>
+        <div id="strictlyPopular">
         Explanation:
         A partition is strictly popular if the majority of players prefer it to any other partition.
         In other words, \(\Gamma\) is strictly popular iff
         \[ \forall \Gamma': |\{ i \in N: \Gamma(i) >_i \Gamma'(i) \}| > |\{ i \in N: \Gamma'(i) >_i \Gamma(i) \}| .\]
-        </p>
-        <p id="coreStable"> 
+        </div>
+        <div id="coreStable">
         Explanation:
         A partition is core-stable if there is no possible strictly blocking coalition. (A coalition strictly blocks if everyone prefers it to their current homes.)
         In other words, \(\Gamma\) is core-stable iff
         \[ \not\exists C \in 2^N: \forall i \in C: C >_i \Gamma(i) .\]
-        </p>
-        <p id="strictlyCoreStable"> 
+        </div>
+        <div id="strictlyCoreStable">
         Explanation:
         A partition is strictly core-stable if there is no possible weakly blocking coalition. (A coalition weakly blocks if everyone is at least as happy in the new one and someone is even happier.)
         In other words, \(\Gamma\) is strictly core-stable iff
         \[ \not\exists C \in 2^N: (\forall i \in C: C \geq_i \Gamma(i)) \land (\exists j \in C: C >_j \Gamma(i)) .\]
-        </p>
-        <p id="perfect">
+        </div>
+        <div id="perfect">
         Explanation:
         A partition is perfect if every player is in one of their favorite possible coalitions.
         In other words, \(\Gamma\) is perfect iff
-        \[ \forall i \in N: \not\exists C \in N^n: C >_i \Gamma(i) .\]
+        \[ \forall i \in N: \not\exists C \in 2^N: C >_i \Gamma(i) .\]
+        </div>
         </p>
       </li>
       <li>
@@ -181,7 +186,7 @@
     <p>
     You have a set of people which for some reason needs to split into groups.
     The people are called <i>players</i> and the groups are called <i>coalitions</i>.
-    Maybe the set of people is your kindergarten class and they need to split up so each group can build a lego tower. 
+    Maybe the set of people is your kindergarten class and they need to split up so each group can build a lego tower.
     A player might really want to be in some coalitions, but not in others.
     These are the player's <i>preferences</i>.
     Once the whole set of players is split into coalitions, it's called a <i>partition</i> or a <i>coalition formation</i>.
@@ -196,7 +201,7 @@
 
     <p>
     \(N\) is the set of players, \(n = |N|\) is the number of players, and \(\Gamma\) is a partition of \(N\).
-    Usually, \(A \subseteq N\) is a coalition and \(a\) is a player in \(A\). 
+    Usually, \(A \subseteq N\) is a coalition and \(a\) is a player in \(A\).
     And \(i\) is a player from anywhere in \(N\).
     </p>
 
