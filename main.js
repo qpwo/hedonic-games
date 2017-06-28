@@ -54,7 +54,7 @@ function collectGraph() {
 // ** Functions for Taking User Input **
 
 // For drawing the graph:
-document.getElementById("graphText").innerHTML = "a: b, c, d\nc: d, e"; // default value
+document.getElementById("graphText").innerHTML = "GeorgeMichael: Maeybe, Michael\nLindsay: Tobias, Maeybe\nSteveHolt: Maeybe\nLucille: Lindsay, GeorgeMichael"; // default value
 document.getElementById("drawGraph").onclick = function() {
   SIGMA.graph.clear();
   let graph = stringToGraph(document.getElementById("graphText").value);
@@ -94,7 +94,8 @@ function stringToGraph(string) {
 }
 
 // For making the partition:
-document.getElementById("partitionText").value = "a, b\nc, d\ne";
+document.getElementById("partitionText").value = "SteveHolt, Maeybe, GeorgeMichael\nLindsay, Tobias, Lucille\nMichael" // default value
+
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
   let partition = stringToPartition(document.getElementById("partitionText").value);
