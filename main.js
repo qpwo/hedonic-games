@@ -68,10 +68,9 @@ document.getElementById("drawGraph").onclick = function() {
   }
   GRAPH = collectGraph();
   SIGMA.refresh();
-  document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
-  document.getElementById("scores").style.backgroundColor = "lightgrey";
+  greyOut();
   PARTITION = null;
-}
+};
 document.getElementById("drawGraph").click()
 
 function stringToGraph(string) {
@@ -108,13 +107,15 @@ document.getElementById("colorPartition").onclick = function() {
   PARTITION = partition;
   colorGraph();
   SIGMA.refresh();
-  document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
-  document.getElementById("scores").style.backgroundColor = "lightgrey";
-}
+  greyOut();
+};
 document.getElementById("colorPartition").click()
 
 function partitionToString(partition) {
   return partition.map(coalition => Array.from(coalition).join(", ")).join("\n");
+}
+function partitionToLine(partition) {
+  return "{{" + partition.map(coalition => Array.from(coalition).join(", ")).join("}, {") + "}}";
 }
 
 function stringToPartition(string) {
@@ -145,6 +146,12 @@ function changePartition(partition) {
   PARTITION = partition;
   colorGraph();
   SIGMA.refresh();
+  greyOut();
+}
+
+function greyOut() {
+  document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
+  document.getElementById("scores").style.backgroundColor = "lightgrey";
 }
 
 // ** Buttons for Displaying Calculations **
@@ -158,55 +165,62 @@ function changePartition(partition) {
     for (let i=0; i<paragraphIds.length; i++)
       document.getElementById(paragraphIds[i]).style.display = "none";
     document.getElementById(paragraphIds[choice]).style.display = "initial";
-    document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
-    document.getElementById("scores").style.backgroundColor = "lightgrey";
-  }
+    greyOut();
+  };
   document.getElementById("playerType").onchange = changePlayerType
   changePlayerType()
 }
 
 
 {
-  let functions = [checkIndividuallyRational, checkNashStable,
+  let checkFunctions = [checkIndividuallyRational, checkNashStable,
     checkIndividuallyStable, checkContractuallyIndividuallyStable,
-    checkStrictlyPopular, checkCoreStable, checkStrictlyCoreStable, checkPerfect]
+    checkStrictlyPopular, checkCoreStable, checkStrictlyCoreStable, checkPerfect];
+  let isFunctions = [isIndividuallyRational, isNashStable,
+    isIndividuallyStable, isContractuallyIndividuallyStable, isStrictlyPopular,
+    isCoreStable, isStrictlyCoreStable, isPerfect];
   let paragraphIds = ["individuallyRational", "nashStable",
     "individuallyStable", "contractuallyIndividuallyStable", "strictlyPopular",
-    "coreStable", "strictlyCoreStable", "perfect",]
-  let changeStabilityType = function() {
+    "coreStable", "strictlyCoreStable", "perfect",];
+
+  document.getElementById("stabilityType").onchange = function() {
     let choice = document.getElementById("stabilityType").selectedIndex;
 
-    let stabilityFunc = functions[choice];
-    let buttonAction = function() {
+    for (let i=0; i<paragraphIds.length; i++)
+      document.getElementById(paragraphIds[i]).style.display = "none";
+    document.getElementById(paragraphIds[choice]).style.display = "initial";
+
+    let results = document.getElementById("stabilityResults");
+
+    document.getElementById("checkStability").onclick = function() {
+      let stabilityFunc = checkFunctions[choice];
       if (PARTITION == null) {
         window.alert("You must set a partition before you can check its stability.")
         return;
       }
       let [string, partition] = stabilityFunc()
-      let results = document.getElementById("stabilityResults");
       results.innerHTML = string;
       results.style.backgroundColor = null;
-      let button = document.getElementById("updatePartition");
+      let updateButton = document.getElementById("updatePartition");
       if (partition) {
-        button.style.display = "initial";
-        button.onclick = function() {
+        updateButton.style.display = "initial";
+        updateButton.onclick = function() {
           changePartition(partition);
-          document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
         };
       }
       else {
-        button.style.display = "none";
+        updateButton.style.display = "none";
       }
-    }
-    document.getElementById("checkStability").onclick = buttonAction;
-    buttonAction();
+    };
+    document.getElementById("checkStability").click()
 
-    for (let i=0; i<paragraphIds.length; i++)
-      document.getElementById(paragraphIds[i]).style.display = "none";
-    document.getElementById(paragraphIds[choice]).style.display = "initial";
-  }
-  document.getElementById("stabilityType").onchange = changeStabilityType;
-  changeStabilityType();
+    document.getElementById("checkStabilityExistence").onclick = function() {
+      results.style.backgroundColor = null;
+      results.innerHTML = checkExistence(isFunctions[choice]);
+    };
+
+  };
+  document.getElementById("stabilityType").onchange();
 }
 
 document.getElementById("computeScores").onclick = function() {
@@ -234,9 +248,10 @@ document.getElementById("computeScores").onclick = function() {
   let scores = document.getElementById("scores");
   scores.innerHTML = result;
   scores.style.backgroundColor = null;
-}
+};
 
 // ** Stability Checks **
+// TODO: merge these into the hedonism.js functions
 
 function checkIndividuallyRational() {
   let [isIR, node] = isIndividuallyRational(GRAPH, PARTITION, SCOREFUNC);
@@ -353,8 +368,21 @@ function rainbow(numOfSteps, step) {
       par.style.display = "none";
       button.innerHTML = "[show explanation]";
     }
-  }
+  };
 
   document.getElementById("hideShowPlayerExplanation").onclick = (() => hideShow("hideShowPlayerExplanation", "playerExplanation"));
   document.getElementById("hideShowStabilityExplanation").onclick = (() => hideShow("hideShowStabilityExplanation", "stabilityExplanation"));
+}
+
+function checkExistence(stability) {
+  if (stability(GRAPH, PARTITION, SCOREFUNC)[0])
+    return "Stable partition found: " + partitionToLine(PARTITION);
+  for (let partition of Object.keys(GRAPH).partitionSet()) {
+    partition = partition.map(coalition => new Set(coalition));
+    if (stability(GRAPH, partition, SCOREFUNC)[0]) {
+      changePartition(partition);
+      return "Stable partition found: " + partitionToLine(partition);
+    }
+  }
+  return "No stable partition exists.";
 }

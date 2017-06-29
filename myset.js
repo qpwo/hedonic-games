@@ -69,11 +69,8 @@ Set.prototype.minus = function(x) {
   return set;
 }
 
-Set.prototype.partitionSet = function() {
-  return Array.from(this).partitionSet().map(partition => partition.map(coalition => new Set(coalition)));
-}
-
 Set.prototype.powerset = function() {
+  // TODO eventually: make this a generator function
   return Array.from(this).powerset().map(arr => new Set(arr));
 }
 

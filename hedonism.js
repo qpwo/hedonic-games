@@ -177,8 +177,8 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
   let homeScores = {};
   for (const coalition of partition) for (const node of coalition)
       homeScores[node] = scoreFunc(graph, node, coalition);
-  let partitions = new Set(Object.keys(graph)).partitionSet();
-  for (const partitionB of partitions) {
+  for (let partitionB of Object.keys(graph).partitionSet()) {
+    partitionB = partitionB.map(coalition => new Set(coalition));
     let winCount = 0;
     for (const coalition of partitionB)
       for (const node of coalition) {
@@ -196,15 +196,16 @@ function isStrictlyPopular(graph, partition, scoreFunc) {
 
 function isPerfect(graph, partition, scoreFunc) {
   // Is this partition perfect? If not, give a counter-example.
-  let nodes = Object.keys(graph);
+  let nodes = new Set(Object.keys(graph));
   for (const coalition of partition)
     for (const node of coalition) {
       let homeScore = scoreFunc(graph, node, coalition);
-      let newCoalitions = (new Set(nodes)).minus(node).powerset().filter(coalitionB => !coalition.equals(coalitionB));
-      for (const newCoalition of newCoalitions) {
-        let newScore = scoreFunc(graph, node, newCoalition.plus(node));
+      let coalitions = nodes.minus(node).powerset();
+      for (const coalitionB of coalitions) {
+        if (coalition.equals(coalitionB)) continue;
+        let newScore = scoreFunc(graph, node, coalitionB.plus(node));
         if (newScore > homeScore)
-          return [false, node, newCoalition.plus(node)];
+          return [false, node, coalitionB.plus(node)];
       }
     }
   return [true, null, null];
