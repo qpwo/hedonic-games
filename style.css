@@ -30,7 +30,7 @@ table, th, td {
   margin-top: 15px;
 }
 
-#hideShowPlayerExplanation, #hideShowStabilityExplanation {
+.hideButton {
   color: blue;
   cursor: pointer;
 }

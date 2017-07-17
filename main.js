@@ -1,6 +1,8 @@
 // Luke Miles, June 2017
 // Code for all the buttons and things on the front webpage
 
+// possible TODO: change the scope tricks from just curly brackets to single-use functions
+
 // ** Necessary globals for setting up a user session **
 
 let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
@@ -164,7 +166,7 @@ function greyOut() {
     SCOREFUNC = functions[choice];
     for (let i=0; i<paragraphIds.length; i++)
       document.getElementById(paragraphIds[i]).style.display = "none";
-    document.getElementById(paragraphIds[choice]).style.display = "initial";
+    document.getElementById(paragraphIds[choice]).style.display = null;
     greyOut();
   };
   document.getElementById("playerType").onchange = changePlayerType
@@ -188,7 +190,7 @@ function greyOut() {
 
     for (let i=0; i<paragraphIds.length; i++)
       document.getElementById(paragraphIds[i]).style.display = "none";
-    document.getElementById(paragraphIds[choice]).style.display = "initial";
+    document.getElementById(paragraphIds[choice]).style.display = null;
 
     let results = document.getElementById("stabilityResults");
 
@@ -203,7 +205,7 @@ function greyOut() {
       results.style.backgroundColor = null;
       let updateButton = document.getElementById("updatePartition");
       if (partition) {
-        updateButton.style.display = "initial";
+        updateButton.style.display = null;
         updateButton.onclick = function() {
           changePartition(partition);
         };
@@ -356,21 +358,31 @@ function rainbow(numOfSteps, step) {
 
 // ** Other Stuff **
 
-{
-  let hideShow = function(buttonId, paragraphId) {
-    let par = document.getElementById(paragraphId);
-    let button = document.getElementById(buttonId);
-    if (par.style.display == "none") {
-      par.style.display = "initial";
-      button.innerHTML = "[hide explanation]";
-    } else {
-      par.style.display = "none";
-      button.innerHTML = "[show explanation]";
-    }
-  };
 
-  document.getElementById("hideShowPlayerExplanation").onclick = (() => hideShow("hideShowPlayerExplanation", "playerExplanation"));
-  document.getElementById("hideShowStabilityExplanation").onclick = (() => hideShow("hideShowStabilityExplanation", "stabilityExplanation"));
+{ // create a +/- button for all the hidable elements on the webpage
+  let makeHideButton = function(element) {
+    let button = document.createElement("span");
+    button.className = "hideButton";
+    button.innerHTML = "[-]";
+    button.onclick = function() {
+      if (element.style.display == "none") {
+        element.style.display = null;
+        button.innerHTML = "[-]";
+      } else {
+        element.style.display = "none";
+        button.innerHTML = "[+]";
+      }
+    };
+    return button;
+  };
+  for (let element of document.getElementsByClassName("hidable")) {
+    let wrapper = document.createElement("span");
+    element.parentNode.insertBefore(wrapper, element);
+    let button = makeHideButton(element);
+    wrapper.appendChild(button);
+    wrapper.appendChild(element);
+    //button.click(); button.click(); // fix button placement
+  }
 }
 
 function checkExistence(stability) {
