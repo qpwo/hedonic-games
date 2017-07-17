@@ -285,7 +285,6 @@ function checkContractuallyIndividuallyStable() {
 }
 
 function checkStrictlyPopular() {
-  // TODO: separate into for, against, and tie votes.
   let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
   if (isSP)
     return ["Yes.", null]
@@ -294,7 +293,7 @@ function checkStrictlyPopular() {
   if (winCount == 0)
     string = "No. Counterexample: partition " + partitionString + " is equally preferred to the current partition.";
   else
-    string = "No. Counterexample: partition " + partitionString + " is preferred overall by " + (-winCount) + " votes.";
+    string = "No. Counterexample: partition " + partitionString + " is preferred overall by " + winCount + " votes.";
   return [string, partition];
 }
 
@@ -376,7 +375,7 @@ function rainbow(numOfSteps, step) {
 
 function checkExistence(stability) {
   if (stability(GRAPH, PARTITION, SCOREFUNC)[0])
-    return "Stable partition found: " + partitionToLine(PARTITION);
+    return "The current partition is stable."
   for (let partition of Object.keys(GRAPH).partitionSet()) {
     partition = partition.map(coalition => new Set(coalition));
     if (stability(GRAPH, partition, SCOREFUNC)[0]) {

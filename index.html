@@ -9,13 +9,17 @@
 </head>
 
 <body>
+  <!-- TODO: make a class called "hidable" for hiding paragraphs -->
 
   <div class="centerColumn">
     <h2> Hedonic Game Simulator </h2>
     <!-- Introduction -->
-    <p> Welcome to the hedonic game simulator! </p>
+    <p>
+    Welcome to the hedonic game simulator.
+    I will be presenting this at the 2017 Algorithmic Decision Theory Doctoral Consortium.
+    I uploaded my extended abstract to <a href="https://arxiv.org/abs/1706.08501">arXiv</a>.
+    </p>
     <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. You can click and drag nodes in the box. </p>
-
     <!-- The box that holds the interactive graph -->
     <div id="outergraphbox">
       <div id="innergraphbox"></div>
@@ -26,12 +30,12 @@
 
       <li> Enter adjacency list below. Symmetric edges are automatically added. <br>
         <textarea id="graphText" cols="50" rows="4"> </textarea>
-        <button type="button" id="drawGraph">Draw!</button>
+        <button type="button" id="drawGraph">Draw</button>
       </li>
 
       <li> Enter partition: <br>
         <textarea id="partitionText" cols="50" rows="4"> </textarea>
-        <button type="button" id="colorPartition">Color!</button>
+        <button type="button" id="colorPartition">Color</button>
       </li>
 
       <li>
@@ -114,9 +118,9 @@
           <option>strictly core-stable</option>
           <option>perfect</option>
         </select>?
-        <button type="button" id="checkStability"> Check this partition! </button>
-        <button type="button" id="checkStabilityExistence"> Check existence! </button>
-        <button type="button" id="updatePartition"> Update partition! </button>
+        <button type="button" id="checkStability"> Check this partition </button>
+        <button type="button" id="checkStabilityExistence"> Check existence </button>
+        <button type="button" id="updatePartition"> Update partition </button>
         </p>
         <p id="stabilityResults"> </p>
 
@@ -173,7 +177,7 @@
       <li>
         Compute every node's score of every other coalition in the partition below.
         A node's score of a coalition is what would be if that node joined that coalition.
-        <button type="button" id="computeScores">Compute!</button>
+        <button type="button" id="computeScores">Compute</button>
         <p id="scores"> </p>
       </li>
 
@@ -257,19 +261,16 @@
         "Fractional Hedonic Games."
         The International Conference on Autonomous Agents and Multi-Agent Systems.
         2014.
-        <a href="http://www.ifaamas.org/Proceedings/aamas2014/aamas/p5.pdf">PDF</a>.
+        <a href="https://arxiv.org/abs/1705.10116">arXiv</a>.
       </li>
     </ul>
 
 
     <hr>
     <!-- footer -->
-    <p> Public domain dedication. No rights reserved. Look at the source!</p>
-    <p>
-    Hosted on <a href="https://github.com/qpwo/hedonic-games">Github</a>.
-    Using graph library <a href="http://sigmajs.org/">sigmajs</a>.
-    </p>
-    <p> To request a feature or report a bug, you can use github or you can email Luke.Lambda aatt uky.edu </p>
+    <p> Public domain dedication. No rights reserved. Look at the source! <br/>
+    Hosted on <a href="https://github.com/qpwo/hedonic-games">Github</a>. Using graph library <a href="http://sigmajs.org/">sigmajs</a>. <br/>
+    To request a feature or report a bug, you can use github or you can email <a href="mailto:luke.lambda@uky.edu" target="_blank">luke.lambda@uky.edu</a> .</p>
   </div>
 
   <script type="text/javascript" src="sigma/sigma.min.js"></script> <!-- main graph library -->
