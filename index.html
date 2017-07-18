@@ -15,11 +15,11 @@
     <h2> Hedonic Game Simulator </h2>
     <!-- Introduction -->
     <p>
-    Welcome to the hedonic game simulator.
+    Welcome to the <a href="#hedonicGames">hedonic game</a> simulator!
     I will be presenting this at the 2017 Algorithmic Decision Theory Doctoral Consortium.
     I uploaded my extended abstract to <a href="https://arxiv.org/abs/1706.08501">arXiv</a>.
     </p>
-    <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. You can click and drag nodes in the box. </p>
+    <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. <b>You can click and drag the nodes in the box.</b> </p>
     <!-- The box that holds the interactive graph -->
     <div id="outergraphbox">
       <div id="innergraphbox"></div>
@@ -48,7 +48,7 @@
           <option>selfish-first (SF)</option>
           <option>equal-treatment (EQ)</option>
           <option>altruistic-treatment (AL)</option>
-          <option>fractional (FR)</option>
+          <option selected="selected">fractional (FR)</option>
           <option>additively-seperable (AS)</option>
         </select> preferences.
         </p>
@@ -92,8 +92,8 @@
           Introduced in [ABH2014].
         </li>
         <li>
-          In additively seperable hedonic games, a node's score of a coalition is the sum of her scores of the players in it.
-          In unweighted, undirected graphs, this is simple the degree of the node in the coalition.
+          In additively seperable hedonic games, a player's score of a coalition is the sum of her scores of the players in it.
+          In unweighted, undirected graphs, this is simply the degree of the player in the coalition.
           \[ score_i^{AS}(A) = |A \cap F_i| .\]
           I don't know when/where additively seperable hedonic games were introduced. If you know, then please email me!
         </li>
@@ -111,7 +111,7 @@
           <option>contractually individually stable</option>
           <option>popular</option>
           <option>strictly popular</option>
-          <option>core-stable</option>
+          <option selected="selected">core-stable</option>
           <option>strictly core-stable</option>
           <option>perfect</option>
         </select>?
@@ -173,15 +173,15 @@
       </li>
 
       <li>
-        Compute every node's score of every other coalition in the partition below.
-        A node's score of a coalition is what would be if that node joined that coalition.
+        Below you can compute every player's score of every other coalition in the partition.
+        (A player \(i\)'s score of a coalition \(C\) is actually \(i\)'s score of \(C \cup \{i\}\).)
         <button type="button" id="computeScores">Compute</button>
         <p id="scores" class="hidable"> </p>
       </li>
 
     </ul>
 
-    <h3> What is a hedonic game? </h3>
+    <h3 id="hedonicGames"> What is a hedonic game? </h3>
     <div class="hidable">
     <h4> Basic idea </h4>
     <p>
@@ -194,7 +194,7 @@
     <b>Hedonic games are the study of how people cooperate and form groups together and when partitions are stable and when partitions fall apart. </b>
     </p>
 
-    <p> More at <a href="https://en.wikipedia.org/wiki/Hedonic_game">Wikipedia</a>.</p>
+    <p> More at <a href="https://en.wikipedia.org/wiki/Hedonic_game">Wikipedia</a> or in [Woe2013].</p>
 
     <p> Hedonic games were independently introduced in [BKS2001] and [BJ2002]. </p>
 
@@ -263,6 +263,13 @@
         2014.
         <a href="https://arxiv.org/abs/1705.10116">arXiv</a>.
       </li>
+      <li>
+        [Woe2013]:
+        Gerhard J Woeginger.
+        "Core Stability in Hedonic Coalition Formation."
+        SOFtware SEMinar (SOFSEM).
+        2013.
+        <a href="https://arxiv.org/abs/1212.2236">arXiv</a>.
     </ul>
 
 

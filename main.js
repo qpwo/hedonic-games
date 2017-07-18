@@ -192,36 +192,27 @@ function greyOut() {
     for (let i=0; i<explanations.length; i++)
       explanations[i].style.display = "none";
     explanations[choice].style.display = null;
-
-    let results = document.getElementById("stabilityResults");
-
-    document.getElementById("checkStability").onclick = function() {
-      let stabilityFunc = checkFunctions[choice];
-      if (PARTITION == null) {
-        window.alert("You must set a partition before you can check its stability.")
-        return;
-      }
-      let [string, partition] = stabilityFunc()
-      results.innerHTML = string;
-      results.style.backgroundColor = null;
-      let updateButton = document.getElementById("updatePartition");
-      if (partition) {
-        updateButton.style.display = null;
-        updateButton.onclick = function() {
-          changePartition(partition);
-        };
-      }
-      else {
-        updateButton.style.display = "none";
-      }
+    let makeStabilityThing = function(test) {
+      return function() {
+        let results = document.getElementById("stabilityResults");
+        if (PARTITION == null) {
+          window.alert("You must set a partition before you can check its stability.")
+          return;
+        }
+        let [string, partition] = test();
+        results.innerHTML = string;
+        results.style.backgroundColor = null;
+        let updateButton = document.getElementById("updatePartition");
+        if (partition) {
+          updateButton.style.display = null;
+          updateButton.onclick = function() {changePartition(partition);};
+        } else
+          updateButton.style.display = "none";
+      };
     };
+    document.getElementById("checkStabilityExistence").onclick = makeStabilityThing(() => checkExistence(isFunctions[choice]));
+    document.getElementById("checkStability").onclick = makeStabilityThing(checkFunctions[choice]);
     document.getElementById("checkStability").click()
-
-    document.getElementById("checkStabilityExistence").onclick = function() {
-      results.style.backgroundColor = null;
-      results.innerHTML = checkExistence(isFunctions[choice]);
-    };
-
   };
   document.getElementById("stabilityType").onchange();
 }
@@ -399,13 +390,11 @@ function rainbow(numOfSteps, step) {
 
 function checkExistence(stability) {
   if (stability(GRAPH, PARTITION, SCOREFUNC)[0])
-    return "The current partition is stable."
+    return ["The current partition is stable.", null];
   for (let partition of Object.keys(GRAPH).partitionSet()) {
     partition = partition.map(coalition => new Set(coalition));
-    if (stability(GRAPH, partition, SCOREFUNC)[0]) {
-      changePartition(partition);
-      return "Stable partition found: " + partitionToLine(partition);
-    }
+    if (stability(GRAPH, partition, SCOREFUNC)[0])
+      return ["Stable partition found: " + partitionToLine(partition), partition];
   }
-  return "No stable partition exists.";
+  return ["No stable partition exists.", null];
 }

@@ -40,3 +40,7 @@ table, th, td {
   color: blue;
   cursor: pointer;
 }
+
+#stabilityResults {
+  font-family: monospace;
+}
