@@ -170,34 +170,31 @@ function isStrictlyCoreStable(graph, partition, scoreFunc) {
   return [true, null];
 }
 
-function isPopular(graph, partition, scoreFunc) {
-  let homeScores = {};
-  for (const coalition of partition) for (const node of coalition)
-    homeScores[node] = scoreFunc(graph, node, coalition);
-  for (let partitionB of Object.keys(graph).partitionSet()) {
-  }
-}
-
 function numberCompare(numA, numB) {
   if (numA < numB) return -1;
   if (numA > numB) return 1;
   return 0;
 }
 
-function isStrictlyPopular(graph, partition, scoreFunc) {
-  // Is this partition stictly popular? If not, give a counter-example.
-  let homeScores = {};
-  for (const coalition of partition) for (const node of coalition)
-      homeScores[node] = scoreFunc(graph, node, coalition);
-  for (let partitionB of Object.keys(graph).partitionSet()) {
-    partitionB = partitionB.map(coalition => new Set(coalition));
-    let winCount = 0;
-    for (const coalition of partitionB) for (const node of coalition)
-      winCount += numberCompare(scoreFunc(graph, node, coalition), homeScores[node])
-    if (winCount >= 0 && !partitionEquals(partitionB,partition))
-      return [false, partitionB, winCount];
-  }
-  return [true, null, null]
+{
+  let makePopularityTest = function(winTest) {
+    return function(graph, partition, scoreFunc) {
+      let homeScores = {};
+      for (const coalition of partition) for (const node of coalition)
+        homeScores[node] = scoreFunc(graph, node, coalition);
+      for (let partitionB of Object.keys(graph).partitionSet()) {
+        partitionB = partitionB.map(coalition => new Set(coalition));
+        let winCount = 0;
+        for (const coalition of partitionB) for (const node of coalition)
+          winCount += numberCompare(scoreFunc(graph, node, coalition), homeScores[node]);
+        if (winTest(winCount) && !partitionEquals(partitionB,partition))
+          return [false, partitionB, winCount];
+      }
+      return [true, null, null]
+    };
+  };
+  var isPopular = makePopularityTest(winCount => (winCount > 0));
+  var isStrictlyPopular = makePopularityTest(winCount => (winCount >= 0));
 }
 
 function isPerfect(graph, partition, scoreFunc) {

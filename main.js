@@ -76,6 +76,7 @@ document.getElementById("drawGraph").onclick = function() {
 document.getElementById("drawGraph").click()
 
 function stringToGraph(string) {
+  // Turn the text box into a graph object
   let graph = {};
   for (let line of string.split('\n')) {
     line = line.replace(/ /g, '');
@@ -114,13 +115,16 @@ document.getElementById("colorPartition").onclick = function() {
 document.getElementById("colorPartition").click()
 
 function partitionToString(partition) {
+  // Turn the array of sets into a long string to put in the text box
   return partition.map(coalition => Array.from(coalition).join(", ")).join("\n");
 }
 function partitionToLine(partition) {
+  // Turn the array of sets into a short string for reading
   return "{{" + partition.map(coalition => Array.from(coalition).join(", ")).join("}, {") + "}}";
 }
 
 function stringToPartition(string) {
+  // Convert the partition text box to an array of sets
   let partition = [];
   for (let line of string.split('\n')) {
     line = line.replace(/ /g, '');
@@ -144,6 +148,7 @@ function isPartition(set, partition) {
 
 
 function changePartition(partition) {
+  // Change the text box, the displayed partition, and the global partition
   document.getElementById("partitionText").value = partitionToString(partition);
   PARTITION = partition;
   colorGraph();
@@ -152,6 +157,7 @@ function changePartition(partition) {
 }
 
 function greyOut() {
+  // Mark obsolete information with a grey background
   document.getElementById("stabilityResults").style.backgroundColor = "lightgrey";
   document.getElementById("scores").style.backgroundColor = "lightgrey";
 }
@@ -160,37 +166,32 @@ function greyOut() {
 
 {
   let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore, fractionalScore, additiveScore];
-  let paragraphIds = ["friendOriented", "enemyOriented", "selfishFirst", "equalTreatment", "altruisticTreatment", "fractional", "additive"];
-  let changePlayerType = function() {
+  document.getElementById("playerType").onchange = function() {
     let choice = document.getElementById("playerType").selectedIndex;
     SCOREFUNC = functions[choice];
-    for (let i=0; i<paragraphIds.length; i++)
-      document.getElementById(paragraphIds[i]).style.display = "none";
-    document.getElementById(paragraphIds[choice]).style.display = null;
+    let explanations = document.getElementById("playerExplanations").children;
+    for (let i=0; i<explanations.length; i++)
+      explanations[i].style.display = "none";
+    explanations[choice].style.display = null;
     greyOut();
   };
-  document.getElementById("playerType").onchange = changePlayerType
-  changePlayerType()
+  document.getElementById("playerType").onchange();
 }
 
 
 {
-  let checkFunctions = [checkIndividuallyRational, checkNashStable,
-    checkIndividuallyStable, checkContractuallyIndividuallyStable,
-    checkStrictlyPopular, checkCoreStable, checkStrictlyCoreStable, checkPerfect];
-  let isFunctions = [isIndividuallyRational, isNashStable,
-    isIndividuallyStable, isContractuallyIndividuallyStable, isStrictlyPopular,
-    isCoreStable, isStrictlyCoreStable, isPerfect];
-  let paragraphIds = ["individuallyRational", "nashStable",
-    "individuallyStable", "contractuallyIndividuallyStable", "strictlyPopular",
-    "coreStable", "strictlyCoreStable", "perfect",];
+  let checkFunctions = [checkIndividuallyRational, checkNashStable, checkIndividuallyStable, checkContractuallyIndividuallyStable,
+    checkPopular, checkStrictlyPopular, checkCoreStable, checkStrictlyCoreStable, checkPerfect];
+  let isFunctions = [isIndividuallyRational, isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable,
+    isPopular, isStrictlyPopular, isCoreStable, isStrictlyCoreStable, isPerfect];
 
   document.getElementById("stabilityType").onchange = function() {
     let choice = document.getElementById("stabilityType").selectedIndex;
 
-    for (let i=0; i<paragraphIds.length; i++)
-      document.getElementById(paragraphIds[i]).style.display = "none";
-    document.getElementById(paragraphIds[choice]).style.display = null;
+    let explanations = document.getElementById("stabilityExplanations").children;
+    for (let i=0; i<explanations.length; i++)
+      explanations[i].style.display = "none";
+    explanations[choice].style.display = null;
 
     let results = document.getElementById("stabilityResults");
 
@@ -286,6 +287,16 @@ function checkContractuallyIndividuallyStable() {
     groupElope(PARTITION, coalition.plus(node))];
 }
 
+function checkPopular(){
+  let [isP, partition, winCount] = isPopular(GRAPH, PARTITION, SCOREFUNC);
+  if (isP)
+    return ["Yes.", null]
+  let partitionString = '{' + partition.map(coalition=>coalition.stringify()).join(',') + '}';
+  let string = "No. Counterexample: partition " + partitionString + " is preferred overall by " + winCount + " votes.";
+  return [string, partition];
+}
+  
+
 function checkStrictlyPopular() {
   let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
   if (isSP)
@@ -326,6 +337,7 @@ function checkPerfect() {
 // ** Coloring tools **
 
 function colorGraph() {
+  // Colors the entire graph
   let length = PARTITION.length;
   PARTITION.forEach((coalition, index) => colorSubgraph(coalition, rainbow(length, index)));
 }
