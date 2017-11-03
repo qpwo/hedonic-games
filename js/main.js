@@ -1,84 +1,20 @@
-// Luke Miles, June 2017
+// Luke Miles, November 2017
 // Code for all the buttons and things on the front webpage
 
-// possible TODO: change the scope tricks from just curly brackets to single-use functions
-
 // ** Necessary globals for setting up a user session **
-
-let SIGMA = new sigma("innergraphbox"); // the thing controlling/displaying the graph
-sigma.plugins.dragNodes(SIGMA, SIGMA.renderers[0]); // enable click and drag
-SIGMA.settings({"zoomingRatio": 1, // scroll doesn't zoom
-  "edgeColor": "#000#"}); // edges are all black
 
 let PARTITION; // current partition of the vertices, an array of sets
 let GRAPH; // a map from nodes to arrays of nodes
 let SCOREFUNC; // function to use for player type
 
-
 var container = document.getElementById("visjsbox");
 var NETWORK = new vis.Network(container, {}, {});
-
-// ** Functions for Reading and Changing the Graph **
-
-//function addNode(name=Sigma.graph.nodes().length, x=Math.random(), y=Math.random()) {
-//  // Add a node to the sigma graph
-//  if (SIGMA.graph.nodes(name)) return;
-//  SIGMA.graph.addNode({
-//    id: name,
-//    label: name,
-//    x: x,
-//    y: y,
-//    size: 1,
-//    color: "#000"
-//  });
-//  SIGMA.refresh();
-//}
-
-function addEdge(source, target) {
-  // Add an edge to the sigma graph
-  if (source == target) return;
-  let name = source + '-' + target;
-  if (SIGMA.graph.edges(name)) return;
-  SIGMA.graph.addEdge({
-    id: name,
-    source: source,
-    target: target
-  });
-}
-
-function collectGraph() {
-  // Make a simple adjacency list object from the complex sigma graph
-  let graph = {};
-  let nodes = SIGMA.graph.nodes().map(node=>node.id).sort();
-  for (const node of nodes)
-    graph[node] = new Set();
-  for (const edge of SIGMA.graph.edges())
-    graph[edge.source].add(edge.target);
-  return graph;
-}
+var DATA = {};
 
 // ** Functions for Taking User Input **
 
 // For drawing the graph:
-document.getElementById("graphText").innerHTML = "George: Maeybe, Michael\nLindsay: Tobias, Maeybe\nSteveHolt: Maeybe\nLucille: Lindsay, George"; // default value
-//document.getElementById("drawGraph").onclick = function() {
-//  SIGMA.graph.clear();
-//  let graph = stringToGraph(document.getElementById("graphText").value);
-//  for (const source of Object.keys(graph)) {
-//    addNode(source);
-//    for (const target of graph[source]) {
-//      addNode(target);
-//      addEdge(source, target);
-//      addEdge(target, source);
-//    }
-//  }
-//  GRAPH = collectGraph();
-//  SIGMA.refresh();
-//  greyOut();
-//  PARTITION = null;
-//};
-//document.getElementById("drawGraph").click();
-
+document.getElementById("graphText").innerHTML = "Michael: George\nGeorge: Maeybe, Michael\nLindsay: Tobias, Maeybe, Lucille\nSteveHolt: Maeybe\nLucille: Lindsay, George"; //default value
 document.getElementById("drawGraph").onclick = function() {
   let stringGraph = stringToGraph(document.getElementById("graphText").value);
   console.log(stringGraph);
@@ -89,8 +25,8 @@ document.getElementById("drawGraph").onclick = function() {
   for (const i of Object.keys(numberGraph))
     for (const j of numberGraph[i])
       edges.push({"from":i, "to":j, "arrows":"to"});
-  data = {"nodes": nodes, "edges": edges};
-  NETWORK.setData(data)
+  DATA = {"nodes": nodes, "edges": edges};
+  NETWORK.setData(DATA);
   GRAPH = numberGraph;
   greyOut();
   PARTITION = null;
@@ -133,15 +69,18 @@ document.getElementById("partitionText").value = "SteveHolt, Maeybe, George\nLin
 
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
-  let partition = stringToPartition(document.getElementById("partitionText").value);
-  let nodes = SIGMA.graph.nodes().map(nodeO => nodeO.id);
-  if (!isPartition(nodes, partition)) {
-    window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
+  let stringPartition = stringToPartition(document.getElementById("partitionText").value);
+  console.log("stringPartition",stringPartition);
+  let numberPartition = numberifyPartition(stringPartition);
+  console.log("numberPartition",numberPartition);
+  let ids = DATA.nodes.map(node => node.id);
+  console.log(ids);
+  if (!isPartition(ids, numberPartition)) {
+    //window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
     return;
   }
-  PARTITION = partition;
+  PARTITION = numberPartition;
   colorGraph();
-  SIGMA.refresh();
   greyOut();
 };
 document.getElementById("colorPartition").click()
@@ -153,6 +92,15 @@ function partitionToString(partition) {
 function partitionToLine(partition) {
   // Turn the array of sets into a short string for reading
   return "{{" + partition.map(coalition => Array.from(coalition).join(", ")).join("}, {") + "}}";
+}
+
+function numberifyPartition(partition) {
+  let labelToIndex = new Map(DATA.nodes.map(node => [node.label, node.id]));
+  console.log(labelToIndex);
+  let partition2 = [];
+  for (const coalition of partition)
+    partition2.push(coalition.map(label => labelToIndex.get(label)));
+  return partition2;
 }
 
 function stringToPartition(string) {
@@ -219,7 +167,7 @@ function greyOut() {
       return function() {
         let results = document.getElementById("stabilityResults");
         if (PARTITION == null) {
-          window.alert("You must set a partition before you can check its stability.")
+          //window.alert("You must set a partition before you can check its stability.")
           return;
         }
         let [string, partition] = test();
@@ -244,7 +192,7 @@ document.getElementById("computeScores").onclick = function() {
   // Display every node's score of every coalition in the partition
   // possible TODO: switch to document.createElement
   if (PARTITION == null) {
-    window.alert("You must set a partition before you can compute the scores.")
+    //window.alert("You must set a partition before you can compute the scores.")
     return;
   }
   let result = "<table>";
@@ -353,13 +301,15 @@ function checkPerfect() {
 function colorGraph() {
   // Colors the entire graph
   let length = PARTITION.length;
-  PARTITION.forEach((coalition, index) => colorSubgraph(coalition, rainbow(length, index)));
-}
-
-function colorSubgraph(coalition, color) {
-  // Color all the nodes in the coalition
-  for (let nodeObject of SIGMA.graph.nodes(Array.from(coalition)))
-    nodeObject.color = color;
+  for (let i=0; i<length; i++) {
+    let color = rainbow(length, i);
+    let coalition = PARTITION[i];
+    for (let node of DATA.nodes)
+      if (coalition.has(node.id)) {
+        node.color = color;
+      }
+  }
+  NETWORK.setData(DATA);
 }
 
 function rainbow(numOfSteps, step) {
