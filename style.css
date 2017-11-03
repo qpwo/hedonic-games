@@ -3,19 +3,6 @@ body {
   margin: auto;
 }
 
-#outergraphbox {
-  width: 400px;
-  height: 400px;
-  margin: auto;
-  border: 1px solid black;
-}
-
-#innergraphbox {
-  width: 400px;
-  height: 400px;
-}
-
-
 table, th, td {
    border: 1px solid black;
 }
@@ -30,7 +17,7 @@ table, th, td {
 }
 
 #visjsbox {
-  width: 400px;
-  height: 400px;
+  width: 500px;
+  height: 500px;
   border: 1px solid black;
 }

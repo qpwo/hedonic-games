@@ -7,6 +7,7 @@
 // TODO eventually: add existence checks
 // possible TODO eventually: allow different players to be of different type
 // possible TODO eventually: allow directed graphs and weighted graphs
+// *** TODO: standardize output to [isStable, counterExample, newPartition] ***
 
 // ** Score Functions **
 
@@ -129,7 +130,7 @@ function isIndividuallyRational(graph, partition, scoreFunc) {
         for (const node of homeCoalition)
           for (const newCoalition of partition.concat(new Set()))
             if (tests.every(test => test(graph, partition, node, homeCoalition, newCoalition, scoreFunc))) // if this situation passes every test
-              return [false, node, newCoalition];
+              return [false, node, newCoalition.stringify()]; // TEMPORARY!
       return [true, null, null];
     }
 

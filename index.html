@@ -25,63 +25,60 @@
 
 
   <!-- All the buttons and interface -->
-  <ul id="interface">
 
-    <li>
-      Enter adjacency list below.<br/>
-      <textarea id="graphText" cols="50" rows="4"> </textarea>
-      <button type="button" id="drawGraph">Draw</button>
-    </li>
+  <div>
+    Enter adjacency list:<br/>
+    <textarea id="graphText" cols="50" rows="4"> </textarea>
+    <button type="button" id="drawGraph">Draw</button>
+  </div>
 
-    <li> Enter partition: <br/>
-      <textarea id="partitionText" cols="50" rows="4"> </textarea>
-      <button type="button" id="colorPartition">Color</button>
-    </li>
+  <div> Enter partition: <br/>
+    <textarea id="partitionText" cols="50" rows="4"> </textarea>
+    <button type="button" id="colorPartition">Color</button>
+  </div>
 
-    <li>
-      <b>Player type:</b>
-      Set all players to have
-      <select id="playerType">
-        <option>friend-oriented (FO)</option>
-        <option>enemy-oriented (EO)</option>
-        <option>selfish-first (SF)</option>
-        <option>equal-treatment (EQ)</option>
-        <option>altruistic-treatment (AL)</option>
-        <option selected="selected">fractional (FR)</option>
-        <option>additively-seperable (AS)</option>
-      </select> preferences.
-    </li>
+  <div>
+    <b>Player type:</b>
+    Set all players to have
+    <select id="playerType">
+      <option>friend-oriented (FO)</option>
+      <option>enemy-oriented (EO)</option>
+      <option>selfish-first (SF)</option>
+      <option>equal-treatment (EQ)</option>
+      <option>altruistic-treatment (AL)</option>
+      <option selected="selected">fractional (FR)</option>
+      <option>additively-seperable (AS)</option>
+    </select> preferences.
+  </div>
 
-    <li>
-      <p>
-      <b>Stability check:</b>
-      Is this partition
-      <select id="stabilityType">
-        <option>individually rational</option>
-        <option>Nash-stable</option>
-        <option>individually stable</option>
-        <option>contractually individually stable</option>
-        <option>popular</option>
-        <option>strictly popular</option>
-        <option selected="selected">core-stable</option>
-        <option>strictly core-stable</option>
-        <option>perfect</option>
-      </select>?
-      <button type="button" id="checkStability"> Check this partition </button>
-      <button type="button" id="checkStabilityExistence"> Check existence </button>
-      <button type="button" id="updatePartition"> Update partition </button>
-      </p>
-      <p id="stabilityResults"> </p>
-    </li>
+  <div>
+    <p>
+    <b>Stability check:</b>
+    Is this partition
+    <select id="stabilityType">
+      <option>individually rational</option>
+      <option>Nash-stable</option>
+      <option>individually stable</option>
+      <option>contractually individually stable</option>
+      <option>popular</option>
+      <option>strictly popular</option>
+      <option selected="selected">core-stable</option>
+      <option>strictly core-stable</option>
+      <option>perfect</option>
+    </select>?
+    <button type="button" id="checkStability"> Check this partition </button>
+    <button type="button" id="checkStabilityExistence"> Check existence </button>
+    <button type="button" id="updatePartition"> Update partition </button>
+    </p>
+    <p id="stabilityResults"> </p>
+  </div>
 
-    <li>
-      Below you can compute every player's score of every other coalition in the partition.
-      (A player i's score of a coalition C is actually i's score of C \cup {i}.)
-      <button type="button" id="computeScores">Compute</button>
-      <p id="scores"> </p>
-    </li>
-
-  </ul>
+  <div>
+    Below you can compute every player's score of every other coalition in the partition.
+    (A player i's score of a coalition C is actually i's score of C \cup {i}.)
+    <button type="button" id="computeScores">Compute</button>
+    <p id="scores"> </p>
+  </div>
 
 
 

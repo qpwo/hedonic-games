@@ -7,8 +7,7 @@ let PARTITION; // current partition of the vertices, an array of sets
 let GRAPH; // a map from nodes to arrays of nodes
 let SCOREFUNC; // function to use for player type
 
-var container = document.getElementById("visjsbox");
-var NETWORK = new vis.Network(container, {}, {});
+var NETWORK = new vis.Network(document.getElementById("visjsbox"), {}, {});
 var DATA = {};
 
 // ** Functions for Taking User Input **
@@ -17,7 +16,6 @@ var DATA = {};
 document.getElementById("graphText").innerHTML = "Michael: George\nGeorge: Maeybe, Michael\nLindsay: Tobias, Maeybe, Lucille\nSteveHolt: Maeybe\nLucille: Lindsay, George"; //default value
 document.getElementById("drawGraph").onclick = function() {
   let stringGraph = stringToGraph(document.getElementById("graphText").value);
-  console.log(stringGraph);
   var labels = Object.keys(stringGraph);
   var nodes = labels.map(function(label, index){return {"id":index, "label":label};});
   let numberGraph = numberifyGraph(stringGraph);
@@ -57,7 +55,6 @@ function stringToGraph(string) {
 
 function numberifyGraph(graph) {
   let labelToIndex = new Map(Object.keys(graph).map((label, index) => [label, index]))
-  console.log(labelToIndex)
   let graph2 = {};
   for (const label of Object.keys(graph))
     graph2[labelToIndex.get(label)] = graph[label].map(label => labelToIndex.get(label))
@@ -70,11 +67,8 @@ document.getElementById("partitionText").value = "SteveHolt, Maeybe, George\nLin
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
   let stringPartition = stringToPartition(document.getElementById("partitionText").value);
-  console.log("stringPartition",stringPartition);
   let numberPartition = numberifyPartition(stringPartition);
-  console.log("numberPartition",numberPartition);
   let ids = DATA.nodes.map(node => node.id);
-  console.log(ids);
   if (!isPartition(ids, numberPartition)) {
     //window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
     return;
@@ -96,7 +90,6 @@ function partitionToLine(partition) {
 
 function numberifyPartition(partition) {
   let labelToIndex = new Map(DATA.nodes.map(node => [node.label, node.id]));
-  console.log(labelToIndex);
   let partition2 = [];
   for (const coalition of partition)
     partition2.push(coalition.map(label => labelToIndex.get(label)));
@@ -155,38 +148,28 @@ function greyOut() {
 }
 
 
+document.getElementById("updatePartition").style.display = "none"; // this isn't working right now
 {
-  let checkFunctions = [checkIndividuallyRational, checkNashStable, checkIndividuallyStable, checkContractuallyIndividuallyStable,
-    checkPopular, checkStrictlyPopular, checkCoreStable, checkStrictlyCoreStable, checkPerfect];
-  let isFunctions = [isIndividuallyRational, isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable,
-    isPopular, isStrictlyPopular, isCoreStable, isStrictlyCoreStable, isPerfect];
+  let isFunctions = [isIndividuallyRational, isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable, isPopular, isStrictlyPopular, isCoreStable, isStrictlyCoreStable, isPerfect];
 
   document.getElementById("stabilityType").onchange = function() {
-    let choice = document.getElementById("stabilityType").selectedIndex;
-    let makeStabilityThing = function(test) {
+    let index = document.getElementById("stabilityType").selectedIndex;
+    let makePrinter = function(testFunc) {
       return function() {
         let results = document.getElementById("stabilityResults");
         if (PARTITION == null) {
-          //window.alert("You must set a partition before you can check its stability.")
+          window.alert("You must set a partition before you can check its stability.");
           return;
         }
-        let [string, partition] = test();
-        results.innerHTML = string;
-        results.style.backgroundColor = null;
-        let updateButton = document.getElementById("updatePartition");
-        if (partition) {
-          updateButton.style.display = null;
-          updateButton.onclick = function() {changePartition(partition);};
-        } else
-          updateButton.style.display = "none";
+        results.innerHTML = testFunc(GRAPH, PARTITION, SCOREFUNC);
       };
     };
-    document.getElementById("checkStabilityExistence").onclick = makeStabilityThing(() => checkExistence(isFunctions[choice]));
-    document.getElementById("checkStability").onclick = makeStabilityThing(checkFunctions[choice]);
+    document.getElementById("checkStabilityExistence").onclick = makePrinter(() => checkExistence(isFunctions[index]));
+    document.getElementById("checkStability").onclick = makePrinter(isFunctions[index]);
     document.getElementById("checkStability").click()
   };
-  document.getElementById("stabilityType").onchange();
 }
+document.getElementById("stabilityType").onchange();
 
 document.getElementById("computeScores").onclick = function() {
   // Display every node's score of every coalition in the partition
@@ -215,85 +198,17 @@ document.getElementById("computeScores").onclick = function() {
   scores.style.backgroundColor = null;
 };
 
-// ** Stability Checks **
-// TODO: merge these into the hedonism.js functions
+// ** Other Stuff **
 
-function checkIndividuallyRational() {
-  let [isIR, node] = isIndividuallyRational(GRAPH, PARTITION, SCOREFUNC);
-  if (isIR)
-    return ["Yes.", null];
-  return ["No. Counterexample: node " + node, groupElope(PARTITION, new Set([node]))];
-}
-
-function checkNashStable() {
-  let [isNS, node, coalition] = isNashStable(GRAPH, PARTITION, SCOREFUNC);
-  if (isNS)
-    return ["Yes.", null];
-  return ["No. Counterexample: node " + node + " and coalition " + coalition.stringify(),
-    groupElope(PARTITION, coalition.plus(node))];
-}
-
-function checkIndividuallyStable() {
-  let [isIS, node, coalition] = isIndividuallyStable(GRAPH, PARTITION, SCOREFUNC);
-  if (isIS)
-    return ["Yes.", null];
-  return ["No. Counterexample: node " + node + " and coalition " + coalition.stringify(),
-    groupElope(PARTITION, coalition.plus(node))];
-}
-
-function checkContractuallyIndividuallyStable() {
-  let [isCIS, node, coalition] = isContractuallyIndividuallyStable(GRAPH, PARTITION, SCOREFUNC);
-  if (isCIS)
-    return ["Yes.", null];
-  return ["No. Counterexample: node " + node + " and coalition " + coalition.stringify(),
-    groupElope(PARTITION, coalition.plus(node))];
-}
-
-function checkPopular(){
-  let [isP, partition, winCount] = isPopular(GRAPH, PARTITION, SCOREFUNC);
-  if (isP)
-    return ["Yes.", null]
-  let partitionString = '{' + partition.map(coalition=>coalition.stringify()).join(',') + '}';
-  let string = "No. Counterexample: partition " + partitionString + " is preferred overall by " + winCount + " votes.";
-  return [string, partition];
-}
-  
-
-function checkStrictlyPopular() {
-  let [isSP, partition, winCount] = isStrictlyPopular(GRAPH, PARTITION, SCOREFUNC);
-  if (isSP)
-    return ["Yes.", null]
-  let partitionString = '{' + partition.map(coalition=>coalition.stringify()).join(',') + '}';
-  let string = "";
-  if (winCount == 0)
-    string = "No. Counterexample: partition " + partitionString + " is equally preferred to the current partition.";
-  else
-    string = "No. Counterexample: partition " + partitionString + " is preferred overall by " + winCount + " votes.";
-  return [string, partition];
-}
-
-function checkCoreStable() {
-  let [isCS, coalition] = isCoreStable(GRAPH, PARTITION, SCOREFUNC);
-  if (isCS)
-    return ["Yes.", null]
-  return ["No. Counterexample: coalition " + coalition.stringify(),
-    groupElope(PARTITION, coalition)];
-}
-
-function checkStrictlyCoreStable() {
-  let [isCS, coalition] = isStrictlyCoreStable(GRAPH, PARTITION, SCOREFUNC);
-  if (isCS)
-    return ["Yes.", null]
-  return ["No. Counterexample: coalition " + coalition.stringify(),
-    groupElope(PARTITION, coalition)];
-}
-
-function checkPerfect() {
-  let [isP, node, coalition] = isPerfect(GRAPH, PARTITION, SCOREFUNC);
-  if (isP)
-    return ["Yes.", null];
-  return ["No. Counterexample: node " + node + " and coalition " + coalition.stringify(),
-    groupElope(PARTITION, coalition.plus(node))];
+function checkExistence(stability) {
+  if (stability(GRAPH, PARTITION, SCOREFUNC)[0])
+    return ["The current partition is stable.", null];
+  for (let partition of Object.keys(GRAPH).partitionSet()) {
+    partition = partition.map(coalition => new Set(coalition));
+    if (stability(GRAPH, partition, SCOREFUNC)[0])
+      return ["Stable partition found: " + partitionToLine(partition), partition];
+  }
+  return ["No stable partition exists.", null];
 }
 
 // ** Coloring tools **
@@ -330,17 +245,4 @@ function rainbow(numOfSteps, step) {
   }
   let c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
   return (c);
-}
-
-// ** Other Stuff **
-
-function checkExistence(stability) {
-  if (stability(GRAPH, PARTITION, SCOREFUNC)[0])
-    return ["The current partition is stable.", null];
-  for (let partition of Object.keys(GRAPH).partitionSet()) {
-    partition = partition.map(coalition => new Set(coalition));
-    if (stability(GRAPH, partition, SCOREFUNC)[0])
-      return ["Stable partition found: " + partitionToLine(partition), partition];
-  }
-  return ["No stable partition exists.", null];
 }
