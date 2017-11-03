@@ -14,21 +14,25 @@ let PARTITION; // current partition of the vertices, an array of sets
 let GRAPH; // a map from nodes to arrays of nodes
 let SCOREFUNC; // function to use for player type
 
+
+var container = document.getElementById("visjsbox");
+var NETWORK = new vis.Network(container, {}, {});
+
 // ** Functions for Reading and Changing the Graph **
 
-function addNode(name=Sigma.graph.nodes().length, x=Math.random(), y=Math.random()) {
-  // Add a node to the sigma graph
-  if (SIGMA.graph.nodes(name)) return;
-  SIGMA.graph.addNode({
-    id: name,
-    label: name,
-    x: x,
-    y: y,
-    size: 1,
-    color: "#000"
-  });
-  SIGMA.refresh();
-}
+//function addNode(name=Sigma.graph.nodes().length, x=Math.random(), y=Math.random()) {
+//  // Add a node to the sigma graph
+//  if (SIGMA.graph.nodes(name)) return;
+//  SIGMA.graph.addNode({
+//    id: name,
+//    label: name,
+//    x: x,
+//    y: y,
+//    size: 1,
+//    color: "#000"
+//  });
+//  SIGMA.refresh();
+//}
 
 function addEdge(source, target) {
   // Add an edge to the sigma graph
@@ -57,23 +61,41 @@ function collectGraph() {
 
 // For drawing the graph:
 document.getElementById("graphText").innerHTML = "George: Maeybe, Michael\nLindsay: Tobias, Maeybe\nSteveHolt: Maeybe\nLucille: Lindsay, George"; // default value
+//document.getElementById("drawGraph").onclick = function() {
+//  SIGMA.graph.clear();
+//  let graph = stringToGraph(document.getElementById("graphText").value);
+//  for (const source of Object.keys(graph)) {
+//    addNode(source);
+//    for (const target of graph[source]) {
+//      addNode(target);
+//      addEdge(source, target);
+//      addEdge(target, source);
+//    }
+//  }
+//  GRAPH = collectGraph();
+//  SIGMA.refresh();
+//  greyOut();
+//  PARTITION = null;
+//};
+//document.getElementById("drawGraph").click();
+
 document.getElementById("drawGraph").onclick = function() {
-  SIGMA.graph.clear();
-  let graph = stringToGraph(document.getElementById("graphText").value);
-  for (const source of Object.keys(graph)) {
-    addNode(source);
-    for (const target of graph[source]) {
-      addNode(target);
-      addEdge(source, target);
-      addEdge(target, source);
-    }
-  }
-  GRAPH = collectGraph();
-  SIGMA.refresh();
+  let stringGraph = stringToGraph(document.getElementById("graphText").value);
+  console.log(stringGraph);
+  var labels = Object.keys(stringGraph);
+  var nodes = labels.map(function(label, index){return {"id":index, "label":label};});
+  let numberGraph = numberifyGraph(stringGraph);
+  var edges = [];
+  for (const i of Object.keys(numberGraph))
+    for (const j of numberGraph[i])
+      edges.push({"from":i, "to":j, "arrows":"to"});
+  data = {"nodes": nodes, "edges": edges};
+  NETWORK.setData(data)
+  GRAPH = numberGraph;
   greyOut();
   PARTITION = null;
 };
-document.getElementById("drawGraph").click()
+document.getElementById("drawGraph").click();
 
 function stringToGraph(string) {
   // Turn the text box into a graph object
@@ -88,11 +110,22 @@ function stringToGraph(string) {
     let [source, targets] = line.split(':');
     if (targets == "") {
       graph[source] = new Set();
-      continue;
+    } else {
+      var targetSet = new Set(targets.split(','));
+      graph[source] = targetSet;
+      targetSet.forEach(function(label){if(!graph.hasOwnProperty(label)){graph[label]=new Set();}});
     }
-    graph[source] = new Set(targets.split(','));
   }
   return graph;
+}
+
+function numberifyGraph(graph) {
+  let labelToIndex = new Map(Object.keys(graph).map((label, index) => [label, index]))
+  console.log(labelToIndex)
+  let graph2 = {};
+  for (const label of Object.keys(graph))
+    graph2[labelToIndex.get(label)] = graph[label].map(label => labelToIndex.get(label))
+  return graph2;
 }
 
 // For making the partition:

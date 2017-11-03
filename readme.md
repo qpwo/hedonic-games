@@ -8,3 +8,6 @@ to make them very readable!
 
 My friend Joshua Baunach and I originally made this software at CatHacks 2017
 at the University of Kentucky. I've been expanding it since then.
+
+
+**Current main goal: Switch to vis.js**
