@@ -1,15 +1,10 @@
 body {
+  margin: 50px auto 80px auto;
   width: 500px;
-  margin: auto;
 }
 
 table, th, td {
    border: 1px solid black;
-}
-
-#interface li {
-  /*list-style: none;*/
-  margin-top: 25px;
 }
 
 #stabilityResults {

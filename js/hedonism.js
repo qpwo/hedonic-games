@@ -1,13 +1,13 @@
-// Luke Miles, June 2017
+// Luke Miles, November 2017
 // Algorithms for altruistic hedonic games
-// Public domain dedication
 
-// TODO: change order of functions
 // possible TODO: rename coalitions to groups
+// possible TODO: switch back from sets to arrays
 // TODO eventually: add existence checks
 // possible TODO eventually: allow different players to be of different type
 // possible TODO eventually: allow directed graphs and weighted graphs
 // *** TODO: standardize output to [isStable, counterExample, newPartition] ***
+// *** TODO: change all score functions to work off score vectors instead of graphs ***
 
 // ** Score Functions **
 
@@ -97,7 +97,7 @@ function isIndividuallyRational(graph, partition, scoreFunc) {
   for (const coalition of partition)
     for (const node of coalition)
       if (scoreFunc(graph, node, coalition) < scoreFunc(graph, node, new Set([node])))
-        return [false, node];
+        return [false, node, groupElope(partition, new Set([node]))];
   return [true, null];
 }
 
@@ -130,13 +130,14 @@ function isIndividuallyRational(graph, partition, scoreFunc) {
         for (const node of homeCoalition)
           for (const newCoalition of partition.concat(new Set()))
             if (tests.every(test => test(graph, partition, node, homeCoalition, newCoalition, scoreFunc))) // if this situation passes every test
-              return [false, node, newCoalition.stringify()]; // TEMPORARY!
+              return [false, [node, newCoalition.stringify()], groupElope(partition, newCoalition.plus(node))]; // TEMPORARY!
       return [true, null, null];
     }
 
   var isNashStable = makeCheckFunc([test0, test1]);
   var isIndividuallyStable = makeCheckFunc([test0, test1, test2]);
   var isContractuallyIndividuallyStable = makeCheckFunc([test0, test1, test2, test3]);
+  // possible TODO: add contractual but not individual stable
 }
 
 function isCoreStable(graph, partition, scoreFunc) {
@@ -148,7 +149,7 @@ function isCoreStable(graph, partition, scoreFunc) {
   for (const coalition of powerset) {
     if (coalition.size==0) continue;
     if (coalition.every(node => scoreFunc(graph, node, coalition) > homeScores[node]))
-      return [false, coalition];
+      return [false, coalition.stringify(), groupElope(partition, coalition)];
   }
   return [true, null];
 }
@@ -166,7 +167,7 @@ function isStrictlyCoreStable(graph, partition, scoreFunc) {
       newScores[node] = scoreFunc(graph, node, coalition)
     if (coalition.every(node => newScores[node] >= homeScores[node]) &&
       coalition.some(node => newScores[node] > homeScores[node]))
-      return [false, coalition];
+      return [false, coalition.stringify(), groupElope(partition, coalition)];
   }
   return [true, null];
 }
@@ -189,7 +190,7 @@ function numberCompare(numA, numB) {
         for (const coalition of partitionB) for (const node of coalition)
           winCount += numberCompare(scoreFunc(graph, node, coalition), homeScores[node]);
         if (winTest(winCount) && !partitionEquals(partitionB,partition))
-          return [false, partitionB, winCount];
+          return [false, [partitionB.map(coalition=>coalition.stringify()), winCount], partitionB];
       }
       return [true, null, null]
     };
@@ -206,10 +207,11 @@ function isPerfect(graph, partition, scoreFunc) {
       let homeScore = scoreFunc(graph, node, coalition);
       let coalitions = nodes.minus(node).powerset();
       for (const coalitionB of coalitions) {
+        coalitionB.add(node);
         if (coalition.equals(coalitionB)) continue;
         let newScore = scoreFunc(graph, node, coalitionB.plus(node));
         if (newScore > homeScore)
-          return [false, node, coalitionB.plus(node)];
+          return [false, [node, coalitionB.plus(node).stringify()], groupElope(partition, coalitionB.plus(node))];
       }
     }
   return [true, null, null];

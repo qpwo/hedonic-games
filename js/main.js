@@ -1,6 +1,8 @@
 // Luke Miles, November 2017
 // Code for all the buttons and things on the front webpage
 
+// TODO: switch from graph type to value matrix type for all score functions
+
 // ** Necessary globals for setting up a user session **
 
 let PARTITION; // current partition of the vertices, an array of sets
@@ -25,7 +27,7 @@ document.getElementById("drawGraph").onclick = function() {
       edges.push({"from":i, "to":j, "arrows":"to"});
   DATA = {"nodes": nodes, "edges": edges};
   NETWORK.setData(DATA);
-  GRAPH = numberGraph;
+  GRAPH = stringGraph;
   greyOut();
   PARTITION = null;
 };
@@ -70,10 +72,10 @@ document.getElementById("colorPartition").onclick = function() {
   let numberPartition = numberifyPartition(stringPartition);
   let ids = DATA.nodes.map(node => node.id);
   if (!isPartition(ids, numberPartition)) {
-    //window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
+    window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
     return;
   }
-  PARTITION = numberPartition;
+  PARTITION = stringPartition;
   colorGraph();
   greyOut();
 };
@@ -125,7 +127,6 @@ function changePartition(partition) {
   document.getElementById("partitionText").value = partitionToString(partition);
   PARTITION = partition;
   colorGraph();
-  SIGMA.refresh();
   greyOut();
 }
 
@@ -157,14 +158,26 @@ document.getElementById("updatePartition").style.display = "none"; // this isn't
     let makePrinter = function(testFunc) {
       return function() {
         let results = document.getElementById("stabilityResults");
+        results.style.backgroundColor = null;
         if (PARTITION == null) {
           window.alert("You must set a partition before you can check its stability.");
           return;
         }
-        results.innerHTML = testFunc(GRAPH, PARTITION, SCOREFUNC);
+        let [isStable, counterExample, newPartition] = testFunc(GRAPH, PARTITION, SCOREFUNC);
+        let button = document.getElementById("updatePartition");
+        if (isStable) {
+          results.innerText = "This partition is stable.";
+          button.style.display = "none";
+        } else {
+          results.innerText = "Counterexample:" + JSON.stringify(counterExample);
+          button.style.display = null;
+          button.onclick = function(){
+            changePartition(newPartition);
+          }
+        }
       };
     };
-    document.getElementById("checkStabilityExistence").onclick = makePrinter(() => checkExistence(isFunctions[index]));
+    document.getElementById("checkStabilityExistence").onclick = makePrinter((_,__,___) => checkExistence(isFunctions[index]));
     document.getElementById("checkStability").onclick = makePrinter(isFunctions[index]);
     document.getElementById("checkStability").click()
   };
@@ -175,7 +188,7 @@ document.getElementById("computeScores").onclick = function() {
   // Display every node's score of every coalition in the partition
   // possible TODO: switch to document.createElement
   if (PARTITION == null) {
-    //window.alert("You must set a partition before you can compute the scores.")
+    window.alert("You must set a partition before you can compute the scores.")
     return;
   }
   let result = "<table>";
@@ -220,7 +233,7 @@ function colorGraph() {
     let color = rainbow(length, i);
     let coalition = PARTITION[i];
     for (let node of DATA.nodes)
-      if (coalition.has(node.id)) {
+      if (coalition.has(node.label)) {
         node.color = color;
       }
   }
