@@ -103,8 +103,7 @@ document.getElementById("colorPartition").onclick = function() {
   let partition = stringToPartition(document.getElementById("partitionText").value);
   let nodes = SIGMA.graph.nodes().map(nodeO => nodeO.id);
   if (!isPartition(nodes, partition)) {
-    window.alert("This is not a valid partition. Every node must occur on " +
-      "exactly one line. (Commas seperate nodes.)");
+    window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
     return;
   }
   PARTITION = partition;
@@ -169,10 +168,6 @@ function greyOut() {
   document.getElementById("playerType").onchange = function() {
     let choice = document.getElementById("playerType").selectedIndex;
     SCOREFUNC = functions[choice];
-    let explanations = document.getElementById("playerExplanations").children;
-    for (let i=0; i<explanations.length; i++)
-      explanations[i].style.display = "none";
-    explanations[choice].style.display = null;
     greyOut();
   };
   document.getElementById("playerType").onchange();
@@ -187,11 +182,6 @@ function greyOut() {
 
   document.getElementById("stabilityType").onchange = function() {
     let choice = document.getElementById("stabilityType").selectedIndex;
-
-    let explanations = document.getElementById("stabilityExplanations").children;
-    for (let i=0; i<explanations.length; i++)
-      explanations[i].style.display = "none";
-    explanations[choice].style.display = null;
     let makeStabilityThing = function(test) {
       return function() {
         let results = document.getElementById("stabilityResults");
@@ -360,33 +350,6 @@ function rainbow(numOfSteps, step) {
 }
 
 // ** Other Stuff **
-
-
-{ // create a +/- button for all the hidable elements on the webpage
-  let makeHideButton = function(element) {
-    let button = document.createElement("span");
-    button.className = "hideButton";
-    button.innerHTML = "[-]";
-    button.onclick = function() {
-      if (element.style.display == "none") {
-        element.style.display = null;
-        button.innerHTML = "[-]";
-      } else {
-        element.style.display = "none";
-        button.innerHTML = "[+]";
-      }
-    };
-    return button;
-  };
-  for (let element of document.getElementsByClassName("hidable")) {
-    let wrapper = document.createElement("span");
-    element.parentNode.insertBefore(wrapper, element);
-    let button = makeHideButton(element);
-    wrapper.appendChild(button);
-    wrapper.appendChild(element);
-    //button.click(); button.click(); // fix button placement
-  }
-}
 
 function checkExistence(stability) {
   if (stability(GRAPH, PARTITION, SCOREFUNC)[0])

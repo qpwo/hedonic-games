@@ -1,4 +1,4 @@
-.centerColumn {
+body {
   width: 500px;
   margin: auto;
 }
@@ -23,22 +23,6 @@ table, th, td {
 #interface li {
   /*list-style: none;*/
   margin-top: 25px;
-}
-
-#references li {
-  list-style: none;
-  margin-top: 15px;
-}
-
-#stabilityExplanations, #playerExplanations {
-  list-style: none;
-  padding: 0 0 0 0;
-  margin: 0 0 0 0;
-}
-
-.hideButton {
-  color: blue;
-  cursor: pointer;
 }
 
 #stabilityResults {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <title>Hedonic Game Simulator</title>
@@ -9,277 +9,130 @@
 </head>
 
 <body>
-  <!-- TODO: make a class called "hidable" for hiding paragraphs -->
 
-  <div class="centerColumn">
-    <h2> Hedonic Game Simulator </h2>
-    <!-- Introduction -->
-    <p>
-    Welcome to the <a href="#hedonicGames">hedonic game</a> simulator!
-    I will be presenting this at the 2017 Algorithmic Decision Theory Doctoral Consortium.
-    I uploaded my extended abstract to <a href="https://arxiv.org/abs/1706.08501">arXiv</a>.
-    </p>
-    <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. <b>You can click and drag the nodes in the box.</b> </p>
-    <!-- The box that holds the interactive graph -->
-    <div id="outergraphbox">
-      <div id="innergraphbox"></div>
-    </div>
-
-    <!-- All the buttons and interface -->
-    <ul id="interface">
-
-      <li> Enter adjacency list below. Symmetric edges are automatically added. <br>
-        <textarea id="graphText" cols="50" rows="4"> </textarea>
-        <button type="button" id="drawGraph">Draw</button>
-      </li>
-
-      <li> Enter partition: <br>
-        <textarea id="partitionText" cols="50" rows="4"> </textarea>
-        <button type="button" id="colorPartition">Color</button>
-      </li>
-
-      <li>
-        <p>
-        <b>Player type:</b>
-        Set all players to have
-        <select id="playerType">
-          <option>friend-oriented (FO)</option>
-          <option>enemy-oriented (EO)</option>
-          <option>selfish-first (SF)</option>
-          <option>equal-treatment (EQ)</option>
-          <option>altruistic-treatment (AL)</option>
-          <option selected="selected">fractional (FR)</option>
-          <option>additively-seperable (AS)</option>
-        </select> preferences.
-        </p>
-
-        <!-- explanations of player types -->
-        <ul class="hidable" id="playerExplanations">
-        <li>
-          A player is friend-oriented if she tries to maximize friends and, in the case of a tie, minimize enemies.
-          This preference relation is defined by the score function
-          \[score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i | .\]
-          Introduced in [DBHS2006].
-        </li>
-        <li>
-          A player is enemy-oriented if she tries to minimize enemies and, in the case of a tie, maximize friends.
-          This preference relation is defined by the score function
-          \[score_i^{EO}(A) = | A \cap F_i | - n | A \cap E_i | .\]
-          Introduced in [DBHS2006].
-        </li>
-        <li>
-          A player is selfish-first if she uses her own preferences first and only uses her friends' preferences to break ties.
-          This preference relation is defined by the score function
-          \[ score_i^{SF}(A) = n^5 score_i^{FO}(A) + \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
-          Introduced in [NRRRS2016].
-        </li>
-        <li>
-          A player is equal-treatment if she puts equal weight on her own opinion and each friend's opinion.
-          This preference relation is defined by the score function
-          \[ score_i^{EQ}(A) = \sum_{a \in A \cap F_i \cup \{i\}} \frac{score_a^{FO}(A)}{|A \cap F_i \cup \{i\}|} .\]
-          Introduced in [NRRRS2016].
-        </li>
-        <li>
-          A player is altruistic-treatment if she uses her friends' preferences first and only uses her own preferences to break ties.
-          This preference relation is defined by the score function
-          \[ score_i^{AL}(A) = score_i^{FO}(A) + n^5 \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|} .\]
-          Introduced in [NRRRS2016].
-        </li>
-        <li>
-          In fractional hedonic games, a player's score of a coalition is the average of her scores of the players in it.
-          Scores could be anything, but this simulator only allows scores that are simple and symmetric.
-          \[ score_i^{FR}(A) = |A \cap F_i| / |A| .\]
-          Introduced in [ABH2014].
-        </li>
-        <li>
-          In additively seperable hedonic games, a player's score of a coalition is the sum of her scores of the players in it.
-          In unweighted, undirected graphs, this is simply the degree of the player in the coalition.
-          \[ score_i^{AS}(A) = |A \cap F_i| .\]
-          I don't know when/where additively seperable hedonic games were introduced. If you know, then please email me!
-        </li>
-        </p>
-      </ul>
-
-      <li>
-        <p>
-        <b>Stability check:</b>
-        Is this partition
-        <select id="stabilityType">
-          <option>individually rational</option>
-          <option>Nash-stable</option>
-          <option>individually stable</option>
-          <option>contractually individually stable</option>
-          <option>popular</option>
-          <option>strictly popular</option>
-          <option selected="selected">core-stable</option>
-          <option>strictly core-stable</option>
-          <option>perfect</option>
-        </select>?
-        <button type="button" id="checkStability"> Check this partition </button>
-        <button type="button" id="checkStabilityExistence"> Check existence </button>
-        <button type="button" id="updatePartition"> Update partition </button>
-        </p>
-        <p id="stabilityResults"> </p>
-
-        <!-- explanations of stability concepts -->
-        <ul class="hidable" id="stabilityExplanations">
-          <li>
-            A partition is individually rational if every player is happier in her home coalition than she would be alone.
-            In other words, \(\Gamma\) is individually rational iff
-            \[ \forall i \in N: \Gamma(i) \geq_i \{i\} .\]
-          </li>
-          <li>
-            A partition is Nash-stable if every player is happier in her home coalition than she would be in any other coalition.
-            In other words, \(\Gamma\) is Nash-stable iff
-            \[ \forall i \in N: \forall C \in \Gamma: \Gamma(i) \geq_i C \cup \{i\} .\]
-          </li>
-          <li>
-            A partition is individually stable if every player who wants to transfer to a new coalition is unwanted by someone in that coalition.
-            In other words, \(\Gamma\) is individually stable iff
-            \[ \forall i \in N: \forall C \in \Gamma: (\Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C >_j C \cup \{i\} ))  .\]
-          </li>
-          <li>
-            A partition is contractually individually stable if every player who wants to transfer to a new coalition is either unwanted by someone in that coalition or is not permitted to leave by someone in her home coalition.
-            In other words, \(\Gamma\) is contractually individually stable iff
-            \[ \forall i \in N: \forall C \in \Gamma: \]
-            \[ \Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C >_j C \cup \{i\} ) \lor (\exists k \in \Gamma(i) \setminus \{i\}: \Gamma(i) >_k \Gamma(i) \setminus \{i\}) .\]
-          </li>
-          <li>
-            A partition is popular if the majority of players weakly prefer it to any other partition.
-            In other words, \(\Gamma\) is strictly popular iff
-            \[ \forall \Gamma': |\{ i \in N: \Gamma(i) >_i \Gamma'(i) \}| \geq |\{ i \in N: \Gamma'(i) >_i \Gamma(i) \}| .\]
-          </li>
-          <li>
-            A partition is strictly popular if the majority of players strictly prefer it to any other partition.
-            In other words, \(\Gamma\) is strictly popular iff
-            \[ \forall \Gamma': |\{ i \in N: \Gamma(i) >_i \Gamma'(i) \}| > |\{ i \in N: \Gamma'(i) >_i \Gamma(i) \}| .\]
-          </li>
-          <li>
-            A partition is core-stable if there is no possible strictly blocking coalition. (A coalition strictly blocks if everyone prefers it to their current homes.)
-            In other words, \(\Gamma\) is core-stable iff
-            \[ \not\exists C \in 2^N: \forall i \in C: C >_i \Gamma(i) .\]
-          </li>
-          <li>
-            A partition is strictly core-stable if there is no possible weakly blocking coalition. (A coalition weakly blocks if everyone is at least as happy in the new one and someone is even happier.)
-            In other words, \(\Gamma\) is strictly core-stable iff
-            \[ \not\exists C \in 2^N: (\forall i \in C: C \geq_i \Gamma(i)) \land (\exists j \in C: C >_j \Gamma(i)) .\]
-          </li>
-          <li>
-            A partition is perfect if every player is in one of their favorite possible coalitions.
-            In other words, \(\Gamma\) is perfect iff
-            \[ \forall i \in N: \not\exists C \in 2^N: C >_i \Gamma(i) .\]
-          </li>
-        </ul>
-      </li>
-
-      <li>
-        Below you can compute every player's score of every other coalition in the partition.
-        (A player \(i\)'s score of a coalition \(C\) is actually \(i\)'s score of \(C \cup \{i\}\).)
-        <button type="button" id="computeScores">Compute</button>
-        <p id="scores" class="hidable"> </p>
-      </li>
-
-    </ul>
-
-    <h3 id="hedonicGames"> What is a hedonic game? </h3>
-    <div class="hidable">
-    <h4> Basic idea </h4>
-    <p>
-    You have a set of people which for some reason needs to split into groups.
-    The people are called <i>players</i> and the groups are called <i>coalitions</i>.
-    Maybe the set of people is your kindergarten class and they need to split up so each group can build a lego tower.
-    A player might really want to be in some coalitions, but not in others.
-    These are the player's <i>preferences</i>.
-    Once the whole set of players is split into coalitions, it's called a <i>partition</i> or a <i>coalition formation</i>.
-    <b>Hedonic games are the study of how people cooperate and form groups together and when partitions are stable and when partitions fall apart. </b>
-    </p>
-
-    <p> More at <a href="https://en.wikipedia.org/wiki/Hedonic_game">Wikipedia</a> or in [Woe2013].</p>
-
-    <p> Hedonic games were independently introduced in [BKS2001] and [BJ2002]. </p>
-
-    <h4> Notation </h4>
-
-    <p>
-    \(N\) is the set of players, \(n = |N|\) is the number of players, and \(\Gamma\) is a partition of \(N\).
-    Usually, \(A \subseteq N\) is a coalition and \(a\) is a player in \(A\).
-    And \(i\) is a player from anywhere in \(N\).
-    </p>
-
-    <p>
-    If some player \(i\) would rather be in coalition \(A\) than coalition \(B\), then we say \(A >_i B\).
-    In principle, \(i\)'s preferences are defined by listing all the subsets of \(N\) which contain \(i\) in order of decreasing desirability.
-    But that would take tons of computer memory or paper and ink, so we mainly focus on hedonic games which are <i>compactly representable</i>.
-    This means that there is some concise way of describing each player's preferences over the possible coalitions.
-    Sometimes that means you have a <i>score function</i> which takes a player and a coalition as input and outputs a real number; the larger the number the more that player likes that coalition.
-    Once you know the score functions, you can concisely say that \(A >_i B\) if and only if \(score_i(A) > score_i(B)\).
-    </p>
-
-    <p> Most of the notation here is from [NRRRS2016]. Other stuff I added to make it more programmer-friendly. </p>
-
-    </div>
+  <h1> Hedonic Game Simulator </h1>
 
 
-    <h3> References </h3>
+  <!-- Introduction -->
+  <p> Welcome to the hedonic game simulator! I <a href="http://lukemiles.org/files/simulator-slides.pdf">presented</a> this at the 2017 Algorithmic Decision Theory Doctoral Consortium. I uploaded my extended abstract to <a href="https://arxiv.org/abs/1706.08501">arXiv</a>. </p>
 
-    In no particular order...
-
-    <ul id="references" class="hidable">
-      <li>
-        [NRRRS2016]:
-        Nhan-Tam Nguyen, Anja Rey, Lisa Rey, Jörg Rothe, and Lena Schend.
-        "Altruistic Hedonic Games."
-        The International Conference on Autonomous Agents and Multi-Agent Systems.
-        2016.
-        <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">PDF</a>.
-      </li>
-      <li>
-        [DBHS2006]:
-        Dinko Dimitrov, Peter Borm, Ruud Hendrickx, and Shao Chin Sung.
-        "Simple priorities and core stability in hedonic games."
-        Social Choice and Welfare.
-        2006.
-        <a href="http://fmwww.bc.edu/repec/esNASM04/up.9919.1074605860.pdf">PDF</a>.
-      </li>
-      <li>
-        [BKS2001]:
-        Suryapratim Banerjee, Hideo Konishi, and Tayfun Sönmez.
-        "Core in a simple coalition formation game."
-        Social Choice and Welfare.
-        2001.
-      </li>
-      <li>
-        [BJ2002]:
-        Anna Bogomolnaia and Matthew O Jackson.
-        "The Stability of Hedonic Coalition Structures."
-        Games and Economic Behavior.
-        2002.
-      </li>
-      <li>
-        [ABH2014]:
-        Haris Aziz, Feliz Brandt, and Paul Harrenstein.
-        "Fractional Hedonic Games."
-        The International Conference on Autonomous Agents and Multi-Agent Systems.
-        2014.
-        <a href="https://arxiv.org/abs/1705.10116">arXiv</a>.
-      </li>
-      <li>
-        [Woe2013]:
-        Gerhard J Woeginger.
-        "Core Stability in Hedonic Coalition Formation."
-        SOFtware SEMinar (SOFSEM).
-        2013.
-        <a href="https://arxiv.org/abs/1212.2236">arXiv</a>.
-    </ul>
+  <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. <b>You can click and drag the nodes in the box.</b> </p>
 
 
-    <hr>
-    <!-- footer -->
-    <p> Public domain dedication. No rights reserved. Look at the source! </p>
-    <p>Hosted on <a href="https://github.com/qpwo/hedonic-games">Github</a>. Using graph library <a href="http://sigmajs.org/">sigmajs</a>. </p>
-    <p> To request a feature or report a bug, you can use github or you can email <a href="mailto:luke.lambda@uky.edu" target="_blank">luke.lambda@uky.edu</a> .
-    There is a standing bounty of $2.56, to be mailed to the first person to find a bug.</p>
+  <!-- The box that holds the interactive graph -->
+  <div id="outergraphbox">
+    <div id="innergraphbox"></div>
   </div>
+
+
+  <!-- All the buttons and interface -->
+  <ul id="interface">
+
+    <li>
+      Enter adjacency list below. Symmetric edges are automatically added. <br/>
+      <textarea id="graphText" cols="50" rows="4"> </textarea>
+      <button type="button" id="drawGraph">Draw</button>
+    </li>
+
+    <li> Enter partition: <br/>
+      <textarea id="partitionText" cols="50" rows="4"> </textarea>
+      <button type="button" id="colorPartition">Color</button>
+    </li>
+
+    <li>
+      <b>Player type:</b>
+      Set all players to have
+      <select id="playerType">
+        <option>friend-oriented (FO)</option>
+        <option>enemy-oriented (EO)</option>
+        <option>selfish-first (SF)</option>
+        <option>equal-treatment (EQ)</option>
+        <option>altruistic-treatment (AL)</option>
+        <option selected="selected">fractional (FR)</option>
+        <option>additively-seperable (AS)</option>
+      </select> preferences.
+    </li>
+
+    <li>
+      <p>
+      <b>Stability check:</b>
+      Is this partition
+      <select id="stabilityType">
+        <option>individually rational</option>
+        <option>Nash-stable</option>
+        <option>individually stable</option>
+        <option>contractually individually stable</option>
+        <option>popular</option>
+        <option>strictly popular</option>
+        <option selected="selected">core-stable</option>
+        <option>strictly core-stable</option>
+        <option>perfect</option>
+      </select>?
+      <button type="button" id="checkStability"> Check this partition </button>
+      <button type="button" id="checkStabilityExistence"> Check existence </button>
+      <button type="button" id="updatePartition"> Update partition </button>
+      </p>
+      <p id="stabilityResults"> </p>
+    </li>
+
+    <li>
+      Below you can compute every player's score of every other coalition in the partition.
+      (A player i's score of a coalition C is actually i's score of C \cup {i}.)
+      <button type="button" id="computeScores">Compute</button>
+      <p id="scores"> </p>
+    </li>
+
+  </ul>
+
+
+
+
+  <!-- html pasted from compiled explanations.md -->
+<h2 id="what-is-a-hedonic-game">What is a hedonic game?</h2>
+<h3 id="basic-idea">Basic idea</h3>
+<p>You have a set of people which for some reason needs to split into groups. The people are called <em>players</em> and the groups are called <em>coalitions</em>. Maybe the set of people is your kindergarten class and they need to split up so each group can build a lego tower. A player might really want to be in some coalitions, but not in others. These are the player's <em>preferences</em>. Once the whole set of players is split into coalitions, it's called a <em>partition</em> or a <em>coalition formation</em>. <strong>Hedonic games are the study of how people cooperate and form groups together and when partitions are stable and when partitions fall apart.</strong></p>
+<p>More at <a href="https://en.wikipedia.org/wiki/Hedonic_game">Wikipedia</a> or in [Woe2013].</p>
+<p>Hedonic games were independently introduced in [BKS2001] and [BJ2002].</p>
+<h3 id="notation">Notation</h3>
+<p><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?N" alt="N" title="N" /> is the set of players, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?n%20%3D%20%7CN%7C" alt="n = |N|" title="n = |N|" /> is the number of players, and <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is a partition of <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?N" alt="N" title="N" />. Usually, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?A%20%5Csubseteq%20N" alt="A \subseteq N" title="A \subseteq N" /> is a coalition and <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?a" alt="a" title="a" /> is a player in <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?A" alt="A" title="A" />. And <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?i" alt="i" title="i" /> is a player from anywhere in <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?N" alt="N" title="N" />.</p>
+<p>If some player <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?i" alt="i" title="i" /> would rather be in coalition <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?A" alt="A" title="A" /> than coalition <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?B" alt="B" title="B" />, then we say <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?A%20%3E_i%20B" alt="A &gt;_i B" title="A &gt;_i B" />. In principle, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?i" alt="i" title="i" />'s preferences are defined by listing all the subsets of <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?N" alt="N" title="N" /> which contain <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?i" alt="i" title="i" /> in order of decreasing desirability. But that would take tons of computer memory or paper and ink, so we mainly focus on hedonic games which are <em>compactly representable</em>. This means that there is some concise way of describing each player's preferences over the possible coalitions. Sometimes that means you have a <em>score function</em> which takes a player and a coalition as input and outputs a real number; the larger the number the more that player likes that coalition. Once you know the score functions, you can concisely say that <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?A%20%3E_i%20B" alt="A &gt;_i B" title="A &gt;_i B" /> if and only if <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%28A%29%20%3E%20score_i%28B%29" alt="score_i(A) &gt; score_i(B)" title="score_i(A) &gt; score_i(B)" />.</p>
+<p>Most of the notation here is from [NRRRS2016]. Other stuff I added to make it more programmer-friendly.</p>
+<h2 id="classes-of-hedonic-games">Classes of Hedonic Games</h2>
+<p>A player is <strong>friend-oriented</strong> if she tries to maximize friends and, in the case of a tie, minimize enemies. This preference relation is defined by the score function <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%5E%7BFO%7D%28A%29%20%3D%20n%20%7C%20A%20%5Ccap%20F_i%20%7C%20-%20%7C%20A%20%5Ccap%20E_i%20%7C" alt="score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i |" title="score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i |" /><br /> Introduced in [DBHS2006].</p>
+<p>A player is <strong>enemy-oriented</strong> if she tries to minimize enemies and, in the case of a tie, maximize friends. This preference relation is defined by the score function <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%5E%7BEO%7D%28A%29%20%3D%20%7C%20A%20%5Ccap%20F_i%20%7C%20-%20n%20%7C%20A%20%5Ccap%20E_i%20%7C" alt="score_i^{EO}(A) = | A \cap F_i | - n | A \cap E_i |" title="score_i^{EO}(A) = | A \cap F_i | - n | A \cap E_i |" /><br /> Introduced in [DBHS2006].</p>
+<p>A player is <strong>selfish-first</strong> if she uses her own preferences first and only uses her friends' preferences to break ties. This preference relation is defined by the score function <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%5E%7BSF%7D%28A%29%20%3D%20n%5E5%20score_i%5E%7BFO%7D%28A%29%20%2B%20%5Csum_%7Ba%20%5Cin%20A%20%5Ccap%20F_i%7D%20%5Cfrac%7Bscore_a%5E%7BFO%7D%28A%29%7D%7B%7CA%20%5Ccap%20F_i%7C%7D" alt="score_i^{SF}(A) = n^5 score_i^{FO}(A) + \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|}" title="score_i^{SF}(A) = n^5 score_i^{FO}(A) + \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|}" /><br /> Introduced in [NRRRS2016].</p>
+<p>A player is <strong>equal-treatment</strong> if she puts equal weight on her own opinion and each friend's opinion. This preference relation is defined by the score function <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%5E%7BEQ%7D%28A%29%20%3D%20%5Csum_%7Ba%20%5Cin%20A%20%5Ccap%20F_i%20%5Ccup%20%5C%7Bi%5C%7D%7D%20%5Cfrac%7Bscore_a%5E%7BFO%7D%28A%29%7D%7B%7CA%20%5Ccap%20F_i%20%5Ccup%20%5C%7Bi%5C%7D%7C%7D" alt="score_i^{EQ}(A) = \sum_{a \in A \cap F_i \cup \{i\}} \frac{score_a^{FO}(A)}{|A \cap F_i \cup \{i\}|}" title="score_i^{EQ}(A) = \sum_{a \in A \cap F_i \cup \{i\}} \frac{score_a^{FO}(A)}{|A \cap F_i \cup \{i\}|}" /><br /> Introduced in [NRRRS2016].</p>
+<p>A player is <strong>altruistic-treatment</strong> if she uses her friends' preferences first and only uses her own preferences to break ties. This preference relation is defined by the score function <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%5E%7BAL%7D%28A%29%20%3D%20score_i%5E%7BFO%7D%28A%29%20%2B%20n%5E5%20%5Csum_%7Ba%20%5Cin%20A%20%5Ccap%20F_i%7D%20%5Cfrac%7Bscore_a%5E%7BFO%7D%28A%29%7D%7B%7CA%20%5Ccap%20F_i%7C%7D" alt="score_i^{AL}(A) = score_i^{FO}(A) + n^5 \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|}" title="score_i^{AL}(A) = score_i^{FO}(A) + n^5 \sum_{a \in A \cap F_i} \frac{score_a^{FO}(A)}{|A \cap F_i|}" /><br /> Introduced in [NRRRS2016].</p>
+<p>In <strong>fractional hedonic games</strong>, a player's score of a coalition is the average of her scores of the players in it. Scores could be anything, but this simulator only allows scores that are simple and symmetric. <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%5E%7BFR%7D%28A%29%20%3D%20%7CA%20%5Ccap%20F_i%7C%20%2F%20%7CA%7C" alt="score_i^{FR}(A) = |A \cap F_i| / |A|" title="score_i^{FR}(A) = |A \cap F_i| / |A|" /><br /> Introduced in [ABH2014].</p>
+<p>In <strong>additively seperable hedonic games</strong>, a player's score of a coalition is the sum of her scores of the players in it. In unweighted, undirected graphs, this is simply the degree of the player in the coalition. <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?score_i%5E%7BAS%7D%28A%29%20%3D%20%7CA%20%5Ccap%20F_i%7C" alt="score_i^{AS}(A) = |A \cap F_i|" title="score_i^{AS}(A) = |A \cap F_i|" /><br /> I don't know when/where additively seperable hedonic games were introduced. If you know, then please email me!</p>
+<h2 id="notions-of-stability">Notions of stability</h2>
+<p>A partition is <strong>individually rational</strong> if every player is happier in her home coalition than she would be alone. In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is individually rational iff <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cforall%20i%20%5Cin%20N%3A%20%5CGamma%28i%29%20%5Cgeq_i%20%5C%7Bi%5C%7D" alt="\forall i \in N: \Gamma(i) \geq_i \{i\}" title="\forall i \in N: \Gamma(i) \geq_i \{i\}" /><br /></p>
+<p>A partition is <strong>Nash-stable</strong> if every player is happier in her home coalition than she would be in any other coalition. In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is Nash-stable iff <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cforall%20i%20%5Cin%20N%3A%20%5Cforall%20C%20%5Cin%20%5CGamma%3A%20%5CGamma%28i%29%20%5Cgeq_i%20C%20%5Ccup%20%5C%7Bi%5C%7D" alt="\forall i \in N: \forall C \in \Gamma: \Gamma(i) \geq_i C \cup \{i\}" title="\forall i \in N: \forall C \in \Gamma: \Gamma(i) \geq_i C \cup \{i\}" /><br /></p>
+<p>A partition is <strong>individually stable</strong> if every player who wants to transfer to a new coalition is unwanted by someone in that coalition. In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is individually stable iff <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cforall%20i%20%5Cin%20N%3A%20%5Cforall%20C%20%5Cin%20%5CGamma%3A" alt="\forall i \in N: \forall C \in \Gamma:" title="\forall i \in N: \forall C \in \Gamma:" /> <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%28%5CGamma%28i%29%20%5Cgeq_i%20C%20%5Ccup%20%5C%7Bi%5C%7D%20%5Clor%20%28%5Cexists%20j%20%5Cin%20C%3A%20C%20%3E_j%20C%20%5Ccup%20%5C%7Bi%5C%7D%20%29%29" alt="(\Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C &gt;_j C \cup \{i\} ))" title="(\Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C &gt;_j C \cup \{i\} ))" /><br /></p>
+<p>A partition is <strong>contractually individually</strong> stable if every player who wants to transfer to a new coalition is either unwanted by someone in that coalition or is not permitted to leave by someone in her home coalition. In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is contractually individually stable iff <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cforall%20i%20%5Cin%20N%3A%20%5Cforall%20C%20%5Cin%20%5CGamma%3A" alt="\forall i \in N: \forall C \in \Gamma:" title="\forall i \in N: \forall C \in \Gamma:" /> <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma%28i%29%20%5Cgeq_i%20C%20%5Ccup%20%5C%7Bi%5C%7D%20%5Clor%20%28%5Cexists%20j%20%5Cin%20C%3A%20C%20%3E_j%20C%20%5Ccup%20%5C%7Bi%5C%7D%20%29%20%5Clor" alt="\Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C &gt;_j C \cup \{i\} ) \lor" title="\Gamma(i) \geq_i C \cup \{i\} \lor (\exists j \in C: C &gt;_j C \cup \{i\} ) \lor" /> <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%28%5Cexists%20k%20%5Cin%20%5CGamma%28i%29%20%5Csetminus%20%5C%7Bi%5C%7D%3A%20%5CGamma%28i%29%20%3E_k%20%5CGamma%28i%29%20%5Csetminus%20%5C%7Bi%5C%7D%29" alt="(\exists k \in \Gamma(i) \setminus \{i\}: \Gamma(i) &gt;_k \Gamma(i) \setminus \{i\})" title="(\exists k \in \Gamma(i) \setminus \{i\}: \Gamma(i) &gt;_k \Gamma(i) \setminus \{i\})" /></p>
+<p>A partition is <strong>popular</strong> if the majority of players weakly prefer it to any other partition. In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is strictly popular iff <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cforall%20%5CGamma%27%3A%20%7C%5C%7B%20i%20%5Cin%20N%3A%20%5CGamma%28i%29%20%3E_i%20%5CGamma%27%28i%29%20%5C%7D%7C%20%5Cgeq%20%7C%5C%7B%20i%20%5Cin%20N%3A%20%5CGamma%27%28i%29%20%3E_i%20%5CGamma%28i%29%20%5C%7D%7C" alt="\forall \Gamma&#39;: |\{ i \in N: \Gamma(i) &gt;_i \Gamma&#39;(i) \}| \geq |\{ i \in N: \Gamma&#39;(i) &gt;_i \Gamma(i) \}|" title="\forall \Gamma&#39;: |\{ i \in N: \Gamma(i) &gt;_i \Gamma&#39;(i) \}| \geq |\{ i \in N: \Gamma&#39;(i) &gt;_i \Gamma(i) \}|" /><br /></p>
+<p>A partition is <strong>strictly popular</strong> if the majority of players strictly prefer it to any other partition. In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is strictly popular iff <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cforall%20%5CGamma%27%3A%20%7C%5C%7B%20i%20%5Cin%20N%3A%20%5CGamma%28i%29%20%3E_i%20%5CGamma%27%28i%29%20%5C%7D%7C%20%3E%20%7C%5C%7B%20i%20%5Cin%20N%3A%20%5CGamma%27%28i%29%20%3E_i%20%5CGamma%28i%29%20%5C%7D%7C" alt="\forall \Gamma&#39;: |\{ i \in N: \Gamma(i) &gt;_i \Gamma&#39;(i) \}| &gt; |\{ i \in N: \Gamma&#39;(i) &gt;_i \Gamma(i) \}|" title="\forall \Gamma&#39;: |\{ i \in N: \Gamma(i) &gt;_i \Gamma&#39;(i) \}| &gt; |\{ i \in N: \Gamma&#39;(i) &gt;_i \Gamma(i) \}|" /><br /></p>
+<p>A partition is <strong>core-stable</strong> if there is no possible strictly blocking coalition. (A coalition strictly blocks if everyone prefers it to their current homes.) In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is core-stable iff <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cnot%5Cexists%20C%20%5Cin%202%5EN%3A%20%5Cforall%20i%20%5Cin%20C%3A%20C%20%3E_i%20%5CGamma%28i%29" alt="\not\exists C \in 2^N: \forall i \in C: C &gt;_i \Gamma(i)" title="\not\exists C \in 2^N: \forall i \in C: C &gt;_i \Gamma(i)" /><br /></p>
+<p>A partition is <strong>strictly core-stable</strong> if there is no possible weakly blocking coalition. (A coalition weakly blocks if everyone is at least as happy in the new one and someone is even happier.) In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is strictly core-stable iff <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cnot%5Cexists%20C%20%5Cin%202%5EN%3A%20%28%5Cforall%20i%20%5Cin%20C%3A%20C%20%5Cgeq_i%20%5CGamma%28i%29%29%20%5Cland%20%28%5Cexists%20j%20%5Cin%20C%3A%20C%20%3E_j%20%5CGamma%28i%29%29" alt="\not\exists C \in 2^N: (\forall i \in C: C \geq_i \Gamma(i)) \land (\exists j \in C: C &gt;_j \Gamma(i))" title="\not\exists C \in 2^N: (\forall i \in C: C \geq_i \Gamma(i)) \land (\exists j \in C: C &gt;_j \Gamma(i))" /><br /></p>
+<p>A partition is <strong>perfect</strong> if every player is in one of their favorite possible coalitions. In other words, <img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5CGamma" alt="\Gamma" title="\Gamma" /> is perfect iff <br /><img style="vertical-align:middle" src="https://latex.codecogs.com/png.latex?%5Cforall%20i%20%5Cin%20N%3A%20%5Cnot%5Cexists%20C%20%5Cin%202%5EN%3A%20C%20%3E_i%20%5CGamma%28i%29" alt="\forall i \in N: \not\exists C \in 2^N: C &gt;_i \Gamma(i)" title="\forall i \in N: \not\exists C \in 2^N: C &gt;_i \Gamma(i)" /><br /></p>
+<h2 id="references">References</h2>
+<p>In chronological order:</p>
+<p>[BKS2001]: Suryapratim Banerjee, Hideo Konishi, and Tayfun Sönmez. &quot;Core in a simple coalition formation game.&quot; Social Choice and Welfare. 2001.</p>
+<p>[BJ2002]: Anna Bogomolnaia and Matthew O Jackson. &quot;The Stability of Hedonic Coalition Structures.&quot; Games and Economic Behavior. 2002.</p>
+<p>[DBHS2006]: Dinko Dimitrov, Peter Borm, Ruud Hendrickx, and Shao Chin Sung. &quot;Simple priorities and core stability in hedonic games.&quot; Social Choice and Welfare. 2006. <a href="http://fmwww.bc.edu/repec/esNASM04/up.9919.1074605860.pdf">PDF</a>.</p>
+<p>[Woe2013]: Gerhard J Woeginger. &quot;Core Stability in Hedonic Coalition Formation.&quot; SOFtware SEMinar (SOFSEM). 2013. <a href="https://arxiv.org/abs/1212.2236">arXiv</a>.</p>
+<p>[ABH2014]: Haris Aziz, Feliz Brandt, and Paul Harrenstein. &quot;Fractional Hedonic Games.&quot; The International Conference on Autonomous Agents and Multi-Agent Systems. 2014. <a href="https://arxiv.org/abs/1705.10116">arXiv</a>.</p>
+<p>[NRRRS2016]: Nhan-Tam Nguyen, Anja Rey, Lisa Rey, Jörg Rothe, and Lena Schend. &quot;Altruistic Hedonic Games.&quot; The International Conference on Autonomous Agents and Multi-Agent Systems. 2016. <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">PDF</a>.</p>
+
+
+
+  <hr>
+  <!-- footer -->
+  <p> Public domain dedication. No rights reserved. Look at the source! </p>
+  <p>Hosted on <a href="https://github.com/qpwo/hedonic-games">Github</a>. Using graph library <a href="http://sigmajs.org/">sigmajs</a>. </p>
+  <p> To request a feature or report a bug, you can use github or you can email <a href="mailto:luke.lambda@uky.edu" target="_blank">luke.lambda@uky.edu</a> .
+  There is a standing bounty of $2.56, to be mailed to the first person to find a bug.</p>
+
 
   <script type="text/javascript" src="sigma/sigma.min.js"></script> <!-- main graph library -->
   <script type="text/javascript" src="sigma/sigma.plugins.dragNodes.js"></script> <!-- plugin for clicking and dragging nodes -->
@@ -287,7 +140,6 @@
   <script type="text/javascript" src="js/myset.js"></script> <!-- algorithms for sets -->
   <script type="text/javascript" src="js/hedonism.js"></script> <!-- algorithms for hedonic games -->
   <script type="text/javascript" src="js/main.js"></script> <!-- code for the buttons etc -->
-  <script type="text/javascript" src="js/mathjax/MathJax.js?config=default"></script> <!-- makes pretty math rendering -->
 
 </body>
 </html>
