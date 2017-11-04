@@ -174,3 +174,11 @@ Nhan-Tam Nguyen, Anja Rey, Lisa Rey, Jörg Rothe, and Lena Schend.
 The International Conference on Autonomous Agents and Multi-Agent Systems.
 2016.
 [PDF](http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf).
+
+---
+
+Public domain dedication. No rights reserved. Look at the source!
+
+Hosted on [Github](https://github.com/qpwo/hedonic-games). Using graph visualization library [vis.js](http://visjs.org/).
+
+To request a feature or report a bug, you can use github or you can email [luke.lambda@uky.edu](mailto:luke.lambda@uky.edu) . There is a standing bounty of $2.56, to be mailed to the first person to find a bug.

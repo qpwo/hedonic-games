@@ -14,71 +14,61 @@
 
 
   <!-- Introduction -->
-  <p> Welcome to the hedonic game simulator! I <a href="http://lukemiles.org/files/simulator-slides.pdf">presented</a> this at the 2017 Algorithmic Decision Theory Doctoral Consortium. I uploaded my extended abstract to <a href="https://arxiv.org/abs/1706.08501">arXiv</a>. </p>
-
-  <p> This software doesn't work at all on smartphones. Desktop with recent chrome or firefox recommended. <b>You can click and drag the nodes in the box.</b> </p>
-
+  <p> Welcome to the hedonic game simulator! I <a href="http://lukemiles.org/files/simulator-slides.pdf">presented</a> this at the 2017 Algorithmic Decision Theory Doctoral Consortium. I uploaded my extended abstract to <a href="https://arxiv.org/abs/1706.08501">arXiv</a>. This software works okay on smartphones but better on laptops.</p>
 
   <!-- The box that holds the interactive graph -->
   <div id="visjsbox">
   </div>
+  <br/>
 
 
   <!-- All the buttons and interface -->
 
-  <div>
-    Enter adjacency list:<br/>
-    <textarea id="graphText" cols="50" rows="4"> </textarea>
-    <button type="button" id="drawGraph">Draw</button>
-  </div>
+  Enter adjacency list:<br/>
+  <textarea id="graphText" cols="50" rows="4"> </textarea>
+  <button type="button" id="drawGraph">Draw</button>
+  <br/> <br/>
 
-  <div> Enter partition to color graph: <br/>
-    <textarea id="partitionText" cols="50" rows="4"> </textarea>
-    <button type="button" id="colorPartition">Color</button>
-  </div>
+  Enter partition to color graph: <br/>
+  <textarea id="partitionText" cols="50" rows="4"> </textarea>
+  <button type="button" id="colorPartition">Color</button>
+  <br/> <br/>
 
-  <div>
-    <b>Player type:</b>
-    Set all players to have
-    <select id="playerType">
-      <option>friend-oriented (FO)</option>
-      <option>enemy-oriented (EO)</option>
-      <option>selfish-first (SF)</option>
-      <option>equal-treatment (EQ)</option>
-      <option>altruistic-treatment (AL)</option>
-      <option selected="selected">fractional (FR)</option>
-      <option>additively-seperable (AS)</option>
-    </select> preferences.
-  </div>
+  <b>Player type:</b>
+  Set all players to have
+  <select id="playerType">
+    <option>friend-oriented (FO)</option>
+    <option>enemy-oriented (EO)</option>
+    <option>selfish-first (SF)</option>
+    <option>equal-treatment (EQ)</option>
+    <option>altruistic-treatment (AL)</option>
+    <option selected="selected">fractional (FR)</option>
+    <option>additively-seperable (AS)</option>
+  </select> preferences.
+  <br/> <br/>
 
-  <div>
-    <p>
-    <b>Stability check:</b>
-    Is this partition
-    <select id="stabilityType">
-      <option>individually rational</option>
-      <option>Nash-stable</option>
-      <option>individually stable</option>
-      <option>contractually individually stable</option>
-      <option>popular</option>
-      <option>strictly popular</option>
-      <option selected="selected">core-stable</option>
-      <option>strictly core-stable</option>
-      <option>perfect</option>
-    </select>?
-    <button type="button" id="checkStability"> Check this partition </button>
-    <button type="button" id="checkStabilityExistence"> Check existence </button>
-    <button type="button" id="updatePartition"> Update partition </button>
-    </p>
-    <p id="stabilityResults"> </p>
-  </div>
+  <b>Stability check:</b>
+  Is this partition
+  <select id="stabilityType">
+    <option>individually rational</option>
+    <option>Nash-stable</option>
+    <option>individually stable</option>
+    <option>contractually individually stable</option>
+    <option>popular</option>
+    <option>strictly popular</option>
+    <option selected="selected">core-stable</option>
+    <option>strictly core-stable</option>
+    <option>perfect</option>
+  </select>?
+  <button type="button" id="checkStability"> Check this partition </button>
+  <button type="button" id="checkStabilityExistence"> Check existence </button>
+  <button type="button" id="updatePartition"> Update partition </button>
+  <p id="stabilityResults"> </p>
 
-  <div>
-    Below you can compute every player's score of every other coalition in the partition.
-    (A player i's score of a coalition C is actually i's score of C \cup {i}.)
-    <button type="button" id="computeScores">Compute</button>
-    <p id="scores"> </p>
-  </div>
+  Below you can compute every player's score of every other coalition in the partition.
+  (A player i's score of a coalition C is actually i's score of C \cup {i}.)
+  <button type="button" id="computeScores">Compute</button>
+  <p id="scores"> </p>
 
 
 
@@ -119,15 +109,15 @@
 <p>[Woe2013]: Gerhard J Woeginger. &quot;Core Stability in Hedonic Coalition Formation.&quot; SOFtware SEMinar (SOFSEM). 2013. <a href="https://arxiv.org/abs/1212.2236">arXiv</a>.</p>
 <p>[ABH2014]: Haris Aziz, Feliz Brandt, and Paul Harrenstein. &quot;Fractional Hedonic Games.&quot; The International Conference on Autonomous Agents and Multi-Agent Systems. 2014. <a href="https://arxiv.org/abs/1705.10116">arXiv</a>.</p>
 <p>[NRRRS2016]: Nhan-Tam Nguyen, Anja Rey, Lisa Rey, Jörg Rothe, and Lena Schend. &quot;Altruistic Hedonic Games.&quot; The International Conference on Autonomous Agents and Multi-Agent Systems. 2016. <a href="http://trust.sce.ntu.edu.sg/aamas16/pdfs/p251.pdf">PDF</a>.</p>
+<hr />
+<p>Public domain dedication. No rights reserved. Look at the source!</p>
+<p>Hosted on <a href="https://github.com/qpwo/hedonic-games">Github</a>. Using graph visualization library <a href="http://visjs.org/">vis.js</a>.</p>
+<p>To request a feature or report a bug, you can use github or you can email <a href="mailto:luke.lambda@uky.edu">luke.lambda@uky.edu</a> . There is a standing bounty of $2.56, to be mailed to the first person to find a bug.</p>
 
 
 
-  <hr>
-  <!-- footer -->
-  <p> Public domain dedication. No rights reserved. Look at the source! </p>
-  <p>Hosted on <a href="https://github.com/qpwo/hedonic-games">Github</a>. Using graph visualization library <a href="http://visjs.org/">vis.js</a>. </p>
-  <p> To request a feature or report a bug, you can use github or you can email <a href="mailto:luke.lambda@uky.edu" target="_blank">luke.lambda@uky.edu</a> .
-  There is a standing bounty of $2.56, to be mailed to the first person to find a bug.</p>
+
+
 
   <script type="text/javascript" src="vis.min.js"></script> <!-- plugin for clicking and dragging nodes -->
   <link rel="stylesheet" type="text/css" href="vis.min.css">

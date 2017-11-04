@@ -149,38 +149,52 @@ function greyOut() {
 }
 
 
-document.getElementById("updatePartition").style.display = "none"; // this isn't working right now
 {
   let isFunctions = [isIndividuallyRational, isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable, isPopular, isStrictlyPopular, isCoreStable, isStrictlyCoreStable, isPerfect];
 
   document.getElementById("stabilityType").onchange = function() {
     let index = document.getElementById("stabilityType").selectedIndex;
-    let makePrinter = function(testFunc) {
-      return function() {
-        let results = document.getElementById("stabilityResults");
-        results.style.backgroundColor = null;
-        if (PARTITION == null) {
-          window.alert("You must set a partition before you can check its stability.");
-          return;
-        }
-        let [isStable, counterExample, newPartition] = testFunc(GRAPH, PARTITION, SCOREFUNC);
-        let button = document.getElementById("updatePartition");
-        if (isStable) {
-          results.innerText = "This partition is stable.";
-          button.style.display = "none";
-        } else {
-          results.innerText = "Counterexample:" + JSON.stringify(counterExample);
-          button.style.display = null;
-          button.onclick = function(){
-            changePartition(newPartition);
-          }
-        }
-      };
-    };
-    document.getElementById("checkStabilityExistence").onclick = makePrinter((_,__,___) => checkExistence(isFunctions[index]));
-    document.getElementById("checkStability").onclick = makePrinter(isFunctions[index]);
+
+    document.getElementById("checkStability").onclick = function() {
+      let results = document.getElementById("stabilityResults");
+      results.style.backgroundColor = null;
+      if (PARTITION == null) {
+        window.alert("You must set a partition before you can check its stability.");
+        return;
+      }
+      let [isStable, counterExample, newPartition] = isFunctions[index](GRAPH, PARTITION, SCOREFUNC);
+      let button = document.getElementById("updatePartition");
+      if (isStable) {
+        results.innerText = "This partition is stable.";
+        button.style.display = "none";
+      } else {
+        results.innerText = "Counterexample:" + JSON.stringify(counterExample);
+        button.style.display = null;
+        button.onclick = function(){changePartition(newPartition)};
+      }
+    }
     document.getElementById("checkStability").click()
-  };
+
+    document.getElementById("checkStabilityExistence").onclick = function() {
+      let results = document.getElementById("stabilityResults");
+      results.style.backgroundColor = null;
+      let button = document.getElementById("updatePartition");
+      if (PARTITION && isFunctions[index](GRAPH, PARTITION, SCOREFUNC)[0]) {
+        results.innerText = "This partition is stable (and therefore satisfies existence).";
+        button.style.display = "none";
+        return;
+      }
+      let [exists, example] = checkExistence(GRAPH, SCOREFUNC, isFunctions[index]);
+      if (exists) {
+        results.innerText = "Stable partition:" + partitionToLine(example);
+        button.style.display = null;
+        button.onclick = function(){changePartition(example);};
+        return;
+      }
+      results.innerText = "No stable partition exists."
+      button.style.display = "none";
+    };
+  }
 }
 document.getElementById("stabilityType").onchange();
 
@@ -210,19 +224,6 @@ document.getElementById("computeScores").onclick = function() {
   scores.innerHTML = result;
   scores.style.backgroundColor = null;
 };
-
-// ** Other Stuff **
-
-function checkExistence(stability) {
-  if (stability(GRAPH, PARTITION, SCOREFUNC)[0])
-    return ["The current partition is stable.", null];
-  for (let partition of Object.keys(GRAPH).partitionSet()) {
-    partition = partition.map(coalition => new Set(coalition));
-    if (stability(GRAPH, partition, SCOREFUNC)[0])
-      return ["Stable partition found: " + partitionToLine(partition), partition];
-  }
-  return ["No stable partition exists.", null];
-}
 
 // ** Coloring tools **
 

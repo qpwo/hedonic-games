@@ -228,3 +228,12 @@ function partitionEquals(partitionA, partitionB) {
   // Do partitionA and partitionB contain the exact same sets?
   return partitionA.every(coalitionA => partitionB.some(coalitionB => coalitionA.equals(coalitionB)));
 }
+
+function checkExistence(graph, scoreFunc, stability) {
+  for (let partition of Object.keys(GRAPH).partitionSet()) {
+    partition = partition.map(coalition => new Set(coalition));
+    if (stability(graph, partition, scoreFunc)[0])
+      return [true, partition];
+  }
+  return [false, null];
+}
