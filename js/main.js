@@ -2,6 +2,7 @@
 // Code for all the buttons and things on the front webpage
 
 // TODO: switch from graph type to value matrix type for all score functions
+// TODO: switch from handling strings to handling integers in all score functions and all everything
 
 // ** Necessary globals for setting up a user session **
 
