@@ -3,6 +3,8 @@
 
 // ** Score Functions **
 
+// TODO: test every function in this file
+
 function sum(array, group) {
   // additive hedonic games
   let x = 0;

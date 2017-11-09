@@ -13,6 +13,19 @@ let SCOREFUNC; // function to use for player type
 var NETWORK = new vis.Network(document.getElementById("visjsbox"), {}, {});
 var DATA = {};
 
+// ** testing bed **
+
+var table = document.getElementById("matrix");
+for (let i=0; i<5; i++) {
+  var row = table.insertRow();
+  for (let j=0; j<4; j++) {
+    var cell = row.insertCell();
+    var input = document.createElement("input");
+    input.size = 2;
+    cell.appendChild(input);
+  }
+}
+
 // ** Functions for Taking User Input **
 
 // For drawing the graph:
