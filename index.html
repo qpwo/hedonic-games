@@ -27,7 +27,8 @@
   Default value of empty cell: <input type="text" id="defaultValue" value="0" size="2">
   <button type="button" onclick="">Set</button> <br/>
   <table id="matrix"></table>
-  <button type="button" onclick="">Set</button> <br/>
+  <button type="button" onclick="drawGraph()">Set</button>
+  <button type="button" onclick="randomizeMatrix()">Randomize</button> <br/>
 
 
   <!-- All the buttons and interface -->
@@ -40,13 +41,13 @@
   <b>Player type:</b>
   Set all players to have
   <select id="playerType">
-    <option>friend-oriented (FO)</option>
-    <option>enemy-oriented (EO)</option>
-    <option>selfish-first (SF)</option>
-    <option>equal-treatment (EQ)</option>
-    <option>altruistic-treatment (AL)</option>
-    <option selected="selected">fractional (FR)</option>
-    <option>additively-seperable (AS)</option>
+    <option>sum</option>
+    <option>mean</option>
+    <option>median</option>
+    <option>max</option>
+    <option>min</option>
+    <option selected="selected">friend-oriented</option>
+    <option>enemy-oriented</option>
   </select> preferences.
   <br/> <br/>
 
@@ -71,7 +72,7 @@
   Below you can compute every player's score of every other coalition in the partition.
   (A player i's score of a coalition C is actually i's score of C \cup {i}.)
   <button type="button" id="computeScores">Compute</button>
-  <p id="scores"> </p>
+  <table id="scores"> </table>
 
 
 

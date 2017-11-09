@@ -9,8 +9,8 @@
 let PARTITION; // current partition of the vertices, an array of sets
 let SCOREFUNC; // function to use for player type
 
+let MATRIX = [];
 let NETWORK = new vis.Network(document.getElementById("visjsbox"), {}, {});
-let WIDTH;
 
 // ** testing bed **
 
@@ -29,6 +29,46 @@ function drawMatrix() {
     }
   }
 }
+drawMatrix();
+
+function randomizeMatrix() {
+  let table = document.getElementById("matrix");
+  for (let row of table.rows) {
+    for (let cell of row.cells) {
+      let input = cell.lastChild;
+      if (Math.random() < 0.3)
+        input.value = Math.floor(Math.random() * 100) + 1;
+      else
+        input.value = "";
+    }
+  }
+  drawGraph();
+}
+randomizeMatrix();
+
+document.getElementById("computeScores").onclick = function() {
+  // Display every node's score of every coalition in the partition
+  if (PARTITION == null) {
+    window.alert("You must set a partition before you can compute the scores.")
+    return;
+  }
+  let table = document.getElementById("scores");
+  table.style.backgroundColor = null;
+  while (table.hasChildNodes())
+    table.removeChild(table.lastChild);
+  table.insertRow().insertCell();
+  const partition = PARTITION.concat([[]]);
+  for (const group of partition)
+    table.rows[0].insertCell().innerText = '{'+group+'}';
+  for (let i=0; i<MATRIX.length; i++) {
+    let row = table.insertRow();
+    row.insertCell().innerText = i;
+    for (const group of partition) {
+      const score = SCOREFUNC(MATRIX[i], group.plus(i));
+      row.insertCell().innerText = ((score % 1 == 0)? score : score.toFixed(2));
+    }
+  }
+}
 
 // ** Functions for Taking User Input **
 
@@ -37,6 +77,7 @@ function drawMatrix() {
 function drawGraph() {
   let table = document.getElementById("matrix");
   let width = table.rows.length;
+  let matrix = Array(width).fill().map(()=>Array(width).fill());
   let nodes = Array(width).fill().map((_,i) => {return {id: i, label: i.toString()}});
   let edges = [];
   for (let row=0; row<width; row++) {
@@ -44,31 +85,34 @@ function drawGraph() {
       const cell = table.rows[row].cells[col];
       const input = cell.lastChild;
       const string = input.value;
-      if (string == "") continue;
-      const value = parseInt(string);
-      edges.push({from: row, to: col, arrows: 'to', label: value.toString()});
+      if (string == "") {
+        matrix[row][col] = 0; // TODO change to default value
+      } else {
+        const value = parseInt(string);
+        edges.push({from: row, to: col, arrows: 'to', label: value.toString()});
+        matrix[row][col] = value;
+      }
     }
   }
+  MATRIX = matrix;
   DATA = {nodes: nodes, edges: edges};
   NETWORK.setData(DATA);
 }
 
 // For making the partition:
-document.getElementById("partitionText").value = "SteveHolt, Maeybe, George\nLindsay, Tobias, Lucille\nMichael" // default value
+document.getElementById("partitionText").value = "0, 1, 3\n4\n2" // default value
 
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
-  let stringPartition = stringToPartition(document.getElementById("partitionText").value);
-  let ids = DATA.nodes.map(node => node.id);
-  if (!isPartition(ids, numberPartition)) {
-    //window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
+  let partition = stringToPartition(document.getElementById("partitionText").value);
+  if (!isPartition(partition, range(MATRIX.length))) {
+    window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
     return;
   }
-  PARTITION = stringPartition;
+  PARTITION = partition;
   colorGraph();
   greyOut();
 };
-document.getElementById("colorPartition").click()
 
 function partitionToString(partition) {
   // Turn the array of sets into a long string to put in the text box
@@ -90,16 +134,16 @@ function stringToPartition(string) {
   return partition;
 }
 
-function isPartition(set, partition) {
-  // Check if partition is actually a partition of the set
-  let setCopy = new Set(set);
-  for (const subSet of partition)
-    for (const x of subSet)
-      if (!setCopy.delete(x)) // an element occurs twice
-        return false;
-  if (setCopy.size > 0) // an element is missing
-    return false;
-  return true;
+function isPartition(partition, array) {
+  // Check if partition is actually a partition of the array
+  for (const arr of partition) {
+    for (const x of arr) {
+      const i = array.indexOf(x);
+      if (i < 0) return false
+      array.splice(i,1)
+    }
+  }
+  return array.length == 0;
 }
 
 
@@ -179,32 +223,6 @@ function greyOut() {
 }
 document.getElementById("stabilityType").onchange();
 
-document.getElementById("computeScores").onclick = function() {
-  // Display every node's score of every coalition in the partition
-  // possible TODO: switch to document.createElement
-  if (PARTITION == null) {
-    //window.alert("You must set a partition before you can compute the scores.")
-    return;
-  }
-  let result = "<table>";
-  result += "<tr><th></th>";
-  let coalitions = PARTITION.concat(new Set());
-  for (const coalition of coalitions)
-    result += "<th>" + coalition.stringify() + "</th>";
-  result += "</tr>";
-  for (const node of Object.keys(GRAPH)) {
-    result += "<tr> <th>" + node + "</th>";
-    for (const coalition of coalitions) {
-      let score = SCOREFUNC(GRAPH, node, coalition.plus(node));
-      result += "<td>" + ((score%1==0)? score : score.toFixed(2)) + "</td>";
-    }
-    result += "</tr>";
-  }
-  result += "</table>";
-  let scores = document.getElementById("scores");
-  scores.innerHTML = result;
-  scores.style.backgroundColor = null;
-};
 
 // ** Coloring tools **
 
@@ -213,9 +231,9 @@ function colorGraph() {
   let length = PARTITION.length;
   for (let i=0; i<length; i++) {
     let color = rainbow(length, i);
-    let coalition = PARTITION[i];
+    let group = PARTITION[i];
     for (let node of DATA.nodes)
-      if (coalition.has(node.label)) {
+      if (group.includes(node.id)) {
         node.color = color;
       }
   }
