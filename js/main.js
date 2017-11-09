@@ -7,74 +7,50 @@
 // ** Necessary globals for setting up a user session **
 
 let PARTITION; // current partition of the vertices, an array of sets
-let GRAPH; // a map from nodes to arrays of nodes
 let SCOREFUNC; // function to use for player type
 
-var NETWORK = new vis.Network(document.getElementById("visjsbox"), {}, {});
-var DATA = {};
+let NETWORK = new vis.Network(document.getElementById("visjsbox"), {}, {});
+let WIDTH;
 
 // ** testing bed **
 
-var table = document.getElementById("matrix");
-for (let i=0; i<5; i++) {
-  var row = table.insertRow();
-  for (let j=0; j<4; j++) {
-    var cell = row.insertCell();
-    var input = document.createElement("input");
-    input.size = 2;
-    cell.appendChild(input);
+function drawMatrix() {
+  const width = parseInt(document.getElementById("numberPlayers").value);
+  let table = document.getElementById("matrix");
+  while (table.hasChildNodes())
+    table.removeChild(table.lastChild);
+  for (let i=0; i<width; i++) {
+    let row = table.insertRow();
+    for (let j=0; j<width; j++) {
+      let cell = row.insertCell();
+      let input = document.createElement("input");
+      input.size = 2;
+      cell.appendChild(input);
+    }
   }
 }
 
 // ** Functions for Taking User Input **
 
 // For drawing the graph:
-document.getElementById("graphText").innerHTML = "Michael: George\nGeorge: Maeybe, Michael\nLindsay: Tobias, Maeybe, Lucille\nSteveHolt: Maeybe\nLucille: Lindsay, George"; //default value
-document.getElementById("drawGraph").onclick = function() {
-  let stringGraph = stringToGraph(document.getElementById("graphText").value);
-  var labels = Object.keys(stringGraph);
-  var nodes = labels.map(function(label, index){return {"id":index, "label":label};});
-  let numberGraph = numberifyGraph(stringGraph);
-  var edges = [];
-  for (const i of Object.keys(numberGraph))
-    for (const j of numberGraph[i])
-      edges.push({"from":i, "to":j, "arrows":"to"});
-  DATA = {"nodes": nodes, "edges": edges};
-  NETWORK.setData(DATA);
-  GRAPH = stringGraph;
-  greyOut();
-  PARTITION = null;
-};
-document.getElementById("drawGraph").click();
 
-function stringToGraph(string) {
-  // Turn the text box into a graph object
-  let graph = {};
-  for (let line of string.split('\n')) {
-    line = line.replace(/ /g, '');
-    if (line == "") continue;
-    if (line.indexOf(':') == -1) {
-      graph[line] = new Set();
-      continue;
-    }
-    let [source, targets] = line.split(':');
-    if (targets == "") {
-      graph[source] = new Set();
-    } else {
-      var targetSet = new Set(targets.split(','));
-      graph[source] = targetSet;
-      targetSet.forEach(function(label){if(!graph.hasOwnProperty(label)){graph[label]=new Set();}});
+function drawGraph() {
+  let table = document.getElementById("matrix");
+  let width = table.rows.length;
+  let nodes = Array(width).fill().map((_,i) => {return {id: i, label: i.toString()}});
+  let edges = [];
+  for (let row=0; row<width; row++) {
+    for (let col=0; col<width; col++) {
+      const cell = table.rows[row].cells[col];
+      const input = cell.lastChild;
+      const string = input.value;
+      if (string == "") continue;
+      const value = parseInt(string);
+      edges.push({from: row, to: col, arrows: 'to', label: value.toString()});
     }
   }
-  return graph;
-}
-
-function numberifyGraph(graph) {
-  let labelToIndex = new Map(Object.keys(graph).map((label, index) => [label, index]))
-  let graph2 = {};
-  for (const label of Object.keys(graph))
-    graph2[labelToIndex.get(label)] = graph[label].map(label => labelToIndex.get(label))
-  return graph2;
+  DATA = {nodes: nodes, edges: edges};
+  NETWORK.setData(DATA);
 }
 
 // For making the partition:
@@ -83,10 +59,9 @@ document.getElementById("partitionText").value = "SteveHolt, Maeybe, George\nLin
 document.getElementById("colorPartition").onclick = function() {
   // Set the partition to the one described by the user and color the coalitions
   let stringPartition = stringToPartition(document.getElementById("partitionText").value);
-  let numberPartition = numberifyPartition(stringPartition);
   let ids = DATA.nodes.map(node => node.id);
   if (!isPartition(ids, numberPartition)) {
-    window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
+    //window.alert("This is not a valid partition. Every node must occur on exactly one line. (Commas seperate nodes.)");
     return;
   }
   PARTITION = stringPartition;
@@ -104,21 +79,13 @@ function partitionToLine(partition) {
   return "{{" + partition.map(coalition => Array.from(coalition).join(", ")).join("}, {") + "}}";
 }
 
-function numberifyPartition(partition) {
-  let labelToIndex = new Map(DATA.nodes.map(node => [node.label, node.id]));
-  let partition2 = [];
-  for (const coalition of partition)
-    partition2.push(coalition.map(label => labelToIndex.get(label)));
-  return partition2;
-}
-
 function stringToPartition(string) {
   // Convert the partition text box to an array of sets
   let partition = [];
   for (let line of string.split('\n')) {
     line = line.replace(/ /g, '');
     if (line == "") continue;
-    partition.push(new Set(line.split(',')));
+    partition.push(line.split(',').map(string => parseInt(string)));
   }
   return partition;
 }
@@ -153,7 +120,7 @@ function greyOut() {
 // ** Buttons for Displaying Calculations **
 
 {
-  let functions = [FOScore, EOScore, FOSFScore, FOEQScore, FOALScore, fractionalScore, additiveScore];
+  let functions = [sum, mean, median, max, min, friendOriented, enemyOriented];
   document.getElementById("playerType").onchange = function() {
     let choice = document.getElementById("playerType").selectedIndex;
     SCOREFUNC = functions[choice];
@@ -173,7 +140,7 @@ function greyOut() {
       let results = document.getElementById("stabilityResults");
       results.style.backgroundColor = null;
       if (PARTITION == null) {
-        window.alert("You must set a partition before you can check its stability.");
+        //window.alert("You must set a partition before you can check its stability.");
         return;
       }
       let [isStable, counterExample, newPartition] = isFunctions[index](GRAPH, PARTITION, SCOREFUNC);
@@ -216,7 +183,7 @@ document.getElementById("computeScores").onclick = function() {
   // Display every node's score of every coalition in the partition
   // possible TODO: switch to document.createElement
   if (PARTITION == null) {
-    window.alert("You must set a partition before you can compute the scores.")
+    //window.alert("You must set a partition before you can compute the scores.")
     return;
   }
   let result = "<table>";

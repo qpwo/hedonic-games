@@ -22,18 +22,15 @@
   <br/>
 
   <!-- testing zone -->
-  Or you can do things with a matrix: <br/>
-  Enter number of players: <input type="text" id="numberPlayers" value="5" size="2"> <br/>
-  Enter names and values in matrix below. <br/>
+  Number of players: <input type="text" id="numberPlayers" value="5" size="2">
+  <button type="button" onclick="drawMatrix()">Set</button> <br/>
+  Default value of empty cell: <input type="text" id="defaultValue" value="0" size="2">
+  <button type="button" onclick="">Set</button> <br/>
   <table id="matrix"></table>
+  <button type="button" onclick="">Set</button> <br/>
 
 
   <!-- All the buttons and interface -->
-
-  Enter adjacency list:<br/>
-  <textarea id="graphText" cols="50" rows="4"> </textarea>
-  <button type="button" id="drawGraph">Draw</button>
-  <br/> <br/>
 
   Enter partition to color graph: <br/>
   <textarea id="partitionText" cols="50" rows="4"> </textarea>
@@ -125,13 +122,12 @@
 
 
 
+
   <script type="text/javascript" src="vis.min.js"></script>
   <link rel="stylesheet" type="text/css" href="vis.min.css"/>
-
-  <script type="text/javascript" src="js/myarray.js"></script> <!-- algorithms for arrays -->
-  <script type="text/javascript" src="js/myset.js"></script> <!-- algorithms for sets -->
-  <script type="text/javascript" src="js/hedonism.js"></script> <!-- algorithms for hedonic games -->
-  <script type="text/javascript" src="js/main.js"></script> <!-- code for the buttons etc -->
+  <script type="text/javascript" src="js/myarray.js"></script>
+  <script type="text/javascript" src="js/hedonism.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
 
 </body>
 </html>

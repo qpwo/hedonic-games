@@ -1,217 +1,190 @@
 // Luke Miles, November 2017
 // Algorithms for altruistic hedonic games
 
-// possible TODO: rename coalitions to groups
-// possible TODO: switch back from sets to arrays
-// TODO eventually: add existence checks
-// possible TODO eventually: allow different players to be of different type
-// possible TODO eventually: allow directed graphs and weighted graphs
-// *** TODO: standardize output to [isStable, counterExample, newPartition] ***
-// *** TODO: change all score functions to work off score vectors instead of graphs ***
-
 // ** Score Functions **
 
-// possible TODO: shorten code for similar score functions with scoping
-// TODO: add maxmin score thing
+// possible TODO: change these function to just take the values of the
+// coalitions, seperate the getting out to another function 
 
-function FOScore(graph, node, coalition) {
-  // node's friend oriented score of coalition
-  if (!coalition.has(node)) throw "coalition doesn't contain node";
-  let n = Object.keys(graph).length;
-  let numFriends = coalition.intersect(graph[node]).size;
-  let numEnemies = coalition.size - numFriends - 1;
-  return n * numFriends - numEnemies;
+function sum(array, group) {
+  // additive hedonic games
+  let x = 0;
+  for (const i of group)
+    x += array[i];
+  return x;
 }
 
-function EOScore(graph, node, coalition) {
-  // node's enemy oriented score of coalition
-  if (!coalition.has(node)) throw "coalition doesn't contain node";
-  let n = Object.keys(graph).length;
-  let numFriends = coalition.intersect(graph[node]).size;
-  let numEnemies = coalition.size - numFriends - 1;
-  return numFriends - n * numEnemies;
+function mean(array, group) {
+  // fractional hedonic games
+  return sum(array, group) / array.length;
 }
 
-function friendAverage(graph, node, coalition) {
-  // the average happiness of a node's friends in a given coalition
-  let n = Object.keys(graph).length;
-  let friends = coalition.intersect(graph[node]);
-  if (friends.size == 0)
-    return 0;
-  let total = 0;
-  let k = coalition.size
-  for (const friend of friends)
-    total += (n+1) * coalition.intersect(graph[friend]).size + 1 - k
-  return total / friends.size;
+function median(array, group) {
+  const values = group.map(i => array[i]).sort((a,b)=>a-b);
+  const middle = Math.floor(values.length/2);
+  if (values.length % 2 == 1)
+    return values[middle];
+  return (values[middle-1] + values[middle])/2;
 }
 
-function FOSFScore(graph, node, coalition) {
-  // node's selfish-first score of coalition
-  if (!coalition.has(node)) throw "coalition doesn't contain node";
-  let n = Object.keys(graph).length;
-  let myScore = FOScore(graph, node, coalition);
-  let friendsScore = friendAverage(graph, node, coalition);
-  return Math.pow(n, 5) * myScore + friendsScore;
+function max(array, group) {
+  // B hedonic games
+  let biggest = -Infinity;
+  for (const i of group) {
+    const val = array[i];
+    if (val > biggest)
+      biggest = val;
+  }
+  return biggest;
 }
 
-function FOALScore(graph, node, coalition) {
-  // node's altruistic-treatment score of coalition
-  if (!coalition.has(node)) throw "coalition doesn't contain node";
-  let n = Object.keys(graph).length;
-  let myScore = FOScore(graph, node, coalition);
-  let friendsScore = friendAverage(graph, node, coalition);
-  return myScore + Math.pow(n, 5) * friendsScore;
+function min(array, group) {
+  // W hedonic games
+  let smallest = Infinity;
+  for (const i of group) {
+    const val = array[i];
+    if (val < smallest)
+      smallest = val;
+  }
+  return smallest;
 }
 
-function FOEQScore(graph, node, coalition) {
-  // node's equal-treatment score of coalition
-  if (!coalition.has(node)) throw "coalition doesn't contain node";
-  let n = Object.keys(graph).length;
-  let k = coalition.size;
-  let S = graph[node].intersect(coalition).plus(node);
-  let total = 0;
-  for (const nodeB of S)
-    total += (n+1) * coalition.intersect(graph[nodeB]).size + 1 - k;
-  return total / S.size;
-}
-
-
-function fractionalScore(graph, node, coalition) {
-  // node's fractional hedonic game score of coalition
-  if (!coalition.has(node)) throw "coalition doesn't contain node";
-  return coalition.intersect(graph[node]).size / coalition.size;
-}
-
-function additiveScore(graph, node, coalition) {
-  // node's additively seperable hedonic game score of coalition
-  if (!coalition.has(node)) throw "coalition doesn't contain node";
-  return coalition.intersect(graph[node]).size;
+{ // scoping
+  let countUp = function(array, group) {
+    let friendCount = 0, enemyCount = 0;
+    for (const i of group) {
+      const val = array[i];
+      if (val > 0)
+        friendCount++;
+      else
+        enemyCount++;
+    }
+    return [friendCount, enemyCount];
+  }
+  function friendOriented(array, group) {
+    const [friendCount, enemyCount] = countUp(array, group);
+    return array.length * friendCount - enemyCount;
+  }
+  function enemyOriented(array, group) {
+    const [friendCount, enemyCount] = countUp(array, group);
+    return friendCount - array.length * enemyCount;
+  }
 }
 
 // ** Stability Concepts **
 
-function isIndividuallyRational(graph, partition, scoreFunc) {
-  // Is every node in every coalition in partition happier in its home coalition than it would be alone?
-  // If not, return a counter-example.
-  let nodes = Object.keys(graph);
-  for (const coalition of partition)
-    for (const node of coalition)
-      if (scoreFunc(graph, node, coalition) < scoreFunc(graph, node, new Set([node])))
-        return [false, node, groupElope(partition, new Set([node]))];
-  return [true, null];
+function isIndividuallyRational(matrix, partition, score) {
+  // Is every player in every group in partition happier in its home group than it would be alone?
+  for (const group of partition)
+    for (const i of group)
+      if (score(matrix[i], [i]) > score(matrix[i], group))
+        return [false, i, groupElope(partition, [i])]
+  return [true, null, null];
 }
 
 // The next three stability concepts repeatedly use the same tests, so it is better to define them all at once
 {
   // four different tests used in stability:
 
-  // Is it actually a different coalition?
-  let test0 = (graph, partition, node, homeCoalition, newCoalition, scoreFunc) =>
-    !homeCoalition.equals(newCoalition);
+  // Is it actually a different group?
+  let test0 = (matrix, partition, i, home, target, score) =>
+    !home.equals(target);
 
-  // Do I (the node) want to leave my home?
-  let test1 = (graph, partition, node, homeCoalition, newCoalition, scoreFunc) =>
-    scoreFunc(graph, node, newCoalition.plus(node)) > scoreFunc(graph, node, homeCoalition);
+  // Do I  want to leave my home?
+  let test1 = (matrix, partition, i, home, target, score) =>
+    score(matrix[i], target.plus(i)) > score(matrix[i], home);
 
-  // Is the new coalition okay with having me?
-  let test2 = (graph, partition, node, homeCoalition, newCoalition, scoreFunc) =>
-    newCoalition.every(nodeB => scoreFunc(graph, nodeB, newCoalition.plus(node)) >= scoreFunc(graph, nodeB, newCoalition));
+  // Is the new group okay with having me?
+  let test2 = (matrix, partition, i, home, target, score) =>
+    target.every(j => score(matrix[j], target.plus(i)) >= score(matrix[j], target))
 
   // Is my home okay with me leaving?
-  let test3 = function(graph, partition, node, homeCoalition, newCoalition, scoreFunc) {
-    let homeWithoutMe = homeCoalition.minus(node);
-    return homeWithoutMe.every(nodeB => scoreFunc(graph,nodeB,homeWithoutMe) >= scoreFunc(graph,nodeB,homeCoalition));
+  var test3 = function(matrix, partition, i, home, target, score) {
+    let newHome = home.minus(i);
+    return newHome.every(j => score(matrix[j], newHome) >= score(matrix[j], home));
   };
 
-  // check if any possible vertex with a home coalition and a new coalition passes every test
-  let makeCheckFunc = tests =>
-    function(graph, partition, scoreFunc) {
-      for (const homeCoalition of partition)
-        for (const node of homeCoalition)
-          for (const newCoalition of partition.concat(new Set()))
-            if (tests.every(test => test(graph, partition, node, homeCoalition, newCoalition, scoreFunc))) // if this situation passes every test
-              return [false, [node, newCoalition.stringify()], groupElope(partition, newCoalition.plus(node))]; // TEMPORARY!
+  // check if any possible vertex with a home group and a new group passes every test
+  let makeCheckFunc = function(tests) {
+    return function(matrix, partition, score) {
+      for (const home of partition)
+        for (const i of home)
+          for (const target of partition)
+            if (tests.every(test => test(matrix, partition, i, home, target, score))) // if this situation passes every test
+              return [false, [i, target], groupElope(partition, target.plus(i))];
       return [true, null, null];
     }
+  }
 
   var isNashStable = makeCheckFunc([test0, test1]);
   var isIndividuallyStable = makeCheckFunc([test0, test1, test2]);
+  var isContractuallyStable = makeCheckFunc([test0, test1, test3]);
   var isContractuallyIndividuallyStable = makeCheckFunc([test0, test1, test2, test3]);
-  // possible TODO: add contractual but not individual stable
 }
 
-function isCoreStable(graph, partition, scoreFunc) {
-  // Is this partition core-stable? If not, give a counter-example.
-  let homeScores = {};
-  for (const coalition of partition) for (const node of coalition)
-    homeScores[node] = scoreFunc(graph, node, coalition);
-  let powerset = Object.keys(graph).powerset().map(arr => new Set(arr));
-  for (const coalition of powerset) {
-    if (coalition.size==0) continue;
-    if (coalition.every(node => scoreFunc(graph, node, coalition) > homeScores[node]))
-      return [false, coalition.stringify(), groupElope(partition, coalition)];
+function isCoreStable(matrix, partition, score) {
+  let homeScores = Array(matrix.length);
+  for (const group of partition)
+    for (const i of group)
+      homeScores[i] = score(matrix[i], group);
+  let powerset = range(matrix.length).powerset();
+  for (const group of powerset) {
+    if (group.size==0) continue; // we don't care about the empty group
+    if (group.every(i => score(matrix[i], group) > homeScores[i]))
+      return [false, group, groupElope(partition, group)];
   }
   return [true, null];
 }
 
-function isStrictlyCoreStable(graph, partition, scoreFunc) {
-  // Is this partition strictly core-stable? If not, give a counter-example.
-  let homeScores = {};
-  for (const coalition of partition) for (const node of coalition)
-    homeScores[node] = scoreFunc(graph, node, coalition);
-  let powerset = Object.keys(graph).powerset().map(arr => new Set(arr));
-  for (const coalition of powerset) {
-    if (coalition.size==0) continue;
-    let newScores = {}
-    for (const node of coalition)
-      newScores[node] = scoreFunc(graph, node, coalition)
-    if (coalition.every(node => newScores[node] >= homeScores[node]) &&
-      coalition.some(node => newScores[node] > homeScores[node]))
-      return [false, coalition.stringify(), groupElope(partition, coalition)];
+function isStrictlyCoreStable(matrix, partition, score) {
+  let homeScores = Array(matrix.length);
+  for (const group of partition)
+    for (const i of group)
+      homeScores[i] = score(matrix[i], group);
+  let powerset = range(matrix.length).powerset();
+  for (const group of powerset) {
+    if (group.size==0) continue; // we don't care about the empty group
+    if (group.every(i => score(matrix[i], group) >= homeScores[i]))
+      if (group.any(i => score(matrix[i], group) > homeScores[i]))
+        return [false, group, groupElope(partition, group)];
   }
-  return [true, null];
-}
-
-function numberCompare(numA, numB) {
-  if (numA < numB) return -1;
-  if (numA > numB) return 1;
-  return 0;
+  return [true, null, null];
 }
 
 {
-  let makePopularityTest = function(winTest) {
-    return function(graph, partition, scoreFunc) {
-      let homeScores = {};
-      for (const coalition of partition) for (const node of coalition)
-        homeScores[node] = scoreFunc(graph, node, coalition);
-      for (let partitionB of Object.keys(graph).partitionSet()) {
-        partitionB = partitionB.map(coalition => new Set(coalition));
+  let makeTest = function(minimumLead) {
+    return function(matrix, partition, score) {
+      let homeScores = Array(matrix.length);
+      for (const group of partition)
+        for (const i of group)
+          homeScores[i] = score(matrix[i], group);
+      for (let partition2 of range(matrix.length).partitionSet()) {
         let winCount = 0;
-        for (const coalition of partitionB) for (const node of coalition)
-          winCount += numberCompare(scoreFunc(graph, node, coalition), homeScores[node]);
-        if (winTest(winCount) && !partitionEquals(partitionB,partition))
-          return [false, [partitionB.map(coalition=>coalition.stringify()), winCount], partitionB];
+        for (const group of partition2)
+          for (const i of group)
+            winCount += Math.sign(score(matrix[i], group) - homeScores[i]);
+        if (winCount >= minimumLead && !partitionEquals(partition,partition2))
+          return [false, [partition2, winCount], partition2];
       }
       return [true, null, null]
     };
   };
-  var isPopular = makePopularityTest(winCount => (winCount > 0));
-  var isStrictlyPopular = makePopularityTest(winCount => (winCount >= 0));
+  var isPopular = makeTest(1);
+  var isStrictlyPopular = makeTest(0);
 }
 
-function isPerfect(graph, partition, scoreFunc) {
-  // Is this partition perfect? If not, give a counter-example.
-  let nodes = new Set(Object.keys(graph));
-  for (const coalition of partition)
-    for (const node of coalition) {
-      let homeScore = scoreFunc(graph, node, coalition);
-      let coalitions = nodes.minus(node).powerset();
-      for (const coalitionB of coalitions) {
-        coalitionB.add(node);
-        if (coalition.equals(coalitionB)) continue;
-        let newScore = scoreFunc(graph, node, coalitionB.plus(node));
+function isPerfect(matrix, partition, score) {
+  const players = range(matrix.length);
+  for (const group of partition)
+    for (const i of group) {
+      const homeScore = score(graph, i, group);
+      const groups = players.minus(i).powerset();
+      for (const group2 of groups) {
+        const g = group2.plus(i);
+        if (group.equals(g)) continue;
+        const newScore = score(matrix, i, g)
         if (newScore > homeScore)
-          return [false, [node, coalitionB.plus(node).stringify()], groupElope(partition, coalitionB.plus(node))];
+          return [false, [i, g], groupElope(partition, g)];
       }
     }
   return [true, null, null];
@@ -219,21 +192,40 @@ function isPerfect(graph, partition, scoreFunc) {
 
 // ** Other Tools **
 
-function groupElope(partition, coalition) {
-  // Moves everyone in coalition out of their home coalitions and into a new one together
-  return partition.map(coalitionB => coalitionB.setMinus(coalition)).filter(coalitionB => coalitionB.size > 0).concat([coalition]);
+function groupElope(partition, group) {
+  // Moves everyone in group out of their home groups and into a new one together
+  let newGroups = [];
+  for (const g of partition) {
+    let newg = [];
+    for (const i of g)
+      if (!group.includes(i))
+        newg.push(i);
+    if (newg.length > 0)
+      newGroups.push(newg)
+  }
+  newGroups.push(group);
+  newGroups.sort((arr1,arr2) => arr1[0] - arr2[0]); // sorting by first elements is sufficient because arrays are disjoint
+  return newGroups;
 }
 
-function partitionEquals(partitionA, partitionB) {
-  // Do partitionA and partitionB contain the exact same sets?
-  return partitionA.every(coalitionA => partitionB.some(coalitionB => coalitionA.equals(coalitionB)));
+function partitionEquals(partition1, partition2) {
+  // Do partition1 and partitionB contain the exact same sets?
+  if (partition1.length != partition2.length)
+    return false;
+  for (let i=0; i<partition1.length; i++)
+    if (!partition1[i].equals(partition2[i]))
+      return false;
+  return true;
 }
 
-function checkExistence(graph, scoreFunc, stability) {
-  for (let partition of Object.keys(GRAPH).partitionSet()) {
-    partition = partition.map(coalition => new Set(coalition));
-    if (stability(graph, partition, scoreFunc)[0])
+function checkExistence(matrix, score, stability) {
+  for (let partition of range(matrix.length).partitionSet()) {
+    if (stability(matrix, partition, score)[0])
       return [true, partition];
   }
   return [false, null];
+}
+
+function range(n) {
+  return Array(n).fill().map((_,i)=>i);
 }

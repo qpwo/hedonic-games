@@ -2,6 +2,8 @@
 // Useful algorithms for arrays
 // Public domain dedication
 
+// TODO: integrate with vhedonism.js
+
 Array.prototype.setEquals = function(arr) {
   // Would the arrays be equal as sets?
   return this.every(x => arr.includes(x)) && arr.every(x => this.includes(x));
@@ -9,8 +11,46 @@ Array.prototype.setEquals = function(arr) {
 
 Array.prototype.equals = function(arr) {
   // Do the arrays have the same string representation?
-  return JSON.stringify(this)==JSON.stringify(arr);
+  if (this.length != arr.length)
+    return false;
+  for (let i=0; i<this.length; i++)
+    if (this[i] != arr[i])
+      return false;
+  return true;
 }
+
+Array.prototype.plus = function(val) {
+  let newArr = Array(this.length+1);
+  let hasPlaced = 0;
+  for (let i=0; i < this.length; i++) {
+    let x = this[i];
+    if ((!hasPlaced) && (val <= x)) {
+      hasPlaced = 1;
+      newArr[i] = val;
+    }
+    newArr[i+hasPlaced] = x;
+  }
+  if (!hasPlaced)
+    newArr[this.length] = val;
+  return newArr;
+}
+
+Array.prototype.minus = function(val) {
+  let newArr = Array(this.length-1);
+  let hasRemoved = 0;
+  for (let i=0; i < this.length; i++) {
+    let x = this[i];
+    if ((!hasRemoved) && (val == x)) {
+      hasRemoved = 1;
+      continue;
+    }
+    newArr[i-hasRemoved] = x;
+  }
+  if (!hasRemoved)
+    newArr.push(this[this.length-1]);
+  return newArr;
+}
+
 
 Array.prototype.intersect = function(arr) {
   // an array of the elements that are in both arrays
