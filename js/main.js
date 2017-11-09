@@ -89,7 +89,7 @@ function drawGraph() {
         matrix[row][col] = 0; // TODO change to default value
       } else {
         const value = parseInt(string);
-        edges.push({from: row, to: col, arrows: 'to', label: value.toString()});
+        edges.push({from: row, to: col, arrows: 'to', label: value.toString(), font:{align:'middle'}});
         matrix[row][col] = value;
       }
     }
@@ -113,6 +113,7 @@ document.getElementById("colorPartition").onclick = function() {
   colorGraph();
   greyOut();
 };
+document.getElementById("colorPartition").click();
 
 function partitionToString(partition) {
   // Turn the array of sets into a long string to put in the text box
@@ -175,7 +176,7 @@ function greyOut() {
 
 
 {
-  let isFunctions = [isIndividuallyRational, isNashStable, isIndividuallyStable, isContractuallyIndividuallyStable, isPopular, isStrictlyPopular, isCoreStable, isStrictlyCoreStable, isPerfect];
+  let isFunctions = [isIndividuallyRational, isNashStable, isIndividuallyStable, isContractuallyStable, isContractuallyIndividuallyStable, isCoreStable, isStrictlyCoreStable, isPopular, isStrictlyPopular, isPerfect];
 
   document.getElementById("stabilityType").onchange = function() {
     let index = document.getElementById("stabilityType").selectedIndex;
@@ -187,7 +188,7 @@ function greyOut() {
         //window.alert("You must set a partition before you can check its stability.");
         return;
       }
-      let [isStable, counterExample, newPartition] = isFunctions[index](GRAPH, PARTITION, SCOREFUNC);
+      let [isStable, counterExample, newPartition] = isFunctions[index](MATRIX, PARTITION, SCOREFUNC);
       let button = document.getElementById("updatePartition");
       if (isStable) {
         results.innerText = "This partition is stable.";
@@ -204,12 +205,12 @@ function greyOut() {
       let results = document.getElementById("stabilityResults");
       results.style.backgroundColor = null;
       let button = document.getElementById("updatePartition");
-      if (PARTITION && isFunctions[index](GRAPH, PARTITION, SCOREFUNC)[0]) {
+      if (PARTITION && isFunctions[index](MATRIX, PARTITION, SCOREFUNC)[0]) {
         results.innerText = "This partition is stable (and therefore satisfies existence).";
         button.style.display = "none";
         return;
       }
-      let [exists, example] = checkExistence(GRAPH, SCOREFUNC, isFunctions[index]);
+      let [exists, example] = checkExistence(MATRIX, SCOREFUNC, isFunctions[index]);
       if (exists) {
         results.innerText = "Stable partition:" + partitionToLine(example);
         button.style.display = null;

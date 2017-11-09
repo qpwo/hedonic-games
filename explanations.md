@@ -42,6 +42,8 @@ more programmer-friendly.
 
 ## Classes of Hedonic Games
 
+TODO: rewrite this whole section
+
 A player is **friend-oriented** if she tries to maximize friends and, in the case
 of a tie, minimize enemies. This preference relation is defined by the score function
 $$score_i^{FO}(A) = n | A \cap F_i | - | A \cap E_i |$$

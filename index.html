@@ -42,11 +42,11 @@
   Set all players to have
   <select id="playerType">
     <option>sum</option>
-    <option>mean</option>
+    <option selected="selected">mean</option>
     <option>median</option>
     <option>max</option>
     <option>min</option>
-    <option selected="selected">friend-oriented</option>
+    <option>friend-oriented</option>
     <option>enemy-oriented</option>
   </select> preferences.
   <br/> <br/>
@@ -55,13 +55,14 @@
   Is this partition
   <select id="stabilityType">
     <option>individually rational</option>
-    <option>Nash-stable</option>
+    <option>Nash stable</option>
     <option>individually stable</option>
+    <option>contractually stable</option>
     <option>contractually individually stable</option>
-    <option>popular</option>
-    <option>strictly popular</option>
     <option selected="selected">core-stable</option>
     <option>strictly core-stable</option>
+    <option>popular</option>
+    <option>strictly popular</option>
     <option>perfect</option>
   </select>?
   <button type="button" id="checkStability"> Check this partition </button>

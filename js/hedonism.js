@@ -129,9 +129,10 @@ function isCoreStable(matrix, partition, score) {
       homeScores[i] = score(matrix[i], group);
   let powerset = range(matrix.length).powerset();
   for (const group of powerset) {
-    if (group.size==0) continue; // we don't care about the empty group
-    if (group.every(i => score(matrix[i], group) > homeScores[i]))
+    if (group.length==0) continue; // we don't care about the empty group
+    if (group.every(i => score(matrix[i], group) > homeScores[i])) {
       return [false, group, groupElope(partition, group)];
+    }
   }
   return [true, null];
 }
@@ -143,9 +144,9 @@ function isStrictlyCoreStable(matrix, partition, score) {
       homeScores[i] = score(matrix[i], group);
   let powerset = range(matrix.length).powerset();
   for (const group of powerset) {
-    if (group.size==0) continue; // we don't care about the empty group
+    if (group.length==0) continue; // we don't care about the empty group
     if (group.every(i => score(matrix[i], group) >= homeScores[i]))
-      if (group.any(i => score(matrix[i], group) > homeScores[i]))
+      if (group.some(i => score(matrix[i], group) > homeScores[i]))
         return [false, group, groupElope(partition, group)];
   }
   return [true, null, null];
