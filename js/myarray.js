@@ -1,13 +1,6 @@
-// Luke Miles, June 2017
+// Luke Miles, November 2017
 // Useful algorithms for arrays
 // Public domain dedication
-
-// TODO: integrate with vhedonism.js
-
-Array.prototype.setEquals = function(arr) {
-  // Would the arrays be equal as sets?
-  return this.every(x => arr.includes(x)) && arr.every(x => this.includes(x));
-}
 
 Array.prototype.equals = function(arr) {
   // Do the arrays have the same string representation?
@@ -51,47 +44,9 @@ Array.prototype.minus = function(val) {
   return newArr;
 }
 
-
-Array.prototype.intersect = function(arr) {
-  // an array of the elements that are in both arrays
-  return this.filter(x => arr.includes(x));
-}
-
-Array.prototype.union = function(arr) {
-  // an array of elements that are in at least one array
-  return this.concat(arr.filter(x => !this.includes(x)));
-}
-
-Array.prototype.setMinus = function(arr) {
-  return this.filter(x => !arr.includes(x))
-}
-
-Array.prototype.sum = function() {
-  // the sum of the elements of an array
-  return this.reduce((sum, x) => sum + x, 0);
-}
-
-Array.prototype.average = function() {
-  // the average of the elements of an array
-  if (this.length==0) return 0;
-  return this.sum() / this.length;
-}
-
 Array.prototype.powerset = function() {
   // all the subsets of an array
   return this.reduceRight((a, x) => a.concat(a.map(y => [x].concat(y))), [[]]);
-}
-
-Array.prototype.max = function(key=(x=>x)) {
-  // the maximum element of an array according to the key
-  let best = this[0];
-  let bestScore = key(best);
-  for (i = 1; i < this.length; i++) {
-    let score = key(this[i]);
-    if (score > bestScore)
-      [best, bestScore] = [this[i], score];
-  }
-  return best;
 }
 
 Array.prototype.partitionSet = function() {

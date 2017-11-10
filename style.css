@@ -3,7 +3,9 @@ body {
   width: 500px;
 }
 
-table, th, td {
+#scores,
+#scores th,
+#scores td {
    border: 1px solid black;
 }
 

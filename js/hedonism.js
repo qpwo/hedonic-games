@@ -3,9 +3,6 @@
 
 // ** Score Functions **
 
-// possible TODO: change these function to just take the values of the
-// coalitions, seperate the getting out to another function 
-
 function sum(array, group) {
   // additive hedonic games
   let x = 0;
